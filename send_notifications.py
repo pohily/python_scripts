@@ -1,9 +1,8 @@
 from email.header import Header
 from email.mime.text import MIMEText
-
+from datetime import datetime
 import requests
 import sys
-from datetime import datetime
 import smtplib
 import configparser
 
