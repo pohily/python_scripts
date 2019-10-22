@@ -54,7 +54,7 @@ def send_mail(release_info, message, config):
     msg = MIMEText(message, 'plain', 'utf-8')
     msg['subject'] = Header('Релиз для {}: {}'.format(release_info['country'], release_info['name']), 'utf-8')
     msg['from'] = config['user_data']['login'] + '@4slovo.ru'
-    msg['to'] = config['recipient']['email']
+    msg['to'] = config['recipients'][release_info['country_key']]
     msg.add_header('Content-Type', 'text/html')
     connection.sendmail(msg['from'], [msg['to']], msg.as_string())
     connection.quit()
@@ -73,7 +73,15 @@ if __name__ == '__main__':
             issues_list[issue['key']] = issue['fields']['summary']
 
     if issues_list:
-        for issue_number in issues_list:
-            message += "[<a href='{issue_url}{issue_number}'>{issue_number}</a>] - {issue_title}<br>".format(
+        for issue_number in issues_list:            message += "[<a href='{issue_url}{issue_number}'>{issue_number}</a>] - {issue_title}<br>".format(
                 issue_number=issue_number, issue_title=issues_list[issue_number], issue_url=ISSUE_URL)
+        if release_info['country'] == 'Россия':
+            country_key = 'ru'
+        elif release_info['country'] == 'Казахстан':
+            country_key = 'kz'
+        elif release_info['country'] == 'Грузия':
+            country_key = 'ge'
+        else:
+            raise Exception('Страна для релиза не определена')
+        release_info['country_key'] = country_key
         send_mail(release_info, message, config)
