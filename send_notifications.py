@@ -30,7 +30,7 @@ def get_release_info(config):
             else:
                 release_country = 'Грузия'
             return datetime.strptime(release['releaseDate'], '%Y-%m-%d').strftime('%d.%m.%Y'), release[
-                'name'], release_country
+                'name'], release_country, release['id']
     raise Exception('Release not found')
 
 
@@ -40,8 +40,8 @@ def get_release_message(release_info):
         release_name=release_info['name'], release_date=release_info['date'], release_country=release_info['country'])
 
 
-def get_issues(config):
-    request = requests.get(url=issues_of_release_link,
+def get_issues(config, issues_url):
+    request = requests.get(url=issues_url,
                            auth=(config['user_data']['login'], config['user_data']['jira_password']))
     return request.json()['issues']
 
@@ -65,11 +65,11 @@ if __name__ == '__main__':
     config = configparser.ConfigParser()
     config.read('config.ini')
     release_info = {}
-    release_info['date'], release_info['name'], release_info['country'] = get_release_info(config)
+    release_info['date'], release_info['name'], release_info['country'], release_info['id'] = get_release_info(config)
     issues_of_release_link = RELEASE_ISSUES_URL.format(release_info['name'])
     issues_list = {}
     message = get_release_message(release_info)
-    for issue in get_issues(config):
+    for issue in get_issues(config, issues_of_release_link):
         if 'сборка' not in issue['fields']['summary'].lower():
             issues_list[issue['key']] = issue['fields']['summary']
 
