@@ -12,6 +12,9 @@ RELEASES_LIST_URL = 'https://jira.4slovo.ru/rest/api/latest/project/SLOV/version
 ISSUE_URL = 'https://jira.4slovo.ru/browse/'
 SMTP_SERVER = 'smtp.4slovo.ru'
 SMTP_PORT = 587
+RELEASE_URL = 'https://jira.4slovo.ru/projects/SLOV/versions/{}'
+REMOTE_LINK = 'https://jira.4slovo.ru/rest/api/latest/issue/{}/remotelink'
+GIT_LAB = 'https://gitlab'
 
 
 def get_release_info(config):
