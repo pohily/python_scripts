@@ -10,13 +10,13 @@ from send_notifications import get_issues
 
 def get_merge_requests(issue_number):
     """ Ищет ссылки на мердж реквесты в задаче и возвращает список ссылок """
-    result = []
+    result = set()
     links_json = requests.get(url=REMOTE_LINK.format(issue_number),
                                  auth=(config['user_data']['login'], config['user_data']['jira_password'])).json()
     for link in links_json:
         url = link['object']['url']
         if GIT_LAB in url:
-            result.append(url)
+            result.add(url)
     return result
 
 
@@ -25,7 +25,9 @@ def sort_merge_requests(urls):
     projects = defaultdict(list)
     for url in urls:
         url_parts = url.split('/')
-        if url_parts[-4] != 'docker':
+        if 'commit' in url:
+            continue
+        if 'docker' not in url:
             projects[url_parts[-3]].append([url])
         else:
             projects['docker'].append(([url]))
@@ -61,18 +63,35 @@ if __name__ == '__main__':
         if 'сборка' not in issue['fields']['summary'].lower():
             issues_list[issue['key']] = issue['fields']['summary']
 
-    merge_requests = []
+    merge_requests = set()
     if issues_list:
         for number, issue_number in enumerate(sorted(issues_list)):
-            merge_requests += get_merge_requests(issue_number)
+            merge_requests |= (get_merge_requests(issue_number))
             message += f"<tr><td class='confluenceTd'>{number + 1}</td>" \
                        f"<td class='confluenceTd'><a href='{ISSUE_URL}{issue_number}" \
                        f"'title='{issues_list[issue_number]}' class='issue-link' data-issue-key='{issue_number}'" \
                        f">{issue_number}</a></td><td class='confluenceTd'></td></tr>"
         projects = sort_merge_requests(merge_requests)
+        message += '</tbody></table></div>'
         if 'docker' in projects:
-            pass
+            docker = True
+            message += '<p><b>Docker -&gt; Master</b></p>'
+            for merge_request in projects['docker']:
+                message += f'<p><a href="{merge_request}" class="external-link" rel="nofollow">{merge_request}</a> </p>'
+        message += '<p></p><p><b>RC -&gt; Staging</b></p><p></p><p></p>'
+        for project in projects:
+            if project == 'docker':
+                continue
+            for merge_request in projects[project]:
+                message += f'<p><a href="{merge_request}" class="external-link" rel="nofollow">{merge_request}</a> </p>'
+        message += '<p></p><p></p><p><b>Staging -&gt; Master</b></p><p></p>'
+        html = f"""{message}"""
+        with open('message.html', 'w') as file:
+            file.write(html)
 
-        message += '</tbody></table></div><p></p><p><b>RC -&gt; Staging</b></p>' \
-                   '<p></p><p></p><p></p><p></p><p><b>Staging -&gt; Master</b></p><p></p>'
+
+        # добавить задачу в жиру
+        # сделать RC ветки
+        # добавить сборочную задачу в релиз
+        # развернуть стенд на нужных ветках и запустить тесты в гитлабе и регресс (в Дженкинс?)
 
