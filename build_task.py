@@ -6,7 +6,7 @@ from email.header import Header
 from email.mime.text import MIMEText
 
 import requests
-from jira import JIRA
+#from jira import JIRA
 
 from send_notifications import RELEASE_ISSUES_URL, RELEASES_LIST_URL, ISSUE_URL, SMTP_PORT, SMTP_SERVER
 
@@ -80,7 +80,7 @@ if __name__ == '__main__':
                        f"<td class='confluenceTd'><a href='{ISSUE_URL}{issue_number}'title='{issues_list[issue_number]}' " \
                        f"class='issue-link' data-issue-key='{issue_number}'>{issue_number}</a></td>" \
                        f"<td class='confluenceTd'></td></tr>"
-        message += '</div><p></p><p><b>RC -&gt; Staging</b></p><p></p><p></p><p></p><p></p><p><b>Staging -&gt; Master</b></p><p></p>'
+        message += '</tbody></table></div><p></p><p><b>RC -&gt; Staging</b></p><p></p><p></p><p></p><p></p><p><b>Staging -&gt; Master</b></p><p></p>'
         if release_info['country'] == 'Россия':
             country_key = 'ru'
         elif release_info['country'] == 'Казахстан':
