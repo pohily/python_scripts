@@ -10,6 +10,7 @@ from jira import JIRA
 
 from send_notifications import RELEASE_ISSUES_URL, RELEASES_LIST_URL, ISSUE_URL, SMTP_PORT, SMTP_SERVER
 
+RELEASE_URL = 'https://jira.4slovo.ru/projects/SLOV/versions/{}'
 
 def get_release_info(config):
     try:
@@ -27,13 +28,13 @@ def get_release_info(config):
             else:
                 release_country = 'Грузия'
             return datetime.strptime(release['releaseDate'], '%Y-%m-%d').strftime('%d.%m.%Y'), release[
-                'name'], release_country
+                'name'], release_country, release['id']
     raise Exception('Release not found')
 
 
 def get_release_message(release_info):
-    return f"<p>Состав релиза:</p><br><p><a href='{ISSUE_URL}' " \
-           f"class='external-link' rel='nofollow'>{ISSUE_URL}</a></p>" \
+    return f"<p>Состав релиза:</p><br><p><a href='{RELEASE_URL.format(release_info['id'])}' " \
+           f"class='external-link' rel='nofollow'>{RELEASE_URL.format(release_info['id'])}</a></p>" \
            f"<div class='table-wrap'><table class='confluenceTable'><tbody>"\
            f"<tr><th class='confluenceTh'>№</th><th class='confluenceTh'>Задача</th>" \
            f"<th class='confluenceTh'>Подлит свежий мастер, нет конфликтов</th></tr>"
@@ -65,7 +66,7 @@ if __name__ == '__main__':
     config = configparser.ConfigParser()
     config.read('config.ini')
     release_info = {}
-    release_info['date'], release_info['name'], release_info['country'] = get_release_info(config)
+    release_info['date'], release_info['name'], release_info['country'], release_info['id'] = get_release_info(config)
     issues_of_release_link = RELEASE_ISSUES_URL.format(release_info['name'])
     issues_list = {}
     message = get_release_message(release_info)
@@ -74,8 +75,8 @@ if __name__ == '__main__':
             issues_list[issue['key']] = issue['fields']['summary']
 
     if issues_list:
-        for number, issue_number in enumerate(issues_list):
-            message += f"<tr><td class='confluenceTd'>{number}</td>" \
+        for number, issue_number in enumerate(sorted(issues_list)):
+            message += f"<tr><td class='confluenceTd'>{number + 1}</td>" \
                        f"<td class='confluenceTd'><a href='{ISSUE_URL}{issue_number}'title='{issues_list[issue_number]}' " \
                        f"class='issue-link' data-issue-key='{issue_number}'>{issue_number}</a></td>" \
                        f"<td class='confluenceTd'></td></tr>"
