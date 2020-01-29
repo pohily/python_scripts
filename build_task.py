@@ -6,12 +6,9 @@ from email.header import Header
 from email.mime.text import MIMEText
 
 import requests
+from jira import JIRA
 
-RELEASE_ISSUES_URL = 'https://jira.4slovo.ru/rest/api/latest/search?jql=fixVersion={}'
-RELEASES_LIST_URL = 'https://jira.4slovo.ru/rest/api/latest/project/SLOV/versions'
-ISSUE_URL = 'https://jira.4slovo.ru/browse/'
-SMTP_SERVER = 'smtp.4slovo.ru'
-SMTP_PORT = 587
+from send_notifications import RELEASE_ISSUES_URL, RELEASES_LIST_URL, ISSUE_URL, SMTP_PORT, SMTP_SERVER
 
 
 def get_release_info(config):
@@ -35,9 +32,12 @@ def get_release_info(config):
 
 
 def get_release_message(release_info):
-    return 'Уважаемые коллеги, добрый день! <br>{release_date} состоялся выпуск релиза для страны {release_country} \
-    {release_name}<br>Состав выпуска:<br><br>'.format(
-        release_name=release_info['name'], release_date=release_info['date'], release_country=release_info['country'])
+    return f"<p>Состав релиза:</p><br><p><a href='{ISSUE_URL}' " \
+           f"class='external-link' rel='nofollow'>{ISSUE_URL}</a></p>" \
+           f"<div class='table-wrap'><table class='confluenceTable'><tbody>"\
+           f"<tr><th class='confluenceTh'>№</th><th class='confluenceTh'>Задача</th>" \
+           f"<th class='confluenceTh'>Подлит свежий мастер, нет конфликтов</th></tr>"
+
 
 
 def get_issues(config):
@@ -74,8 +74,12 @@ if __name__ == '__main__':
             issues_list[issue['key']] = issue['fields']['summary']
 
     if issues_list:
-        for issue_number in issues_list:
-            message += f"[<a href='{ISSUE_URL}{issue_number}'>{issue_number}</a>] - {issues_list[issue_number]}<br>"
+        for number, issue_number in enumerate(issues_list):
+            message += f"<tr><td class='confluenceTd'>{number}</td>" \
+                       f"<td class='confluenceTd'><a href='{ISSUE_URL}{issue_number}'title='{issues_list[issue_number]}' " \
+                       f"class='issue-link' data-issue-key='{issue_number}'>{issue_number}</a></td>" \
+                       f"<td class='confluenceTd'></td></tr>"
+        message += '</div><p></p><p><b>RC -&gt; Staging</b></p><p></p><p></p><p></p><p></p><p><b>Staging -&gt; Master</b></p><p></p>'
         if release_info['country'] == 'Россия':
             country_key = 'ru'
         elif release_info['country'] == 'Казахстан':
@@ -86,3 +90,4 @@ if __name__ == '__main__':
             raise Exception('Страна для релиза не определена')
         release_info['country_key'] = country_key
         send_mail(release_info, message, config)
+
