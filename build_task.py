@@ -6,6 +6,7 @@ import requests
 
 from send_notifications import RELEASE_ISSUES_URL, ISSUE_URL, RELEASES_LIST_URL, RELEASE_URL, REMOTE_LINK, GIT_LAB, STATUS_FOR_RELEASE
 from send_notifications import get_issues
+from issue import issue
 
 SHOW_SLOV_MERGES = False
 
@@ -59,8 +60,9 @@ def get_links(merges):
             result += f'|\r|||[{link}]|'
     return result
 
+
 def create_issue():
-    issue =
+    pass
 
 
 if __name__ == '__main__':
