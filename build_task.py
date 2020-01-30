@@ -49,10 +49,15 @@ def get_release_id(config):
 
 def get_links(merges):
     """ возвращает ссылки на мерджи SLOV -> RC для таблицы """
-    result = []
+    result = ''
+    start = True
     for link in merges:
-        result.append(f'<a href="{link}" class="external-link" rel="nofollow">{link}</a><br/>')
-    return ''.join(result)
+        if start:
+            result += f'[{link}]|'
+            start = False
+        else:
+            result += f'|\r|||[{link}]|'
+    return result
 
 
 if __name__ == '__main__':
@@ -65,13 +70,7 @@ if __name__ == '__main__':
     #
     #           До таблицы
     #
-    message = f"<p><b>Состав релиза:</b></p><p><a href='{RELEASE_URL.format(release_info['id'])}' " \
-              f"class='external-link' rel='nofollow'>{RELEASE_URL.format(release_info['id'])}</a></p>" \
-              f"<div class='table-wrap'><table class='confluenceTable'><tbody>" \
-              f"<tr><th class='confluenceTh'>№</th>" \
-              f"<th class='confluenceTh'>Задача</th>" \
-              f"<th class='confluenceTh'>SLOV -&gt; RC</th>" \
-              f"<th class='confluenceTh'>Подлит свежий мастер, нет конфликтов</th></tr>"
+    message = f"Состав релиза:\r\n\r\n[{RELEASE_URL.format(release_info['id'])}]\r\n\r\n||№||Задача||SLOV -> RC||Подлит свежий мастер, нет конфликтов||\r"
     #
     #           Выбираем задачи для релиза в нужных статусах
     #
@@ -93,12 +92,9 @@ if __name__ == '__main__':
     #           Заполняем таблицу
     #
     for index, issue_number in enumerate(sorted(issues_list)):
-        message += f"<tr><td class='confluenceTd'>{index + 1}</td>" \
-                   f"<td class='confluenceTd'><a href='{ISSUE_URL}{issue_number}'title='{issues_list[issue_number]}' " \
-                   f"class='issue-link' data-issue-key='{issue_number}'>{issue_number}</a></td>" \
-                   f"<td class='confluenceTd'>{get_links(merge_requests[issue_number])}</td>" \
-                   f"<td class='confluenceTd'>ок</td></tr>"
-    message += '</tbody></table></div>'
+        message += f"\n|{index + 1}|[{issue_number}|{ISSUE_URL}{issue_number}]|{get_links(merge_requests[issue_number])}|(/)|\r"
+
+    message += '\n\r'
     #
     #           Создаем RC
     #
@@ -108,36 +104,36 @@ if __name__ == '__main__':
     #
     if 'docker' in projects:
         docker = True
-        message += '<p><b>Docker -&gt; Master</b></p>'
+        message += '\n*Docker -> Master*\r\n\r'
     #
     #           SLOV -> RC
     #
     if SHOW_SLOV_MERGES:
-        message += '<p></p><p><b>SLOV -&gt; RC</b></p><p></p><p></p>'
+        message += '\n*SLOV -> RC*\r'
         for project in projects:
             if project == 'docker':
                 continue
             for merge_request in projects[project]:
-                message += f'<p><a href="{merge_request}" class="external-link" rel="nofollow">{merge_request}</a> </p>'
-            message += '<br/>'
+                message += f'\n[{merge_request}]\r'
+            message += '\n\r'
     #
     #           RC -> Staging
     #
-    message += '<p></p><p><b>RC -&gt; Staging</b></p><p></p><p></p>'
+    message += '\n*RC -> Staging*\r\n\r'
     #
     #           Staging -> Master
     #
-    message += '<p></p><p></p><p><b>Staging -&gt; Master</b></p><p></p>'
+    message += '\n*Staging -> Master*\r\n\r'
     #
     #           Staging -> Master
     #
-    message += '<p></p>'
+    message += '\n\r'
     #
     #           Вывод результата в Jira
     #
-    html = f"""{message}"""
-    with open('message.html', 'w') as file:
-        file.write(html)
+    txt = f"""{message}"""
+    with open('message.txt', 'w') as file:
+        file.write(txt)
 
 
 
