@@ -36,7 +36,7 @@ def sort_merge_requests(task):
 
 def get_release_id(config):
     try:
-        release_input = 'ru.5.6.10'#sys.argv[1]
+        release_input = 'ru.5.6.8'#sys.argv[1]
     except IndexError:
         raise Exception('Enter release name')
     releases_json = requests.get(url=RELEASES_LIST_URL,
@@ -58,6 +58,9 @@ def get_links(merges):
         else:
             result += f'|\r|||[{link}]|'
     return result
+
+def create_issue():
+    issue =
 
 
 if __name__ == '__main__':
