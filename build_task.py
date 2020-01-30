@@ -1,5 +1,4 @@
 from collections import defaultdict
-from re import findall
 
 import configparser
 from jira import JIRA
@@ -110,8 +109,6 @@ if __name__ == '__main__':
     if 'docker' in projects:
         docker = True
         message += '<p><b>Docker -&gt; Master</b></p>'
-        for merge_request in projects['docker']:
-            message += f'<p><a href="{merge_request}" class="external-link" rel="nofollow">{merge_request}</a> </p>'
     #
     #           SLOV -> RC
     #
