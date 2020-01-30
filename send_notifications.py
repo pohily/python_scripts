@@ -10,11 +10,13 @@ import requests
 RELEASE_ISSUES_URL = 'https://jira.4slovo.ru/rest/api/latest/search?jql=fixVersion={}'
 RELEASES_LIST_URL = 'https://jira.4slovo.ru/rest/api/latest/project/SLOV/versions'
 ISSUE_URL = 'https://jira.4slovo.ru/browse/'
+ISSUE_API_LINK = 'https://jira.4slovo.ru/rest/api/latest/issue/{}'
 SMTP_SERVER = 'smtp.4slovo.ru'
 SMTP_PORT = 587
 RELEASE_URL = 'https://jira.4slovo.ru/projects/SLOV/versions/{}'
 REMOTE_LINK = 'https://jira.4slovo.ru/rest/api/latest/issue/{}/remotelink'
 GIT_LAB = 'https://gitlab'
+STATUS_FOR_RELEASE = ['Released to production', 'Passed QA', 'In regression test', 'Ready for release']
 
 
 def get_release_info(config):

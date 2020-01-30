@@ -4,7 +4,7 @@ import configparser
 from jira import JIRA
 import requests
 
-from send_notifications import RELEASE_ISSUES_URL, ISSUE_URL, RELEASES_LIST_URL, RELEASE_URL, REMOTE_LINK, GIT_LAB
+from send_notifications import RELEASE_ISSUES_URL, ISSUE_URL, RELEASES_LIST_URL, RELEASE_URL, REMOTE_LINK, GIT_LAB, STATUS_FOR_RELEASE
 from send_notifications import get_issues
 
 
@@ -28,9 +28,9 @@ def sort_merge_requests(urls):
         if 'commit' in url:
             continue
         if 'docker' not in url:
-            projects[url_parts[-3]].append([url])
+            projects[url_parts[4]].append(url)
         else:
-            projects['docker'].append(([url]))
+            projects['docker'].append((url))
     return projects
 
 
@@ -54,15 +54,23 @@ if __name__ == '__main__':
     release_info['name'], release_info['id'] = get_release_id(config)
     issues_of_release_link = RELEASE_ISSUES_URL.format(release_info['name'])
     issues_list = {}
-    message = f"<p>Состав релиза:</p><br><p><a href='{RELEASE_URL.format(release_info['id'])}' " \
+    #
+    #           До таблицы
+    #
+    message = f"<p><b>Состав релиза:</b></p><p><a href='{RELEASE_URL.format(release_info['id'])}' " \
            f"class='external-link' rel='nofollow'>{RELEASE_URL.format(release_info['id'])}</a></p>" \
            f"<div class='table-wrap'><table class='confluenceTable'><tbody>"\
            f"<tr><th class='confluenceTh'>№</th><th class='confluenceTh'>Задача</th>" \
            f"<th class='confluenceTh'>Подлит свежий мастер, нет конфликтов</th></tr>"
+    #
+    #           Выбираем задачи для релиза в нужных статусах
+    #
     for issue in get_issues(config, issues_of_release_link):
-        if 'сборка' not in issue['fields']['summary'].lower():
+        if 'сборка' not in issue['fields']['summary'].lower() and issue['fields']['status']['name'] in STATUS_FOR_RELEASE:
             issues_list[issue['key']] = issue['fields']['summary']
-
+    #
+    #           Заполняем таблицу
+    #
     merge_requests = set()
     if issues_list:
         for number, issue_number in enumerate(sorted(issues_list)):
@@ -73,25 +81,47 @@ if __name__ == '__main__':
                        f">{issue_number}</a></td><td class='confluenceTd'></td></tr>"
         projects = sort_merge_requests(merge_requests)
         message += '</tbody></table></div>'
+        #
+        #           Docker -> Master
+        #
         if 'docker' in projects:
             docker = True
             message += '<p><b>Docker -&gt; Master</b></p>'
             for merge_request in projects['docker']:
                 message += f'<p><a href="{merge_request}" class="external-link" rel="nofollow">{merge_request}</a> </p>'
-        message += '<p></p><p><b>RC -&gt; Staging</b></p><p></p><p></p>'
+        #
+        #           SLOV -> RC
+        #
+        message += '<p></p><p><b>SLOV -&gt; RC</b></p><p></p><p></p>'
         for project in projects:
             if project == 'docker':
                 continue
             for merge_request in projects[project]:
                 message += f'<p><a href="{merge_request}" class="external-link" rel="nofollow">{merge_request}</a> </p>'
+            message += '<br/>'
+        #
+        #           RC -> Staging
+        #
+        message += '<p></p><p><b>RC -&gt; Staging</b></p><p></p><p></p>'
+        #
+        #           Staging -> Master
+        #
         message += '<p></p><p></p><p><b>Staging -&gt; Master</b></p><p></p>'
+        #
+        #           Staging -> Master
+        #
+        message += '<p></p>'
+        #
+        #           Вывод результата в Jira
+        #
         html = f"""{message}"""
         with open('message.html', 'w') as file:
             file.write(html)
 
 
-        # добавить задачу в жиру
+
+        # добавить задачу в жиру, добавить сборочную задачу в релиз
         # сделать RC ветки
-        # добавить сборочную задачу в релиз
+        # деплойные действия
         # развернуть стенд на нужных ветках и запустить тесты в гитлабе и регресс (в Дженкинс?)
 
