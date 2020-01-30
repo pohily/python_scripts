@@ -8,7 +8,7 @@ import requests
 from send_notifications import RELEASE_ISSUES_URL, ISSUE_URL, RELEASES_LIST_URL, RELEASE_URL, REMOTE_LINK, GIT_LAB, STATUS_FOR_RELEASE
 from send_notifications import get_issues
 
-SHOW_SLOV_MERGES = True
+SHOW_SLOV_MERGES = False
 
 def get_merge_requests(issue_number):
     """ Ищет ссылки на мердж реквесты в задаче и возвращает список ссылок """
@@ -22,16 +22,16 @@ def get_merge_requests(issue_number):
     return list(result)
 
 
-def sort_merge_requests(links):
+def sort_merge_requests(task):
     """ Возвращает словарь списков мерджреквестов, рассортированных по проектам """
     projects = defaultdict(list)
-    for link in links:
-        link = link[0]
-        url_parts = link.split('/')
-        if 'docker' not in link:
-            projects[url_parts[4]].append(link)
-        else:
-            projects['docker'].append(link)
+    for links in task:
+        for link in links:
+            url_parts = link.split('/')
+            if 'docker' not in link:
+                projects[url_parts[4]].append(link)
+            else:
+                projects['docker'].append(link)
     return projects
 
 
@@ -112,6 +112,17 @@ if __name__ == '__main__':
         message += '<p><b>Docker -&gt; Master</b></p>'
         for merge_request in projects['docker']:
             message += f'<p><a href="{merge_request}" class="external-link" rel="nofollow">{merge_request}</a> </p>'
+    #
+    #           SLOV -> RC
+    #
+    if SHOW_SLOV_MERGES:
+        message += '<p></p><p><b>SLOV -&gt; RC</b></p><p></p><p></p>'
+        for project in projects:
+            if project == 'docker':
+                continue
+            for merge_request in projects[project]:
+                message += f'<p><a href="{merge_request}" class="external-link" rel="nofollow">{merge_request}</a> </p>'
+            message += '<br/>'
     #
     #           RC -> Staging
     #
