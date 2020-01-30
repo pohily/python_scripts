@@ -1,3 +1,6 @@
+from build_task import config, message, release
+from send_notifications import RELEASE_URL
+
 issue = f'{{"fields": {{"fixVersions": [{{"self": "{RELEASE_URL.format(release['id'])}", "id": "{release['id']}", "description": "", "name": "{release['name']}", "archived": false, "released": false' \
 f'}}],"priority": {{"self": "https://jira.4slovo.ru/rest/api/2/priority/2", "iconUrl": "https://jira.4slovo.ru/images/icons/priorities/high.svg", "name": "High","id": "2"' \
 f'}},"assignee": {{"self": "https://jira.4slovo.ru/rest/api/2/user?username=a.dobrynin","name": "a.dobrynin","key": "a.dobrynin","emailAddress": "a.dobrynin@4slovo.ru","avatarUrls": {{' \
