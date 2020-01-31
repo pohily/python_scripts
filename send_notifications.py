@@ -1,6 +1,6 @@
-import configparser
-import smtplib
-import sys
+from configparser import ConfigParser
+from smtplib import SMTP
+from sys import argv
 from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
@@ -21,7 +21,7 @@ SMTP_SERVER = 'smtp.4slovo.ru'
 
 def get_release_info(config):
     try:
-        release_input = sys.argv[1]
+        release_input = argv[1]
     except IndexError:
         raise Exception('Enter release name')
     releases_json = requests.get(url=RELEASES_LIST_URL,
@@ -52,7 +52,7 @@ def get_issues(config, issues_url):
 
 
 def send_mail(release_info, message, config):
-    connection = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+    connection = SMTP(SMTP_SERVER, SMTP_PORT)
     connection.ehlo()
     connection.starttls()
     connection.ehlo()
@@ -67,7 +67,7 @@ def send_mail(release_info, message, config):
 
 
 if __name__ == '__main__':
-    config = configparser.ConfigParser()
+    config = ConfigParser()
     config.read('config.ini')
     release_info = {}
     release_info['date'], release_info['name'], release_info['country'], release_info['id'] = get_release_info(config)

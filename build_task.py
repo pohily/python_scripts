@@ -1,6 +1,7 @@
 from collections import defaultdict
+from sys import argv
 
-import configparser
+from configparser import ConfigParser
 from jira import JIRA
 import requests
 
@@ -36,7 +37,12 @@ def sort_merge_requests(task):
 
 def get_release_id(config):
     try:
-        release_input = 'ru.5.6.7'#sys.argv[1]
+        # откуда происходит ввод названия релиза
+        COMMAND_LINE_INPUT = eval(config['options']['COMMAND_LINE_INPUT'])
+        if COMMAND_LINE_INPUT:
+            release_input = argv[1]
+        else:
+            release_input = 'ru.5.6.7'
     except IndexError:
         raise Exception('Enter release name')
     releases_json = requests.get(url=RELEASES_LIST_URL,
@@ -52,11 +58,16 @@ def get_links(merges):
     result = ''
     start = True
     for link in merges:
+        url_parts = link.split('/')
+        if 'docker' in link:
+            project_name = f'{url_parts[3]}/{url_parts[4]}/{url_parts[6]}'
+        else:
+            project_name = f'{url_parts[4]}/{url_parts[6]}'
         if start:
-            result += f'[{link}]'
+            result += f'[{project_name}|{link}]'
             start = False
         else:
-            result += f'\r[{link}]'
+            result += f'\r[{project_name}|{link}]'
     return result
 
 
@@ -65,7 +76,7 @@ def create_issue():
 
 
 if __name__ == '__main__':
-    config = configparser.ConfigParser()
+    config = ConfigParser()
     config.read('config.ini')
     jira_options = {'server': 'https://jira.4slovo.ru/'}
     jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
@@ -138,6 +149,14 @@ if __name__ == '__main__':
     #
     message += '\n\r'
     #
+    #           Преддеплойные действия
+    #
+    message += '\n\r'
+    #
+    #           Постдеплойные действия
+    #
+    message += '\n\r'
+    #
     #           Вывод результата в Jira
     #
     issue_dict = {
@@ -167,7 +186,6 @@ if __name__ == '__main__':
 
 
 
-    # добавить задачу в жиру, добавить сборочную задачу в релиз
     # сделать RC ветки
     # деплойные действия
     # развернуть стенд на нужных ветках и запустить тесты в гитлабе и регресс (в Дженкинс?)
