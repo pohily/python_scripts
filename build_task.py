@@ -6,7 +6,6 @@ import requests
 
 from send_notifications import RELEASE_ISSUES_URL, ISSUE_URL, RELEASES_LIST_URL, RELEASE_URL, REMOTE_LINK, GIT_LAB, STATUS_FOR_RELEASE
 from send_notifications import get_issues
-from issue import issue
 
 SHOW_SLOV_MERGES = False
 
@@ -37,7 +36,7 @@ def sort_merge_requests(task):
 
 def get_release_id(config):
     try:
-        release_input = 'ru.5.6.8'#sys.argv[1]
+        release_input = 'ru.5.6.7'#sys.argv[1]
     except IndexError:
         raise Exception('Enter release name')
     releases_json = requests.get(url=RELEASES_LIST_URL,
@@ -54,10 +53,10 @@ def get_links(merges):
     start = True
     for link in merges:
         if start:
-            result += f'[{link}]|'
+            result += f'[{link}]'
             start = False
         else:
-            result += f'|\r|||[{link}]|'
+            result += f'\r[{link}]'
     return result
 
 
@@ -68,6 +67,9 @@ def create_issue():
 if __name__ == '__main__':
     config = configparser.ConfigParser()
     config.read('config.ini')
+    jira_options = {'server': 'https://jira.4slovo.ru/'}
+    jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
+    projects = jira.projects()
     release_info = {}
     release_info['name'], release_info['id'] = get_release_id(config)
     issues_of_release_link = RELEASE_ISSUES_URL.format(release_info['name'])
@@ -75,12 +77,14 @@ if __name__ == '__main__':
     #
     #           До таблицы
     #
-    message = f"Состав релиза:\r\n\r\n[{RELEASE_URL.format(release_info['id'])}]\r\n\r\n||№||Задача||SLOV -> RC||Подлит свежий мастер, нет конфликтов||\r"
+    message = f"Состав релиза:\r\n\r\n[{RELEASE_URL.format(release_info['id'])}]\r\n\r\n||№||Задача||SLOV -> RC||Подлит свежий мастер, нет конфликтов||\r\n"
     #
     #           Выбираем задачи для релиза в нужных статусах
     #
     for issue in get_issues(config, issues_of_release_link):
-        if 'сборка' not in issue['fields']['summary'].lower() and issue['fields']['status']['name'] in STATUS_FOR_RELEASE:
+        if 'сборка' not in issue['fields']['summary'].lower() \
+                and issue['fields']['status']['name'] in STATUS_FOR_RELEASE \
+                and issue['fields']['issuetype']['name'] != 'Defect':
             issues_list[issue['key']] = issue['fields']['summary']
     #
     #           Собираем мердж реквесты
@@ -97,7 +101,7 @@ if __name__ == '__main__':
     #           Заполняем таблицу
     #
     for index, issue_number in enumerate(sorted(issues_list)):
-        message += f"\n|{index + 1}|[{issue_number}|{ISSUE_URL}{issue_number}]|{get_links(merge_requests[issue_number])}|(/)|\r"
+        message += f"|{index + 1}|[{issue_number}|{ISSUE_URL}{issue_number}]|{get_links(merge_requests[issue_number])}| |\r\n"
 
     message += '\n\r'
     #
@@ -136,9 +140,30 @@ if __name__ == '__main__':
     #
     #           Вывод результата в Jira
     #
-    txt = f"""{message}"""
-    with open('message.txt', 'w') as file:
-        file.write(txt)
+    issue_dict = {
+        "fixVersions": [
+    {
+        "self": f"{RELEASE_URL.format(release_info['id'])}",
+        "id": f"{release_info['id']}",
+        "name": f"{release_info['name']}",
+    }
+    ],
+        'project': {'key': 'SLOV'},
+        'summary': f"Сборка {release_info['name']}",
+        'description': f'{message}',
+        'issuetype': {'name': 'Задача'},
+
+    }
+    CREATE_JIRA_ISSUE = eval(config['options']['CREATE_JIRA_ISSUE'])
+    if CREATE_JIRA_ISSUE:
+        new_issue = jira.create_issue(fields=issue_dict)
+    #
+    #           Вывод результата в файл
+    #
+    if not CREATE_JIRA_ISSUE:
+        txt = f"""{message}"""
+        with open('message.txt', 'w') as file:
+            file.write(txt)
 
 
 
