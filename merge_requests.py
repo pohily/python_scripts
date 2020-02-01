@@ -1,6 +1,8 @@
 import gitlab
 from configparser import ConfigParser
 
+PROJECT_MERGE_REQUESTS = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests'
+
 
 if __name__ == '__main__':
     config = ConfigParser()
@@ -10,5 +12,7 @@ if __name__ == '__main__':
     python_scripts = projects[3]
     branches = python_scripts.branches.list()
     at_85 = branches[0]
+    groups = gl.groups.list()
+    group = gl.groups.get('3')
+    projects = group.projects.list()
     pass
-

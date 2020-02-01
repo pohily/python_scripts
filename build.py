@@ -8,7 +8,7 @@ import requests
 from send_notifications import ISSUE_URL, RELEASE_URL, REMOTE_LINK, GIT_LAB, STATUS_FOR_RELEASE
 
 docker = False # флаг наличия мерджей на докер
-Merge_request = namedtuple('Merge_request', ['url', 'project'])
+Merge_request = namedtuple('Merge_request', ['url', 'link_name', 'project'])
 
 def get_release_details(config, jira):
     try:
@@ -31,7 +31,14 @@ def get_merge_requests(issue_number):
     links_json = requests.get(url=REMOTE_LINK.format(issue_number),
                                  auth=(config['user_data']['login'], config['user_data']['jira_password'])).json()
     for link in links_json:
-        merge_link = Merge_request(link['object']['url'], link['object']['title'])
+        url_parts = link['object']['url'].split('/')
+        if len(url_parts) < 6:
+            continue
+        if 'docker' in link:
+            project = f'{url_parts[3]}/{url_parts[4]}'
+        else:
+            project = f'{url_parts[4]}'
+        merge_link = Merge_request(link['object']['url'], f'{project}/{url_parts[6]}', project)
         if GIT_LAB in merge_link.url:
             result.append(merge_link)
     return result
@@ -45,10 +52,10 @@ def get_links(merges):
         if not merge.url:
             return '-' # если в задаче нет мердж реквеста
         if start:
-            result += f'[{merge.project}|{merge.url}]'
+            result += f'[{merge.link_name}|{merge.url}]'
             start = False
         else:
-            result += f'\r[{merge.project}|{merge.url}]'
+            result += f'\r[{merge.link_name}|{merge.url}]'
     return result
 
 
@@ -102,8 +109,6 @@ if __name__ == '__main__':
     #
     if docker:
         message += '\n*Docker -> Master*\r\n\r'
-        for link in docker_merges:
-            message += f'\n{link}\r' # тест (мерджи slov -> rc). потом будем выводить мерджи в мастер
     #
     #           RC -> Staging
     #
