@@ -1,12 +1,11 @@
 from configparser import ConfigParser
-from smtplib import SMTP
-from sys import argv
 from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
-from jira import JIRA
+from smtplib import SMTP
+from sys import argv
 
-import requests
+from jira import JIRA
 
 ISSUE_API_LINK = 'https://jira.4slovo.ru/rest/api/latest/issue/{}'
 ISSUE_URL = 'https://jira.4slovo.ru/browse/'
