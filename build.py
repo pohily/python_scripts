@@ -1,4 +1,4 @@
-from collections import defaultdict
+from collections import defaultdict, namedtuple
 from sys import argv
 
 from configparser import ConfigParser
@@ -8,31 +8,19 @@ import requests
 from send_notifications import RELEASE_ISSUES_URL, ISSUE_URL, RELEASES_LIST_URL, RELEASE_URL, REMOTE_LINK, GIT_LAB, STATUS_FOR_RELEASE
 from send_notifications import get_issues
 
-SHOW_SLOV_MERGES = False
+docker = False # флаг наличия мерджей на докер
+Merge_request = namedtuple('Merge_request', ['url', 'project'])
 
 def get_merge_requests(issue_number):
-    """ Ищет ссылки на мердж реквесты в задаче и возвращает список ссылок """
-    result = set()
+    """ Ищет ссылки на мердж реквесты в задаче и возвращает список ссылок и проектов"""
+    result = []
     links_json = requests.get(url=REMOTE_LINK.format(issue_number),
                                  auth=(config['user_data']['login'], config['user_data']['jira_password'])).json()
     for link in links_json:
-        url = link['object']['url']
-        if GIT_LAB in url:
-            result.add(url)
-    return list(result)
-
-
-def sort_merge_requests(task):
-    """ Возвращает словарь списков мерджреквестов, рассортированных по проектам """
-    projects = defaultdict(list)
-    for links in task:
-        for link in links:
-            url_parts = link.split('/')
-            if 'docker' not in link:
-                projects[url_parts[4]].append(link)
-            else:
-                projects['docker'].append(link)
-    return projects
+        merge_link = Merge_request(link['object']['url'], link['object']['title'])
+        if GIT_LAB in merge_link.url:
+            result.append(merge_link)
+    return result
 
 
 def get_release_id(config):
@@ -54,20 +42,17 @@ def get_release_id(config):
 
 
 def get_links(merges):
-    """ возвращает ссылки на мерджи SLOV -> RC для таблицы """
+    """ принимает список кортежей. возвращает ссылки на мерджи SLOV -> RC для таблицы """
     result = ''
     start = True
-    for link in merges:
-        url_parts = link.split('/')
-        if 'docker' in link:
-            project_name = f'{url_parts[3]}/{url_parts[4]}/{url_parts[6]}'
-        else:
-            project_name = f'{url_parts[4]}/{url_parts[6]}'
+    for merge in merges:
+        if not merge.url:
+            return ' ' # если в задаче нет мердж реквеста
         if start:
-            result += f'[{project_name}|{link}]'
+            result += f'[{merge.project}|{merge.url}]'
             start = False
         else:
-            result += f'\r[{project_name}|{link}]'
+            result += f'\r[{merge.project}|{merge.url}]'
     return result
 
 
@@ -80,18 +65,18 @@ if __name__ == '__main__':
     config.read('config.ini')
     jira_options = {'server': 'https://jira.4slovo.ru/'}
     jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
-    projects = jira.projects()
     release_info = {}
     release_info['name'], release_info['id'] = get_release_id(config)
     issues_of_release_link = RELEASE_ISSUES_URL.format(release_info['name'])
-    issues_list = {}
     #
     #           До таблицы
     #
-    message = f"Состав релиза:\r\n\r\n[{RELEASE_URL.format(release_info['id'])}]\r\n\r\n||№||Задача||SLOV -> RC||Подлит свежий мастер, нет конфликтов||\r\n"
+    message = f"Состав релиза:\r\n\r\n[{RELEASE_URL.format(release_info['id'])}]\r\n\r\n" \
+              f"||№||Задача||SLOV -> RC||Подлит свежий мастер, нет конфликтов||\r\n"
     #
     #           Выбираем задачи для релиза в нужных статусах
     #
+    issues_list = {}
     for issue in get_issues(config, issues_of_release_link):
         if 'сборка' not in issue['fields']['summary'].lower() \
                 and issue['fields']['status']['name'] in STATUS_FOR_RELEASE \
@@ -100,14 +85,17 @@ if __name__ == '__main__':
     #
     #           Собираем мердж реквесты
     #
-    merge_requests = defaultdict(list)
+    merge_requests = defaultdict(list) # словарь- задача: список кортежей ссылок и проектов
+    docker_merges = [] # список мерджей докера
     if issues_list:
         for issue_number in issues_list:
             for merge in get_merge_requests(issue_number):
-                if 'commit' in merge:
+                if 'commit' in merge.url:
                     continue
+                elif 'docker' in merge.url:
+                    docker = True
+                    docker_merges.append(merge.url)
                 merge_requests[issue_number].append(merge)
-    projects = sort_merge_requests(merge_requests.values())
     #
     #           Заполняем таблицу
     #
@@ -122,20 +110,10 @@ if __name__ == '__main__':
     #
     #           Docker -> Master
     #
-    if 'docker' in projects:
-        docker = True
+    if docker:
         message += '\n*Docker -> Master*\r\n\r'
-    #
-    #           SLOV -> RC
-    #
-    if SHOW_SLOV_MERGES:
-        message += '\n*SLOV -> RC*\r'
-        for project in projects:
-            if project == 'docker':
-                continue
-            for merge_request in projects[project]:
-                message += f'\n[{merge_request}]\r'
-            message += '\n\r'
+        for link in docker_merges:
+            message += f'\n{link}\r' # тест (мерджи slov -> rc). потом будем выводить мерджи в мастер
     #
     #           RC -> Staging
     #

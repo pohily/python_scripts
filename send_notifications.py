@@ -45,10 +45,11 @@ def get_release_message(release_info):
         release_name=release_info['name'], release_date=release_info['date'], release_country=release_info['country'])
 
 
-def get_issues(config, issues_url):
-    request = requests.get(url=issues_url,
+def get_issues(config, release_url):
+    request = requests.get(url=release_url,
                            auth=(config['user_data']['login'], config['user_data']['jira_password']))
-    return request.json()['issues']
+    request_issues = request.json()['issues']
+    return request_issues
 
 
 def send_mail(release_info, message, config):
