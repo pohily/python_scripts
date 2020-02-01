@@ -6,9 +6,11 @@ from jira import JIRA
 import requests
 
 from send_notifications import ISSUE_URL, RELEASE_URL, REMOTE_LINK, GIT_LAB, STATUS_FOR_RELEASE
+from merge_requests import get_merge_request_details
 
 docker = False # флаг наличия мерджей на докер
-Merge_request = namedtuple('Merge_request', ['url', 'link_name', 'project'])
+Merge_request = namedtuple('Merge_request', ['url', 'iid', 'project'])
+
 
 def get_release_details(config, jira):
     try:
@@ -38,24 +40,26 @@ def get_merge_requests(issue_number):
             project = f'{url_parts[3]}/{url_parts[4]}'
         else:
             project = f'{url_parts[4]}'
-        merge_link = Merge_request(link['object']['url'], f'{project}/{url_parts[6]}', project)
+        iid = url_parts[6]
+        merge_link = Merge_request(link['object']['url'], iid, project)
         if GIT_LAB in merge_link.url:
             result.append(merge_link)
     return result
 
 
-def get_links(merges):
+def get_links(config, merges):
     """ принимает список кортежей. возвращает ссылки на мерджи SLOV -> RC для таблицы """
     result = ''
     start = True
     for merge in merges:
-        if not merge.url:
-            return '-' # если в задаче нет мердж реквеста
+        if not merge:
+            return 'Нет мердж реквестов| |\r\n'
+        _, status = get_merge_request_details(config, merge.project, merge.iid)
         if start:
-            result += f'[{merge.link_name}|{merge.url}]'
+            result += f'[{merge.project}/{merge.iid}|{merge.url}]|{status}|\r\n'
             start = False
         else:
-            result += f'\r[{merge.link_name}|{merge.url}]'
+            result += f'| | |[{merge.project}/{merge.iid}|{merge.url}]|{status}|\r\n'
     return result
 
 
@@ -97,7 +101,7 @@ if __name__ == '__main__':
     #           Заполняем таблицу
     #
     for index, issue_number in enumerate(sorted(issues_list)):
-        message += f"|{index + 1}|[{issue_number}|{ISSUE_URL}{issue_number}]|{get_links(merge_requests[issue_number])}| |\r\n"
+        message += f"|{index + 1}|[{issue_number}|{ISSUE_URL}{issue_number}]|{get_links(config, merge_requests[issue_number])}"
 
     message += '\n\r'
     #
