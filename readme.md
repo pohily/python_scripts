@@ -52,4 +52,5 @@
 **6** Установить зависимости: 
 > **pip install -r requirements.txt**
 
+**7** Создать файл **config.ini** из **config-template.ini**, вставив данные своих аккаунтов 
 

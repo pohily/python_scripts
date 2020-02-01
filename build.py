@@ -11,18 +11,6 @@ from send_notifications import get_issues
 docker = False # флаг наличия мерджей на докер
 Merge_request = namedtuple('Merge_request', ['url', 'project'])
 
-def get_merge_requests(issue_number):
-    """ Ищет ссылки на мердж реквесты в задаче и возвращает список ссылок и проектов"""
-    result = []
-    links_json = requests.get(url=REMOTE_LINK.format(issue_number),
-                                 auth=(config['user_data']['login'], config['user_data']['jira_password'])).json()
-    for link in links_json:
-        merge_link = Merge_request(link['object']['url'], link['object']['title'])
-        if GIT_LAB in merge_link.url:
-            result.append(merge_link)
-    return result
-
-
 def get_release_id(config):
     try:
         # откуда происходит ввод названия релиза
@@ -41,6 +29,18 @@ def get_release_id(config):
     raise Exception('Release not found')
 
 
+def get_merge_requests(issue_number):
+    """ Ищет ссылки на мердж реквесты в задаче и возвращает список ссылок и проектов"""
+    result = []
+    links_json = requests.get(url=REMOTE_LINK.format(issue_number),
+                                 auth=(config['user_data']['login'], config['user_data']['jira_password'])).json()
+    for link in links_json:
+        merge_link = Merge_request(link['object']['url'], link['object']['title'])
+        if GIT_LAB in merge_link.url:
+            result.append(merge_link)
+    return result
+
+
 def get_links(merges):
     """ принимает список кортежей. возвращает ссылки на мерджи SLOV -> RC для таблицы """
     result = ''
@@ -54,10 +54,6 @@ def get_links(merges):
         else:
             result += f'\r[{merge.project}|{merge.url}]'
     return result
-
-
-def create_issue():
-    pass
 
 
 if __name__ == '__main__':
