@@ -15,43 +15,66 @@ PROJECTS_NAMES = {"chestnoe_slovo": 7, "crm4slovokz": 11, "4slovokz": 12, "chest
                   "python-scripts": 154, "landing": 159, "ru": 166, "ru-db": 167,
                   }
 MR_STATUS = {'can_be_merged': '(/) Нет конфликтов', 'cannot_be_merged': '(x) Конфликт!'}
+
 PROJECT_MERGE_REQUESTS = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?{}'
 MR_BY_IID = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?iids[]={}&{}'
 PROJECTS = 'https://gitlab.4slovo.ru/api/v4/projects/{}?{}'
+GET_BRANCH = 'https://gitlab.4slovo.ru/api/v4/projects/{}/repository/branches/{}&{}'
 
-Merge_request_details = namedtuple('Merge_request_details', ['id', 'merge_status'])
+Merge_request_details = namedtuple('Merge_request_details', ['id', 'merge_status', 'source_branch'])
 
 
-def get_merge_request_details(config, links):
+def get_merge_request_details(config, MR):
     """ Возвращает статус (есть или нет конфликты) и id мердж реквеста (вдруг понадобится) в таблицу """
-    _, project, iid = links
+    _, project, iid = MR
     project_id = PROJECTS_NAMES[project]
     token = f"private_token={(config['user_data']['GITLAB_PRIVATE_TOKEN'])}"
     details = requests.get(url=MR_BY_IID.format(project_id, iid, token)).json()
     if details:
         details = details[0]
-        return Merge_request_details(details['id'], MR_STATUS[details['merge_status']])
+        return Merge_request_details(details['id'], MR_STATUS[details['merge_status']], details['source_branch'])
     else:
-        return Merge_request_details('0', 'MR не найден')
+        return Merge_request_details('0', 'MR не найден', '')
 
 
-def make_rc(config, links):
-    return 'Тест'
+def make_rc(config, MR, RC_name):
+    """ Создаем RC, если еще нет. Создаем МР slov -> RC. Если нет конфликтов - делаем МР. Возвращем статус МР """
+    gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
+    project = gl.projects.get(f'{PROJECTS_NAMES[MR.project]}')
+    if "docker" in MR.url:
+        target_branch = project.branches.get('master')
+    else:
+        try:
+            target_branch = project.branches.get(f'{RC_name}')
+        except Exception:
+            target_branch = project.branches.create({'branch': f'{RC_name}',
+                                              'ref': 'master'})
+    _, _, source = get_merge_request_details(config, MR)
+    source_branch = project.branches.get(source)
+    mr = project.mergerequests.create({'source_branch': f'{source_branch}',
+                                       'target_branch': target_branch,
+                                       'title': f'{MR.issue} -> {RC_name}',
+                                       'target_project_id': PROJECTS_NAMES[MR.project],
+                                       })
+    _, status, _ = get_merge_request_details(config, mr)
+    if status == 'can_be_merged':
+        mr.merge()
+    return MR_STATUS[status]
+    #return 'Тест'
 
 
 if __name__ == '__main__':
     config = ConfigParser()
     config.read('config.ini')
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
+
+    project = gl.projects.get('130')
+    try:
+        branch = project.branches.get('rc-ru-5-6-10')
+    except Exception:
+        print("no")
+    pass
     """
-    projects = gl.projects.list()    
-    python_scripts = projects[3]
-    branches = python_scripts.branches.list()
-    at_85 = branches[0]
-    groups = gl.groups.list()
-    group = gl.groups.get('3')
-    projects = group.projects.list()
-    
     x = f"private_token={(config['user_data']['GITLAB_PRIVATE_TOKEN'])}"
     projects = {}
     for i in range(200, 300):

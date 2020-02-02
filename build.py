@@ -10,7 +10,7 @@ from send_notifications import ISSUE_URL, RELEASE_URL, REMOTE_LINK, GIT_LAB, STA
 from merge_requests import get_merge_request_details, make_rc
 
 docker = False # флаг наличия мерджей на докер
-Merge_request = namedtuple('Merge_request', ['url', 'iid', 'project'])
+Merge_request = namedtuple('Merge_request', ['url', 'iid', 'project', 'issue']) # iid - номер МР в url'е
 
 
 def get_release_details(config, jira):
@@ -42,7 +42,7 @@ def get_merge_requests(issue_number):
         else:
             project = f'{url_parts[4]}'
         iid = url_parts[6]
-        merge_link = Merge_request(link['object']['url'], iid, project)
+        merge_link = Merge_request(link['object']['url'], iid, project, issue_number)
         if GIT_LAB in merge_link.url:
             result.append(merge_link)
     return result
@@ -53,19 +53,18 @@ def get_links(config, merges):
     result = ''
     start = True
     for merge in merges:
-        if not merge:
-            return 'Нет мердж реквестов| |\r\n'
         if start:
             result += f'[{merge.project}/{merge.iid}|{merge.url}]'
             #
             #           Пытаемся сделать MR из текущей задачи в RC. Выводим статус в таблицу
             #
-            status = make_rc(config, merge)
+            print_stage(f'Пытаемся сделать MR из {issue_number} в {RC_name}')
+            status = make_rc(config, merge, RC_name)
             result += f'|{status}|\r\n'
             start = False
         else:
             result += f'| | |[{merge.project}/{merge.iid}|{merge.url}]'
-            status = make_rc(config, merge)
+            status = make_rc(config, merge, RC_name)
             result += f'|{status}|\r\n'
     return result
 
@@ -80,6 +79,7 @@ if __name__ == '__main__':
     jira_options = {'server': 'https://jira.4slovo.ru/'}
     jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
     release_name, release_id, release_issues = get_release_details(config, jira)
+    RC_name = f'rc-{release_name.replace(".", "-")}'
     #
     #           До таблицы
     #
@@ -112,7 +112,7 @@ if __name__ == '__main__':
             for merge in MR_count:
                 if 'commit' in merge.url:
                     continue
-                elif 'docker' in merge.url:
+                elif 'docker' in merge.url: # Todo delete?
                     docker = True
                     docker_merges.append(merge.url)
                 merge_requests[issue_number].append(merge)
@@ -157,6 +157,7 @@ if __name__ == '__main__':
     #
     #           Вывод результата в Jira
     #
+    print_stage('Вывод результата в Jira')
     issue_dict = {
         "fixVersions": [
     {
