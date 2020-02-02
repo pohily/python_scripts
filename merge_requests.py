@@ -23,6 +23,8 @@ GET_BRANCH = 'https://gitlab.4slovo.ru/api/v4/projects/{}/repository/branches/{}
 
 Merge_request_details = namedtuple('Merge_request_details', ['id', 'merge_status', 'source_branch'])
 
+projects_with_RC = set() # проекты, в которых есть RC
+docker_projects_with_RC = set()
 
 def get_merge_request_details(config, MR):
     """ Возвращает статус (есть или нет конфликты) и id мердж реквеста (вдруг понадобится) в таблицу """
@@ -43,12 +45,14 @@ def make_rc(config, MR, RC_name):
     project = gl.projects.get(f'{PROJECTS_NAMES[MR.project]}')
     if "docker" in MR.url:
         target_branch = project.branches.get('master')
+        docker_projects_with_RC.add(PROJECTS_NAMES[MR.project])
     else:
+        projects_with_RC.add(PROJECTS_NAMES[MR.project])
         try:
             target_branch = project.branches.get(f'{RC_name}')
         except Exception:
             target_branch = project.branches.create({'branch': f'{RC_name}',
-                                              'ref': 'master'})
+                                                     'ref': 'master'})
     _, _, source = get_merge_request_details(config, MR)
     source_branch = project.branches.get(source)
     mr = project.mergerequests.create({'source_branch': f'{source_branch}',
@@ -61,6 +65,19 @@ def make_rc(config, MR, RC_name):
         mr.merge()
     return MR_STATUS[status]
     #return 'Тест'
+
+
+def get_list_of_RC_projects(project, RC_name):
+    result = []
+    if project == 'docker':
+        source = sorted(docker_projects_with_RC)
+    else:
+        source = sorted(projects_with_RC)
+    for pr in source:
+        token = f"private_token={(config['user_data']['GITLAB_PRIVATE_TOKEN'])}"
+        link = requests.get(url=GET_BRANCH.format(PROJECTS_NAMES[pr], RC_name, token))
+        result.append(link)
+    return sorted(result)
 
 
 if __name__ == '__main__':

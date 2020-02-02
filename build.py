@@ -7,7 +7,7 @@ from jira import JIRA
 import requests
 
 from send_notifications import ISSUE_URL, RELEASE_URL, REMOTE_LINK, GIT_LAB, STATUS_FOR_RELEASE
-from merge_requests import get_merge_request_details, make_rc
+from merge_requests import make_rc, get_list_of_RC_projects
 
 docker = False # флаг наличия мерджей на докер
 Merge_request = namedtuple('Merge_request', ['url', 'iid', 'project', 'issue']) # iid - номер МР в url'е
@@ -38,6 +38,8 @@ def get_merge_requests(issue_number):
         if len(url_parts) < 6:
             continue
         if 'docker' in link:
+            global docker
+            docker = True
             project = f'{url_parts[3]}/{url_parts[4]}'
         else:
             project = f'{url_parts[4]}'
@@ -100,7 +102,6 @@ if __name__ == '__main__':
     #
     print_stage('Собираем мердж реквесты')
     merge_requests = defaultdict(list) # словарь- задача: список кортежей ссылок и проектов
-    docker_merges = [] # список мерджей докера
     MRless_issues_number = 1
     if issues_list:
         for issue_number in issues_list:
@@ -112,9 +113,6 @@ if __name__ == '__main__':
             for merge in MR_count:
                 if 'commit' in merge.url:
                     continue
-                elif 'docker' in merge.url: # Todo delete?
-                    docker = True
-                    docker_merges.append(merge.url)
                 merge_requests[issue_number].append(merge)
     #
     #           Заполняем таблицу
@@ -133,18 +131,18 @@ if __name__ == '__main__':
     #
     if docker:
         message += '\n*Docker -> Master*\r\n\r'
+        for link in get_list_of_RC_projects('docker', RC_name):
+            message += f'\n{link}\r'
     #
     #           RC -> Staging
     #
     message += '\n\r\n*RC -> Staging*\r\n\r'
+    for link in get_list_of_RC_projects('not_docker', RC_name):
+        message += f'\n{link}\r'
     #
     #           Staging -> Master
     #
     message += '\n\r\n*Staging -> Master*\r\n\r'
-    #
-    #           Staging -> Master
-    #
-    message += '\n\r\n\r'
     #
     #           Преддеплойные действия
     #
