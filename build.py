@@ -131,13 +131,13 @@ if __name__ == '__main__':
     #
     if docker:
         message += '\n*Docker -> Master*\r\n\r'
-        for link in get_list_of_RC_projects('docker', RC_name):
+        for link in get_list_of_RC_projects('docker', RC_name, config):
             message += f'\n{link}\r'
     #
     #           RC -> Staging
     #
     message += '\n\r\n*RC -> Staging*\r\n\r'
-    for link in get_list_of_RC_projects('not_docker', RC_name):
+    for link in get_list_of_RC_projects('not_docker', RC_name, config):
         message += f'\n{link}\r'
     #
     #           Staging -> Master

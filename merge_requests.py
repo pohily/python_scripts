@@ -2,7 +2,6 @@ import gitlab
 from configparser import ConfigParser
 import requests
 from collections import namedtuple
-import json
 
 
 PROJECTS_NAMES = {"chestnoe_slovo": 7, "crm4slovokz": 11, "4slovokz": 12, "chestnoe_slovo_backend": 20, "common": 91,
@@ -67,7 +66,8 @@ def make_rc(config, MR, RC_name):
     #return 'Тест'
 
 
-def get_list_of_RC_projects(project, RC_name):
+def get_list_of_RC_projects(project, RC_name, config):
+    """ Возвращает список проектов в RC """
     result = []
     if project == 'docker':
         source = sorted(docker_projects_with_RC)
