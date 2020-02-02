@@ -22,16 +22,21 @@ PROJECTS = 'https://gitlab.4slovo.ru/api/v4/projects/{}?{}'
 Merge_request_details = namedtuple('Merge_request_details', ['id', 'merge_status'])
 
 
-def get_merge_request_details(config, project, iid):
+def get_merge_request_details(config, links):
+    """ Возвращает статус (есть или нет конфликты) и id мердж реквеста (вдруг понадобится) в таблицу """
+    _, project, iid = links
     project_id = PROJECTS_NAMES[project]
     token = f"private_token={(config['user_data']['GITLAB_PRIVATE_TOKEN'])}"
     details = requests.get(url=MR_BY_IID.format(project_id, iid, token)).json()
     if details:
         details = details[0]
-        result = Merge_request_details(details['id'], MR_STATUS[details['merge_status']])
-        return result
+        return Merge_request_details(details['id'], MR_STATUS[details['merge_status']])
     else:
         return Merge_request_details('0', 'MR не найден')
+
+
+def make_rc(config, links):
+    return 'Тест'
 
 
 if __name__ == '__main__':

@@ -1,12 +1,13 @@
 from collections import defaultdict, namedtuple
 from sys import argv
+from  datetime import datetime
 
 from configparser import ConfigParser
 from jira import JIRA
 import requests
 
 from send_notifications import ISSUE_URL, RELEASE_URL, REMOTE_LINK, GIT_LAB, STATUS_FOR_RELEASE
-from merge_requests import get_merge_request_details
+from merge_requests import get_merge_request_details, make_rc
 
 docker = False # флаг наличия мерджей на докер
 Merge_request = namedtuple('Merge_request', ['url', 'iid', 'project'])
@@ -48,19 +49,29 @@ def get_merge_requests(issue_number):
 
 
 def get_links(config, merges):
-    """ принимает список кортежей. возвращает ссылки на мерджи SLOV -> RC для таблицы """
+    """ принимает список кортежей. заполняет таблицу ссылками на МР SLOV -> RC и статусами МР """
     result = ''
     start = True
     for merge in merges:
         if not merge:
             return 'Нет мердж реквестов| |\r\n'
-        _, status = get_merge_request_details(config, merge.project, merge.iid)
         if start:
-            result += f'[{merge.project}/{merge.iid}|{merge.url}]|{status}|\r\n'
+            result += f'[{merge.project}/{merge.iid}|{merge.url}]'
+            #
+            #           Пытаемся сделать MR из текущей задачи в RC. Выводим статус в таблицу
+            #
+            status = make_rc(config, merge)
+            result += f'|{status}|\r\n'
             start = False
         else:
-            result += f'| | |[{merge.project}/{merge.iid}|{merge.url}]|{status}|\r\n'
+            result += f'| | |[{merge.project}/{merge.iid}|{merge.url}]'
+            status = make_rc(config, merge)
+            result += f'|{status}|\r\n'
     return result
+
+
+def print_stage(text):
+    print(f'{datetime.now().strftime("%H:%M:%S")} {text}')
 
 
 if __name__ == '__main__':
@@ -77,6 +88,7 @@ if __name__ == '__main__':
     #
     #           Выбираем задачи для релиза в нужных статусах
     #
+    print_stage('Выбираем задачи для релиза в нужных статусах')
     issues_list = {}
     for issue in release_issues:
         if 'сборка' not in issue.fields.summary.lower() \
@@ -86,6 +98,7 @@ if __name__ == '__main__':
     #
     #           Собираем мердж реквесты
     #
+    print_stage('Собираем мердж реквесты')
     merge_requests = defaultdict(list) # словарь- задача: список кортежей ссылок и проектов
     docker_merges = [] # список мерджей докера
     if issues_list:
@@ -100,6 +113,7 @@ if __name__ == '__main__':
     #
     #           Заполняем таблицу
     #
+    print_stage('Заполняем таблицу')
     for index, issue_number in enumerate(sorted(issues_list)):
         message += f"|{index + 1}|[{issue_number}|{ISSUE_URL}{issue_number}]|{get_links(config, merge_requests[issue_number])}"
 
@@ -128,6 +142,7 @@ if __name__ == '__main__':
     #
     #           Преддеплойные действия
     #
+    print_stage('Заполняем деплойные действия')
     message += '\n\r\n\r'
     #
     #           Постдеплойные действия
