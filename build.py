@@ -101,9 +101,15 @@ if __name__ == '__main__':
     print_stage('Собираем мердж реквесты')
     merge_requests = defaultdict(list) # словарь- задача: список кортежей ссылок и проектов
     docker_merges = [] # список мерджей докера
+    MRless_issues_number = 1
     if issues_list:
         for issue_number in issues_list:
-            for merge in get_merge_requests(issue_number):
+            MR_count = get_merge_requests(issue_number)
+            if not MR_count: # если в задаче нет МР
+                message += f"|{MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]| Нет мердж реквестов |(/)|\r\n"
+                MRless_issues_number += 1
+                continue
+            for merge in MR_count:
                 if 'commit' in merge.url:
                     continue
                 elif 'docker' in merge.url:
@@ -114,8 +120,8 @@ if __name__ == '__main__':
     #           Заполняем таблицу
     #
     print_stage('Заполняем таблицу')
-    for index, issue_number in enumerate(sorted(issues_list)):
-        message += f"|{index + 1}|[{issue_number}|{ISSUE_URL}{issue_number}]|{get_links(config, merge_requests[issue_number])}"
+    for index, issue_number in enumerate(sorted(issues_list)): # Todo  сортировка задач по приоритету
+        message += f"|{index + MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]|{get_links(config, merge_requests[issue_number])}"
 
     message += '\n\r'
     #
