@@ -38,9 +38,7 @@ def get_merge_requests(issue_number):
         url_parts = link['object']['url'].split('/')
         global confluence
         if not confluence:
-            if 'confluence' in link['object']['url'] and \
-                    'relationship' in link['application'] and \
-                    link['application']['relationship'] == "mentioned in":
+            if 'confluence' in link['object']['url'] and link['relationship'] == "mentioned in":
                 confluence = link['object']['url']
         if len(url_parts) < 6:
             continue
@@ -108,17 +106,22 @@ if __name__ == '__main__':
     print_stage('Собираем мердж реквесты')
     merge_requests = defaultdict(list) # словарь- задача: список кортежей ссылок и проектов
     MRless_issues_number = 1
+    MRless_issues = []
     if issues_list:
         for issue_number in issues_list:
             MR_count = get_merge_requests(issue_number)
             if not MR_count: # если в задаче нет МР
                 message += f"|{MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]| Нет мердж реквестов - (/)|\r\n"
                 MRless_issues_number += 1
+                MRless_issues.append(issue_number)
                 continue
             for merge in MR_count:
                 if 'commit' in merge.url:
                     continue
                 merge_requests[issue_number].append(merge)
+        if MRless_issues:
+            for item in MRless_issues:
+                issues_list.pop(item)
     #
     #           Заполняем таблицу
     #
@@ -126,7 +129,7 @@ if __name__ == '__main__':
     for index, issue_number in enumerate(sorted(issues_list)): # Todo  сортировка задач по приоритету
         message += f"|{index + MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]|{get_links(config, merge_requests[issue_number])}|\r\n"
 
-    message += f'\n\r[Отчет о тестировании:|{confluence}]\r\n\r\n'
+    message += f'\n\r\n\r[*Отчет о тестировании*.|{confluence}]\r\n\r\n'
     #
     #           Создаем MR RC -> Staging
     #
