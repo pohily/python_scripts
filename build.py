@@ -36,14 +36,17 @@ def get_merge_requests(issue_number):
                                  auth=(config['user_data']['login'], config['user_data']['jira_password'])).json()
     for link in links_json:
         url_parts = link['object']['url'].split('/')
+        global confluence
+        if not confluence:
+            if 'confluence' in link['object']['url'] and \
+                    'relationship' in link['application'] and \
+                    link['application']['relationship'] == "mentioned in":
+                confluence = link['object']['url']
         if len(url_parts) < 6:
             continue
         if 'docker' in link['object']['url']:
             global docker
             docker = True
-        if 'confluence' in link['object']['url'] and link['application']['relationship'] == "mentioned in":
-            global confluence
-            confluence = link['object']['url']
         project = f'{url_parts[4]}'
         iid = url_parts[6]
         merge_link = Merge_request(link['object']['url'], iid, project, issue_number)
@@ -64,12 +67,12 @@ def get_links(config, merges):
             #
             print_stage(f'Пытаемся сделать MR из {issue_number} в {RC_name}')
             status = make_rc(config, merge, RC_name)
-            result += f'|{status}|\r\n'
+            result += f' - {status}'
             start = False
         else:
-            result += f'| | |[{merge.project}/{merge.iid}|{merge.url}]'
+            result += f'\r[{merge.project}/{merge.iid}|{merge.url}]'
             status = make_rc(config, merge, RC_name)
-            result += f'|{status}|\r\n'
+            result += f' - {status}'
     return result
 
 
@@ -87,9 +90,8 @@ if __name__ == '__main__':
     #
     #           До таблицы
     #
-    message = f"Состав релиза:\r\n[{RELEASE_URL.format(release_id)}]\r\n\r\n" \
-              f"Отчет о тестировании:\r\n[{confluence}]\r\n\r\n" \
-              f"||№||Задача||Мердж реквесты SLOV -> RC||Подлит свежий мастер, нет конфликтов||\r\n"
+    message = f"[Состав релиза:|{RELEASE_URL.format(release_id)}]\r\n\r\n" \
+              f"||№||Задача||Мердж реквесты SLOV -> RC. Подлит свежий мастер, нет конфликтов||\r\n"
     #
     #           Выбираем задачи для релиза в нужных статусах
     #
@@ -110,7 +112,7 @@ if __name__ == '__main__':
         for issue_number in issues_list:
             MR_count = get_merge_requests(issue_number)
             if not MR_count: # если в задаче нет МР
-                message += f"|{MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]| Нет мердж реквестов |(/)|\r\n"
+                message += f"|{MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]| Нет мердж реквестов - (/)|\r\n"
                 MRless_issues_number += 1
                 continue
             for merge in MR_count:
@@ -122,9 +124,9 @@ if __name__ == '__main__':
     #
     print_stage('Заполняем таблицу')
     for index, issue_number in enumerate(sorted(issues_list)): # Todo  сортировка задач по приоритету
-        message += f"|{index + MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]|{get_links(config, merge_requests[issue_number])}"
+        message += f"|{index + MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]|{get_links(config, merge_requests[issue_number])}|\r\n"
 
-    message += '\n\r'
+    message += f'\n\r[Отчет о тестировании:|{confluence}]\r\n\r\n'
     #
     #           Создаем MR RC -> Staging
     #

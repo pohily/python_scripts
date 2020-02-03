@@ -28,7 +28,7 @@ projects_with_RC = set() # проекты, в которых есть RC
 docker_projects_with_RC = set()
 
 def get_merge_request_details(config, MR):
-    """ Возвращает статус (есть или нет конфликты) и id мердж реквеста (вдруг понадобится) в таблицу """
+    """ Возвращает статус (есть или нет конфликты), id мердж реквеста (вдруг понадобится) в таблицу, source_branch """
     _, project, iid = MR
     project_id = PROJECTS_NAMES[project]
     token = f"private_token={(config['user_data']['GITLAB_PRIVATE_TOKEN'])}"
@@ -68,7 +68,6 @@ def make_rc(config, MR, RC_name):
     if status == 'can_be_merged':
         mr.merge()
     return MR_STATUS[status]
-    #return 'Тест'
 
 
 def make_mr_to_staging(RC_name, config):
