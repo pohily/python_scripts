@@ -57,7 +57,7 @@ def make_rc(config, MR, RC_name):
     source_branch = project.branches.get(source)
     mr = project.mergerequests.create({'source_branch': source_branch,
                                        'target_branch': target_branch,
-                                       'title': f'{MR.issue} -> {RC_name}',
+                                       'title': f'[skip-ci] {MR.issue} -> {RC_name}',
                                        'target_project_id': PROJECTS_NAMES[MR.project],
                                        })
     _, status, _ = get_merge_request_details(config, mr)
