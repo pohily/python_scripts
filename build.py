@@ -40,9 +40,7 @@ def get_merge_requests(issue_number):
         if 'docker' in link:
             global docker
             docker = True
-            project = f'{url_parts[3]}/{url_parts[4]}'
-        else:
-            project = f'{url_parts[4]}'
+        project = f'{url_parts[4]}'
         iid = url_parts[6]
         merge_link = Merge_request(link['object']['url'], iid, project, issue_number)
         if GIT_LAB in merge_link.url:
@@ -132,13 +130,13 @@ if __name__ == '__main__':
     if docker:
         message += '\n*Docker -> Master*\r\n\r'
         for link in get_list_of_RC_projects('docker', RC_name, config):
-            message += f'\n{link}\r'
+            message += f'\n[{link}]\r'
     #
     #           RC -> Staging
     #
     message += '\n\r\n*RC -> Staging*\r\n\r'
     for link in get_list_of_RC_projects('not_docker', RC_name, config):
-        message += f'\n{link}\r'
+        message += f'\n[{link}]\r'
     #
     #           Staging -> Master
     #

@@ -19,6 +19,7 @@ PROJECT_MERGE_REQUESTS = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requ
 MR_BY_IID = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?iids[]={}&{}'
 PROJECTS = 'https://gitlab.4slovo.ru/api/v4/projects/{}?{}'
 GET_BRANCH = 'https://gitlab.4slovo.ru/api/v4/projects/{}/repository/branches/{}&{}'
+MR_BY_TARGET_BRANCH = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?target_branch={}&{}'
 
 Merge_request_details = namedtuple('Merge_request_details', ['id', 'merge_status', 'source_branch'])
 
@@ -44,9 +45,9 @@ def make_rc(config, MR, RC_name):
     project = gl.projects.get(f'{PROJECTS_NAMES[MR.project]}')
     if "docker" in MR.url:
         target_branch = project.branches.get('master')
-        docker_projects_with_RC.add(PROJECTS_NAMES[MR.project])
+        docker_projects_with_RC.add(MR.project)
     else:
-        projects_with_RC.add(PROJECTS_NAMES[MR.project])
+        projects_with_RC.add(MR.project)
         try:
             target_branch = project.branches.get(f'{RC_name}')
         except Exception:
@@ -68,15 +69,24 @@ def make_rc(config, MR, RC_name):
 
 def get_list_of_RC_projects(project, RC_name, config):
     """ Возвращает список проектов в RC """
+    config = ConfigParser()
+    config.read('config.ini')
+    gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
     result = []
     if project == 'docker':
         source = sorted(docker_projects_with_RC)
     else:
         source = sorted(projects_with_RC)
     for pr in source:
+        project = gl.projects.get(pr)
+        branch = project.branches.get(RC_name)
+        mr_commit = branch.attributes['commit']['id']
         token = f"private_token={(config['user_data']['GITLAB_PRIVATE_TOKEN'])}"
-        link = requests.get(url=GET_BRANCH.format(PROJECTS_NAMES[pr], RC_name, token))
-        result.append(link)
+        mrs_to_rc = requests.get(url=MR_BY_TARGET_BRANCH.format(pr, RC_name, token)).json()
+        for branch in mrs_to_rc:
+            if branch['merge_commit_sha'] == mr_commit:
+                result.append(branch['web_url'])
+                break
     return sorted(result)
 
 
@@ -84,13 +94,16 @@ if __name__ == '__main__':
     config = ConfigParser()
     config.read('config.ini')
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
-
-    project = gl.projects.get('130')
-    try:
-        branch = project.branches.get('rc-ru-5-6-10')
-    except Exception:
-        print("no")
-    pass
+    p = gl.projects.get('166')
+    b = p.branches.get('rc-ru-5-6-10')
+    mr_commit = b.attributes['commit']['id']
+    token = f"private_token={(config['user_data']['GITLAB_PRIVATE_TOKEN'])}"
+    mrs_to_rc = requests.get(url=MR_BY_TARGET_BRANCH.format('166', 'rc-ru-5-6-10', token)).json()
+    for branch in mrs_to_rc:
+        if branch['merge_commit_sha'] == mr_commit:
+            url = branch['web_url']
+            pass
+            pass
     """
     x = f"private_token={(config['user_data']['GITLAB_PRIVATE_TOKEN'])}"
     projects = {}
