@@ -55,7 +55,7 @@ def make_rc(config, MR, RC_name):
                                                      'ref': 'master'})
     _, _, source = get_merge_request_details(config, MR)
     source_branch = project.branches.get(source)
-    mr = project.mergerequests.create({'source_branch': f'{source_branch}',
+    mr = project.mergerequests.create({'source_branch': source_branch,
                                        'target_branch': target_branch,
                                        'title': f'{MR.issue} -> {RC_name}',
                                        'target_project_id': PROJECTS_NAMES[MR.project],
@@ -67,8 +67,26 @@ def make_rc(config, MR, RC_name):
     #return 'Тест'
 
 
+def make_mr_to_staging(RC_name, config):
+    ''' Делаем МР из RC в стейджинг '''
+    config = ConfigParser()
+    config.read('config.ini')
+    gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
+    result = []
+    source = sorted(projects_with_RC)
+    for pr in source:
+        project = gl.projects.get(pr)
+        source_branch = project.branches.get(RC_name)
+        target_branch = 'staging'
+        mr = project.mergerequests.create({'source_branch': source_branch,
+                                           'target_branch': target_branch,
+                                           'title': f'{RC_name} -> Staging',
+                                           'target_project_id': pr,
+                                           })
+    #todo вывод ссылок в стейджинг
+
 def get_list_of_RC_projects(project, RC_name, config):
-    """ Возвращает список проектов в RC """
+    """ Возвращает список ссылок на МР RC -> Staging """
     config = ConfigParser()
     config.read('config.ini')
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])

@@ -7,7 +7,7 @@ from jira import JIRA
 import requests
 
 from send_notifications import ISSUE_URL, RELEASE_URL, REMOTE_LINK, GIT_LAB, STATUS_FOR_RELEASE
-from merge_requests import make_rc, get_list_of_RC_projects
+from merge_requests import make_rc, get_list_of_RC_projects, make_mr_to_staging
 
 docker = False # флаг наличия мерджей на докер
 Merge_request = namedtuple('Merge_request', ['url', 'iid', 'project', 'issue']) # iid - номер МР в url'е
@@ -121,9 +121,9 @@ if __name__ == '__main__':
 
     message += '\n\r'
     #
-    #           Создаем RC
+    #           Создаем MR RC -> Staging
     #
-    pass
+    make_mr_to_staging(RC_name, config)
     #
     #           Docker -> Master
     #
