@@ -10,6 +10,7 @@ from send_notifications import ISSUE_URL, RELEASE_URL, REMOTE_LINK, GIT_LAB, STA
 from merge_requests import make_rc, get_list_of_RC_projects, make_mr_to_staging
 
 docker = False # флаг наличия мерджей на докер
+confluence = '' # ссылка на отчет о тестировании
 Merge_request = namedtuple('Merge_request', ['url', 'iid', 'project', 'issue']) # iid - номер МР в url'е
 
 
@@ -37,9 +38,12 @@ def get_merge_requests(issue_number):
         url_parts = link['object']['url'].split('/')
         if len(url_parts) < 6:
             continue
-        if 'docker' in link:
+        if 'docker' in link['object']['url']:
             global docker
             docker = True
+        if 'confluence' in link['object']['url'] and link['application']['relationship'] == "mentioned in":
+            global confluence
+            confluence = link['object']['url']
         project = f'{url_parts[4]}'
         iid = url_parts[6]
         merge_link = Merge_request(link['object']['url'], iid, project, issue_number)
@@ -83,7 +87,8 @@ if __name__ == '__main__':
     #
     #           До таблицы
     #
-    message = f"Состав релиза:\r\n\r\n[{RELEASE_URL.format(release_id)}]\r\n\r\n" \
+    message = f"Состав релиза:\r\n[{RELEASE_URL.format(release_id)}]\r\n\r\n" \
+              f"Отчет о тестировании:\r\n[{confluence}]\r\n\r\n" \
               f"||№||Задача||Мердж реквесты SLOV -> RC||Подлит свежий мастер, нет конфликтов||\r\n"
     #
     #           Выбираем задачи для релиза в нужных статусах
