@@ -3,6 +3,7 @@ from configparser import ConfigParser
 import requests
 from collections import namedtuple
 
+TEST = True
 
 PROJECTS_NAMES = {"chestnoe_slovo": 7, "crm4slovokz": 11, "4slovokz": 12, "chestnoe_slovo_backend": 20, "common": 91,
                   "chestnoe_slovo_landing": 62, "api": 97, "cache": 86, "sawmill": 90, "inn": 92, "finance": 94,
@@ -41,6 +42,9 @@ def get_merge_request_details(config, MR):
 
 def make_rc(config, MR, RC_name):
     """ Создаем RC, если еще нет. Создаем МР slov -> RC. Если нет конфликтов - делаем МР. Возвращем статус МР """
+    if TEST:
+        return 'Тест'
+
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
     project = gl.projects.get(f'{PROJECTS_NAMES[MR.project]}')
     if "docker" in MR.url:
@@ -69,6 +73,9 @@ def make_rc(config, MR, RC_name):
 
 def make_mr_to_staging(RC_name, config):
     ''' Делаем МР из RC в стейджинг '''
+    if TEST:
+        return 'тест'
+
     config = ConfigParser()
     config.read('config.ini')
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
