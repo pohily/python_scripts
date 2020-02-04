@@ -1,6 +1,4 @@
 from collections import namedtuple
-from configparser import ConfigParser
-from itertools import chain
 
 import gitlab
 import requests
@@ -17,6 +15,7 @@ PROJECTS_NAMES = {"chestnoe_slovo": 7, "crm4slovokz": 11, "4slovokz": 12, "chest
                   "python-scripts": 154, "landing": 159, "ru": 166, "ru-db": 167,
                   }
 MR_STATUS = {'can_be_merged': '(/) Нет конфликтов', 'cannot_be_merged': '(x) Конфликт!'}
+PRIORITY = {'Critical': 1, 'Highest': 2, 'High': 3, 'Medium': 4, 'Low': 5, 'Lowest': 6}
 
 MR_BY_TARGET_BRANCH = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?target_branch={}&{}' # не используются
 PROJECT_MERGE_REQUESTS = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?{}'
@@ -43,7 +42,7 @@ def delete_create_RC(config, project, RC_name):
 
 def get_merge_request_details(config, MR):
     """ Возвращает статус (есть или нет конфликты), source_branch """
-    _, project, iid = MR
+    _, iid, project, _ = MR
     project_id = PROJECTS_NAMES[project]
     token = f"private_token={(config['user_data']['GITLAB_PRIVATE_TOKEN'])}"
     details = requests.get(url=MR_BY_IID.format(project_id, iid, token)).json()

@@ -1,13 +1,12 @@
 from collections import defaultdict, namedtuple
 from configparser import ConfigParser
 from datetime import datetime
-from itertools import chain
 from sys import argv
 
 import requests
 from jira import JIRA
 
-from merge_requests import make_rc, make_mr_to_staging, delete_create_RC
+from merge_requests import make_rc, make_mr_to_staging, delete_create_RC, PRIORITY
 from send_notifications import ISSUE_URL, RELEASE_URL, REMOTE_LINK, GIT_LAB, STATUS_FOR_RELEASE
 
 docker = False # флаг наличия мерджей на докер
@@ -89,13 +88,17 @@ if __name__ == '__main__':
         config.read('config.ini')
         jira_options = {'server': 'https://jira.4slovo.ru/'}
         jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
+        #
+        #           Определяем состав релиза
+        #
+        print_stage('Определяем состав релиза')
         release_name, release_id, release_issues = get_release_details(config, jira)
         RC_name = f'rc-{release_name.replace(".", "-")}'
         #
         #           До таблицы
         #
         message = f"[Состав релиза:|{RELEASE_URL.format(release_id)}]\r\n\r\n" \
-                  f"||№||Задача||Мердж реквесты SLOV -> RC. Подлит свежий мастер, нет конфликтов||\r\n"
+                  f"||№||Задача||Мердж реквесты SLOV -> RC. Статус||\r\n"
         #
         #           Выбираем задачи для релиза в нужных статусах
         #
@@ -105,7 +108,7 @@ if __name__ == '__main__':
             if 'сборка' not in issue.fields.summary.lower() \
                     and issue.fields.status.name in STATUS_FOR_RELEASE \
                     and issue.fields.issuetype.name != 'Defect':
-                issues_list[issue.key] = issue.fields.summary
+                issues_list[issue.key] = PRIORITY[issue.fields.priority.name]
         #
         #           Собираем мердж реквесты
         #
@@ -137,6 +140,7 @@ if __name__ == '__main__':
         #
         #           Удаляем и создаем RC
         #
+        print_stage('Удаляем и создаем RC')
         for project in used_projects:
             delete_create_RC(config, project, RC_name)
         #
@@ -151,7 +155,7 @@ if __name__ == '__main__':
         #
         #           Создаем MR RC -> Staging
         #
-        mr_links = make_mr_to_staging(config, RC_name)
+        mr_links = make_mr_to_staging(config, used_projects, RC_name)
         #
         #           Docker -> Master
         #
@@ -205,14 +209,11 @@ if __name__ == '__main__':
         #
         #           Вывод результата в файл
         #
-
         txt = f"""{message}"""
-
         file.write(txt)
 
 
-
-        # сделать RC ветки
         # деплойные действия
+        # запуск скрипта на гитлабе вебхуком от жиры
         # развернуть стенд на нужных ветках и запустить тесты в гитлабе и регресс (в Дженкинс?)
 
