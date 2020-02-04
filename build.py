@@ -133,20 +133,22 @@ if __name__ == '__main__':
     #
     #           Создаем MR RC -> Staging
     #
-    make_mr_to_staging(config, RC_name)
+    mr_links = make_mr_to_staging(config, RC_name)
     #
     #           Docker -> Master
     #
     if docker:
         message += '\n*Docker -> Master*\r\n\r'
-        for link in get_list_of_RC_projects('docker', RC_name, config):
-            message += f'\n[{link}]\r'
+        for link in mr_links:
+            if 'docker' in link:
+                message += f'\n[{link}]\r'
     #
     #           RC -> Staging
     #
     message += '\n\r\n*RC -> Staging*\r\n\r'
-    for link in get_list_of_RC_projects('not_docker', RC_name, config):
-        message += f'\n[{link}]\r'
+    for link in mr_links:
+        if 'docker' not in link:
+            message += f'\n[{link}]\r'
     #
     #           Staging -> Master
     #

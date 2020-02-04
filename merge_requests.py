@@ -59,9 +59,10 @@ def make_rc(config, MR, RC_name):
         project.branches.get(f'{RC_name}')
     except Exception:
         project.branches.create({'branch': f'{RC_name}', 'ref': 'master'})
+
     target_branch = f'{RC_name}'
-    _, _, source = get_merge_request_details(config, MR)
-    source_branch = source
+    _, _, source_branch = get_merge_request_details(config, MR)
+
     mr = project.mergerequests.create({'source_branch': source_branch,
                                        'target_branch': target_branch,
                                        'title': f'[skip-ci] {MR.issue} -> {RC_name}',
@@ -74,14 +75,14 @@ def make_rc(config, MR, RC_name):
 
 
 def make_mr_to_staging(config, RC_name):
-    ''' Делаем МР из RC в стейджинг '''
+    ''' Делаем МР из RC в стейджинг и возвращаем список ссылок на МР'''
     if TEST:
         return 'тест'
-
+    mr_links = []
     config = ConfigParser()
     config.read('config.ini')
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
-    result = []
+
     for pr in chain(projects_with_RC, docker_projects_with_RC):
         project = gl.projects.get(pr)
         source_branch = RC_name
@@ -94,47 +95,30 @@ def make_mr_to_staging(config, RC_name):
                                            'title': f'{RC_name} -> {target_branch}',
                                            'target_project_id': pr,
                                            })
-    #todo вывод ссылок в стейджинг
-
-def get_list_of_RC_projects(project, RC_name, config):
-    """ Возвращает список ссылок на МР RC -> Staging """
-    config = ConfigParser()
-    config.read('config.ini')
-    gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
-    result = []
-    if project == 'docker':
-        source = sorted(docker_projects_with_RC)
-    else:
-        source = sorted(projects_with_RC)
-    for pr in source:
-        project = gl.projects.get(pr)
-        branch = project.branches.get(RC_name)
-        mr_commit = branch.attributes['commit']['id']
-        token = f"private_token={(config['user_data']['GITLAB_PRIVATE_TOKEN'])}"
-        mrs_to_rc = requests.get(url=MR_BY_TARGET_BRANCH.format(pr, RC_name, token)).json()
-        for branch in mrs_to_rc:
-            if branch['merge_commit_sha'] == mr_commit:
-                result.append(branch['web_url'])
-                break
-    return sorted(result)
+        mr_links.append(mr.attributes['web_url'])
+    return mr_links
 
 
 if __name__ == '__main__':
     config = ConfigParser()
     config.read('config.ini')
+    mr_links = []
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
-    project = gl.projects.get(20)
-    p = project.pipelines.get('7943')
+    RC_name = 'rc-ru-5-6-10'
+    source = [20]
+    for pr in source:
+        project = gl.projects.get(pr)
+        source_branch = RC_name
+        if pr in (110, 166, 167):
+            target_branch = 'master'
+        else:
+            target_branch = 'staging'
+        mr = project.mergerequests.create({'source_branch': source_branch,
+                                           'target_branch': target_branch,
+                                           'title': f'ТЕСТ3 {RC_name} -> {target_branch}',
+                                           'target_project_id': pr,
+                                           })
+        mr_links.append(mr.attributes['web_url'])
     pass
-    """
-    x = f"private_token={(config['user_data']['GITLAB_PRIVATE_TOKEN'])}"
-    projects = {}
-    for i in range(200, 300):
-        project = requests.get(url=PROJECTS.format(i, x))
-        if project.status_code == 200:
-            projects[project.json()['name']] = project.json()['id']
-    with open('projects.json', 'w') as file:
-        json.dump(projects, file)
-    pass"""
 
 
