@@ -1,9 +1,11 @@
-import gitlab
-from configparser import ConfigParser
-import requests
 from collections import namedtuple
+from configparser import ConfigParser
+from itertools import chain
 
-TEST = True
+import gitlab
+import requests
+
+TEST = False
 
 PROJECTS_NAMES = {"chestnoe_slovo": 7, "crm4slovokz": 11, "4slovokz": 12, "chestnoe_slovo_backend": 20, "common": 91,
                   "chestnoe_slovo_landing": 62, "api": 97, "cache": 86, "sawmill": 90, "inn": 92, "finance": 94,
@@ -24,7 +26,7 @@ MR_BY_TARGET_BRANCH = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_request
 
 Merge_request_details = namedtuple('Merge_request_details', ['id', 'merge_status', 'source_branch'])
 
-projects_with_RC = set() # проекты, в которых есть RC
+projects_with_RC = set() # проекты - цифрой, в которых есть RC
 docker_projects_with_RC = set()
 
 def get_merge_request_details(config, MR):
@@ -46,19 +48,20 @@ def make_rc(config, MR, RC_name):
         return 'Тест'
 
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
+
     project = gl.projects.get(f'{PROJECTS_NAMES[MR.project]}')
     if "docker" in MR.url:
-        target_branch = project.branches.get('master')
         docker_projects_with_RC.add(MR.project)
     else:
         projects_with_RC.add(MR.project)
-        try:
-            target_branch = project.branches.get(f'{RC_name}')
-        except Exception:
-            target_branch = project.branches.create({'branch': f'{RC_name}',
-                                                     'ref': 'master'})
+
+    try:
+        project.branches.get(f'{RC_name}')
+    except Exception:
+        project.branches.create({'branch': f'{RC_name}', 'ref': 'master'})
+    target_branch = f'{RC_name}'
     _, _, source = get_merge_request_details(config, MR)
-    source_branch = project.branches.get(source)
+    source_branch = source
     mr = project.mergerequests.create({'source_branch': source_branch,
                                        'target_branch': target_branch,
                                        'title': f'[skip-ci] {MR.issue} -> {RC_name}',
@@ -70,7 +73,7 @@ def make_rc(config, MR, RC_name):
     return MR_STATUS[status]
 
 
-def make_mr_to_staging(RC_name, config):
+def make_mr_to_staging(config, RC_name):
     ''' Делаем МР из RC в стейджинг '''
     if TEST:
         return 'тест'
@@ -79,14 +82,16 @@ def make_mr_to_staging(RC_name, config):
     config.read('config.ini')
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
     result = []
-    source = sorted(projects_with_RC)
-    for pr in source:
+    for pr in chain(projects_with_RC, docker_projects_with_RC):
         project = gl.projects.get(pr)
-        source_branch = project.branches.get(RC_name)
-        target_branch = 'staging'
+        source_branch = RC_name
+        if pr in (110, 166, 167):
+            target_branch = 'master'
+        else:
+            target_branch = 'staging'
         mr = project.mergerequests.create({'source_branch': source_branch,
                                            'target_branch': target_branch,
-                                           'title': f'{RC_name} -> Staging',
+                                           'title': f'{RC_name} -> {target_branch}',
                                            'target_project_id': pr,
                                            })
     #todo вывод ссылок в стейджинг
@@ -118,16 +123,9 @@ if __name__ == '__main__':
     config = ConfigParser()
     config.read('config.ini')
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
-    p = gl.projects.get('166')
-    b = p.branches.get('rc-ru-5-6-10')
-    mr_commit = b.attributes['commit']['id']
-    token = f"private_token={(config['user_data']['GITLAB_PRIVATE_TOKEN'])}"
-    mrs_to_rc = requests.get(url=MR_BY_TARGET_BRANCH.format('166', 'rc-ru-5-6-10', token)).json()
-    for branch in mrs_to_rc:
-        if branch['merge_commit_sha'] == mr_commit:
-            url = branch['web_url']
-            pass
-            pass
+    project = gl.projects.get(20)
+    p = project.pipelines.get('7943')
+    pass
     """
     x = f"private_token={(config['user_data']['GITLAB_PRIVATE_TOKEN'])}"
     projects = {}

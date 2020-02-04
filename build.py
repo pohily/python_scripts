@@ -1,17 +1,17 @@
 from collections import defaultdict, namedtuple
-from sys import argv
-from  datetime import datetime
-
 from configparser import ConfigParser
-from jira import JIRA
-import requests
+from datetime import datetime
+from sys import argv
 
-from send_notifications import ISSUE_URL, RELEASE_URL, REMOTE_LINK, GIT_LAB, STATUS_FOR_RELEASE
+import requests
+from jira import JIRA
+
 from merge_requests import make_rc, get_list_of_RC_projects, make_mr_to_staging
+from send_notifications import ISSUE_URL, RELEASE_URL, REMOTE_LINK, GIT_LAB, STATUS_FOR_RELEASE
 
 docker = False # флаг наличия мерджей на докер
 confluence = '' # ссылка на отчет о тестировании
-Merge_request = namedtuple('Merge_request', ['url', 'iid', 'project', 'issue']) # iid - номер МР в url'е
+Merge_request = namedtuple('Merge_request', ['url', 'iid', 'project', 'issue']) # iid - номер МР в url'е, project - str
 
 
 def get_release_details(config, jira):
@@ -133,7 +133,7 @@ if __name__ == '__main__':
     #
     #           Создаем MR RC -> Staging
     #
-    make_mr_to_staging(RC_name, config)
+    make_mr_to_staging(config, RC_name)
     #
     #           Docker -> Master
     #
