@@ -66,11 +66,14 @@ def get_links(config, merges):
             print_stage(f'Пытаемся сделать MR из {issue_number} в {RC_name}')
             status = make_rc(config, merge, RC_name)
             result += f' - {status}'
+            print_stage(f'{status}')
             start = False
         else:
             result += f'\r[{merge.project}/{merge.iid}|{merge.url}]'
+            print_stage(f'Пытаемся сделать MR из {issue_number} в {RC_name}')
             status = make_rc(config, merge, RC_name)
             result += f' - {status}'
+            print_stage(f'{status}')
     return result
 
 
@@ -79,122 +82,123 @@ def print_stage(text):
 
 
 if __name__ == '__main__':
-    config = ConfigParser()
-    config.read('config.ini')
-    jira_options = {'server': 'https://jira.4slovo.ru/'}
-    jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
-    release_name, release_id, release_issues = get_release_details(config, jira)
-    RC_name = f'rc-{release_name.replace(".", "-")}'
-    #
-    #           До таблицы
-    #
-    message = f"[Состав релиза:|{RELEASE_URL.format(release_id)}]\r\n\r\n" \
-              f"||№||Задача||Мердж реквесты SLOV -> RC. Подлит свежий мастер, нет конфликтов||\r\n"
-    #
-    #           Выбираем задачи для релиза в нужных статусах
-    #
-    print_stage('Выбираем задачи для релиза в нужных статусах')
-    issues_list = {}
-    for issue in release_issues:
-        if 'сборка' not in issue.fields.summary.lower() \
-                and issue.fields.status.name in STATUS_FOR_RELEASE \
-                and issue.fields.issuetype.name != 'Defect':
-            issues_list[issue.key] = issue.fields.summary
-    #
-    #           Собираем мердж реквесты
-    #
-    print_stage('Собираем мердж реквесты')
-    merge_requests = defaultdict(list) # словарь- задача: список кортежей ссылок и проектов
-    MRless_issues_number = 1
-    MRless_issues = []
-    if issues_list:
-        for issue_number in issues_list:
-            MR_count = get_merge_requests(issue_number)
-            if not MR_count: # если в задаче нет МР
-                message += f"|{MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]| Нет мердж реквестов - (/)|\r\n"
-                MRless_issues_number += 1
-                MRless_issues.append(issue_number)
-                continue
-            for merge in MR_count:
-                if 'commit' in merge.url:
+    with open('message.txt', 'w') as file:
+        config = ConfigParser()
+        config.read('config.ini')
+        jira_options = {'server': 'https://jira.4slovo.ru/'}
+        jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
+        release_name, release_id, release_issues = get_release_details(config, jira)
+        RC_name = f'rc-{release_name.replace(".", "-")}'
+        #
+        #           До таблицы
+        #
+        message = f"[Состав релиза:|{RELEASE_URL.format(release_id)}]\r\n\r\n" \
+                  f"||№||Задача||Мердж реквесты SLOV -> RC. Подлит свежий мастер, нет конфликтов||\r\n"
+        #
+        #           Выбираем задачи для релиза в нужных статусах
+        #
+        print_stage('Выбираем задачи для релиза в нужных статусах')
+        issues_list = {}
+        for issue in release_issues:
+            if 'сборка' not in issue.fields.summary.lower() \
+                    and issue.fields.status.name in STATUS_FOR_RELEASE \
+                    and issue.fields.issuetype.name != 'Defect':
+                issues_list[issue.key] = issue.fields.summary
+        #
+        #           Собираем мердж реквесты
+        #
+        print_stage('Собираем мердж реквесты')
+        merge_requests = defaultdict(list) # словарь- задача: список кортежей ссылок и проектов
+        MRless_issues_number = 1
+        MRless_issues = []
+        if issues_list:
+            for issue_number in issues_list:
+                MR_count = get_merge_requests(issue_number)
+                if not MR_count: # если в задаче нет МР
+                    message += f"|{MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]| Нет мердж реквестов - (/)|\r\n"
+                    MRless_issues_number += 1
+                    MRless_issues.append(issue_number)
                     continue
-                merge_requests[issue_number].append(merge)
-        if MRless_issues:
-            for item in MRless_issues:
-                issues_list.pop(item)
-    #
-    #           Заполняем таблицу
-    #
-    print_stage('Заполняем таблицу')
-    for index, issue_number in enumerate(sorted(issues_list)): # Todo  сортировка задач по приоритету
-        message += f"|{index + MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]|{get_links(config, merge_requests[issue_number])}|\r\n"
+                for merge in MR_count:
+                    if 'commit' in merge.url:
+                        continue
+                    merge_requests[issue_number].append(merge)
+            if MRless_issues:
+                for item in MRless_issues:
+                    issues_list.pop(item)
+        #
+        #           Заполняем таблицу
+        #
+        print_stage('Заполняем таблицу')
+        for index, issue_number in enumerate(sorted(issues_list)): # Todo  сортировка задач по приоритету
+            message += f"|{index + MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]|{get_links(config, merge_requests[issue_number])}|\r\n"
 
-    message += f'\n\r\n\r[*Отчет о тестировании*.|{confluence}]\r\n\r\n'
-    #
-    #           Создаем MR RC -> Staging
-    #
-    mr_links = make_mr_to_staging(config, RC_name)
-    #
-    #           Docker -> Master
-    #
-    print_stage('Заполняем ссылки на МР')
-    if docker:
-        message += '\n*Docker -> Master*\r\n\r'
+        message += f'\n\r\n\r[*Отчет о тестировании*.|{confluence}]\r\n\r\n'
+        #
+        #           Создаем MR RC -> Staging
+        #
+        mr_links = make_mr_to_staging(config, RC_name)
+        #
+        #           Docker -> Master
+        #
+        print_stage('Заполняем ссылки на МР')
+        if docker:
+            message += '\n*Docker -> Master*\r\n\r'
+            for link in mr_links:
+                if 'docker' in link:
+                    message += f'\n[{link}]\r'
+        #
+        #           RC -> Staging
+        #
+        message += '\n\r\n*RC -> Staging*\r\n\r'
         for link in mr_links:
-            if 'docker' in link:
+            if 'docker' not in link:
                 message += f'\n[{link}]\r'
-    #
-    #           RC -> Staging
-    #
-    message += '\n\r\n*RC -> Staging*\r\n\r'
-    for link in mr_links:
-        if 'docker' not in link:
-            message += f'\n[{link}]\r'
-    #
-    #           Staging -> Master
-    #
-    message += '\n\r\n*Staging -> Master*\r\n\r'
-    #
-    #           Преддеплойные действия
-    #
-    print_stage('Заполняем деплойные действия')
-    message += '\n\r\n\r'
-    #
-    #           Постдеплойные действия
-    #
-    message += '\n\r\n\r'
-    #
-    #           Вывод результата в Jira
-    #
-    print_stage('Вывод результата в Jira')
-    issue_dict = {
-        "fixVersions": [
-    {
-        "self": f"{RELEASE_URL.format(release_id)}",
-        "id": f"{release_id}",
-        "name": f"{release_name}",
-    }
-    ],
-        'project': {'key': 'SLOV'},
-        'summary': f"Сборка {release_name}",
-        'description': f'{message}',
-        'issuetype': {'name': 'Задача'},
+        #
+        #           Staging -> Master
+        #
+        message += '\n\r\n*Staging -> Master*\r\n\r'
+        #
+        #           Преддеплойные действия
+        #
+        print_stage('Заполняем деплойные действия')
+        message += '\n\r\n\r'
+        #
+        #           Постдеплойные действия
+        #
+        message += '\n\r\n\r'
+        #
+        #           Вывод результата в Jira
+        #
+        print_stage('Вывод результата в Jira')
+        issue_dict = {
+            "fixVersions": [
+        {
+            "self": f"{RELEASE_URL.format(release_id)}",
+            "id": f"{release_id}",
+            "name": f"{release_name}",
+        }
+        ],
+            'project': {'key': 'SLOV'},
+            'summary': f"Сборка {release_name}",
+            'description': f'{message}',
+            'issuetype': {'name': 'Задача'},
 
-    }
-    CREATE_JIRA_ISSUE = eval(config['options']['CREATE_JIRA_ISSUE'])
-    if CREATE_JIRA_ISSUE:
-        new_issue = jira.create_issue(fields=issue_dict)
-    #
-    #           Вывод результата в файл
-    #
-    if not CREATE_JIRA_ISSUE:
+        }
+        CREATE_JIRA_ISSUE = eval(config['options']['CREATE_JIRA_ISSUE'])
+        if CREATE_JIRA_ISSUE:
+            new_issue = jira.create_issue(fields=issue_dict)
+        #
+        #           Вывод результата в файл
+        #
+
         txt = f"""{message}"""
-        with open('message.txt', 'w') as file:
-            file.write(txt)
+
+        file.write(txt)
 
 
 
-    # сделать RC ветки
-    # деплойные действия
-    # развернуть стенд на нужных ветках и запустить тесты в гитлабе и регресс (в Дженкинс?)
+        # сделать RC ветки
+        # деплойные действия
+        # развернуть стенд на нужных ветках и запустить тесты в гитлабе и регресс (в Дженкинс?)
 
