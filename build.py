@@ -1,12 +1,13 @@
 from collections import defaultdict, namedtuple
 from configparser import ConfigParser
 from datetime import datetime
+from itertools import chain
 from sys import argv
 
 import requests
 from jira import JIRA
 
-from merge_requests import make_rc, make_mr_to_staging
+from merge_requests import make_rc, make_mr_to_staging, delete_create_RC
 from send_notifications import ISSUE_URL, RELEASE_URL, REMOTE_LINK, GIT_LAB, STATUS_FOR_RELEASE
 
 docker = False # флаг наличия мерджей на докер
@@ -53,13 +54,14 @@ def get_merge_requests(issue_number):
     return result
 
 
-def get_links(config, merges):
+def get_links(config, merges, max_lenth):
     """ принимает список кортежей. заполняет таблицу ссылками на МР SLOV -> RC и статусами МР """
     result = ''
     start = True
     for merge in merges:
+        padding = ' ' * (max_lenth - len(merge.project) + 1) # чтобы статус МР был на одном уровне в таблицы
         if start:
-            result += f'[{merge.project}/{merge.iid}|{merge.url}]'
+            result += f'[{merge.project}/{merge.iid}|{merge.url}]' + padding
             #
             #           Пытаемся сделать MR из текущей задачи в RC. Выводим статус в таблицу
             #
@@ -69,7 +71,7 @@ def get_links(config, merges):
             print_stage(f'{status}')
             start = False
         else:
-            result += f'\r[{merge.project}/{merge.iid}|{merge.url}]'
+            result += f'\r[{merge.project}/{merge.iid}|{merge.url}]' + padding
             print_stage(f'Пытаемся сделать MR из {issue_number} в {RC_name}')
             status = make_rc(config, merge, RC_name)
             result += f' - {status}'
@@ -109,6 +111,8 @@ if __name__ == '__main__':
         #
         print_stage('Собираем мердж реквесты')
         merge_requests = defaultdict(list) # словарь- задача: список кортежей ссылок и проектов
+        used_projects = set()
+        max_lenth = 0 # длина названия проекта
         MRless_issues_number = 1
         MRless_issues = []
         if issues_list:
@@ -122,16 +126,26 @@ if __name__ == '__main__':
                 for merge in MR_count:
                     if 'commit' in merge.url:
                         continue
+                    if len(merge.project) > max_lenth:
+                        max_lenth = len(merge.project)
+                    used_projects.add(merge.project)
                     merge_requests[issue_number].append(merge)
+
             if MRless_issues:
                 for item in MRless_issues:
                     issues_list.pop(item)
+        #
+        #           Удаляем и создаем RC
+        #
+        for project in used_projects:
+            delete_create_RC(config, project, RC_name)
         #
         #           Заполняем таблицу
         #
         print_stage('Заполняем таблицу')
         for index, issue_number in enumerate(sorted(issues_list)): # Todo  сортировка задач по приоритету
-            message += f"|{index + MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]|{get_links(config, merge_requests[issue_number])}|\r\n"
+            message += f"|{index + MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]|" \
+                       f"{get_links(config, merge_requests[issue_number], max_lenth)}|\r\n"
 
         message += f'\n\r\n\r[*Отчет о тестировании*.|{confluence}]\r\n\r\n'
         #
