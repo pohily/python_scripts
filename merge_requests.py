@@ -30,9 +30,10 @@ Merge_request_details = namedtuple('Merge_request_details', ['merge_status', 'so
 projects_with_RC = set() # проекты - int, в которых есть RC
 docker_projects_with_RC = set()
 
+
 def get_merge_request_details(config, MR):
     """ Возвращает статус (есть или нет конфликты), source_branch """
-    _, project, iid = MR
+    _, iid, project, _ = MR
     project_id = PROJECTS_NAMES[project]
     token = f"private_token={(config['user_data']['GITLAB_PRIVATE_TOKEN'])}"
     details = requests.get(url=MR_BY_IID.format(project_id, iid, token)).json()
@@ -51,15 +52,17 @@ def make_rc(config, MR, RC_name):
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
 
     project = gl.projects.get(f'{PROJECTS_NAMES[MR.project]}')
+
+
+    try:
+        branch = project.branches.get(f'{RC_name}')
+    except Exception:
+        project.branches.create({'branch': f'{RC_name}', 'ref': 'master'})
+
     if "docker" in MR.url:
         docker_projects_with_RC.add(MR.project)
     else:
         projects_with_RC.add(MR.project)
-
-    try:
-        project.branches.get(f'{RC_name}')
-    except Exception:
-        project.branches.create({'branch': f'{RC_name}', 'ref': 'master'})
 
     target_branch = f'{RC_name}'
     _, source_branch = get_merge_request_details(config, MR)
@@ -69,7 +72,7 @@ def make_rc(config, MR, RC_name):
                                        'title': f'[skip-ci] {MR.issue} -> {RC_name}',
                                        'target_project_id': PROJECTS_NAMES[MR.project],
                                        })
-    status, _ = get_merge_request_details(config, mr)
+    status = mr.attributes['merge_status']
     if status == 'can_be_merged':
         mr.merge()
     return MR_STATUS[status]
