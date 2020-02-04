@@ -6,7 +6,7 @@ from sys import argv
 import requests
 from jira import JIRA
 
-from merge_requests import make_rc, get_list_of_RC_projects, make_mr_to_staging
+from merge_requests import make_rc, make_mr_to_staging
 from send_notifications import ISSUE_URL, RELEASE_URL, REMOTE_LINK, GIT_LAB, STATUS_FOR_RELEASE
 
 docker = False # флаг наличия мерджей на докер
@@ -21,7 +21,7 @@ def get_release_details(config, jira):
         if COMMAND_LINE_INPUT:
             release_input = argv[1]
         else:
-            release_input = 'ru.5.6.10'
+            release_input = 'kz.3.14.20'
     except IndexError:
         raise Exception('Enter release name')
     fix_issues = jira.search_issues(f'fixVersion={release_input}')
@@ -137,6 +137,7 @@ if __name__ == '__main__':
     #
     #           Docker -> Master
     #
+    print_stage('Заполняем ссылки на МР')
     if docker:
         message += '\n*Docker -> Master*\r\n\r'
         for link in mr_links:
