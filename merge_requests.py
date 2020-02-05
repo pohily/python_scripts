@@ -1,6 +1,4 @@
 from collections import namedtuple
-from configparser import ConfigParser
-from itertools import chain
 
 import gitlab
 import requests
@@ -17,6 +15,7 @@ PROJECTS_NAMES = {"chestnoe_slovo": 7, "crm4slovokz": 11, "4slovokz": 12, "chest
                   "python-scripts": 154, "landing": 159, "ru": 166, "ru-db": 167,
                   }
 MR_STATUS = {'can_be_merged': '(/) Нет конфликтов', 'cannot_be_merged': '(x) Конфликт!'}
+PRIORITY = {'Critical': 1, 'Highest': 2, 'High': 3, 'Medium': 4, 'Low': 5, 'Lowest': 6}
 
 MR_BY_TARGET_BRANCH = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?target_branch={}&{}' # не используются
 PROJECT_MERGE_REQUESTS = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?{}'
@@ -27,8 +26,18 @@ PROJECTS = 'https://gitlab.4slovo.ru/api/v4/projects/{}?{}'
 
 Merge_request_details = namedtuple('Merge_request_details', ['merge_status', 'source_branch'])
 
-projects_with_RC = set() # проекты - int, в которых есть RC
-docker_projects_with_RC = set()
+
+def delete_create_RC(config, project, RC_name):
+    """ Для каждого затронутого релизом проекта удаляем RC, если есть. Затем создаем RC """
+    if TEST:
+        return 'Тест'
+
+    gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
+    pr = gl.projects.get(f'{PROJECTS_NAMES[project]}')
+    try:
+        pr.branches.get(f'{RC_name}')
+    except Exception:
+        pr.branches.create({'branch': f'{RC_name}', 'ref': 'master'})
 
 
 def get_merge_request_details(config, MR):
@@ -45,24 +54,13 @@ def get_merge_request_details(config, MR):
 
 
 def make_rc(config, MR, RC_name):
-    """ Создаем RC, если еще нет. Создаем МР slov -> RC. Если нет конфликтов - мерджим МР. Возвращем статус МР """
+    """ Создаем МР slov -> RC. Если нет конфликтов - мерджим МР. Возвращем статус МР """
     if TEST:
         return 'Тест'
 
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
 
     project = gl.projects.get(f'{PROJECTS_NAMES[MR.project]}')
-
-
-    try:
-        branch = project.branches.get(f'{RC_name}')
-    except Exception:
-        project.branches.create({'branch': f'{RC_name}', 'ref': 'master'})
-
-    if "docker" in MR.url:
-        docker_projects_with_RC.add(MR.project)
-    else:
-        projects_with_RC.add(MR.project)
 
     target_branch = f'{RC_name}'
     _, source_branch = get_merge_request_details(config, MR)
@@ -78,17 +76,15 @@ def make_rc(config, MR, RC_name):
     return MR_STATUS[status]
 
 
-def make_mr_to_staging(config, RC_name):
-    ''' Делаем МР из RC в стейджинг и возвращаем список ссылок на МР'''
+def make_mr_to_staging(config, projects, RC_name):
+    """ Делаем МР из RC в стейджинг и возвращаем список ссылок на МР """
     if TEST:
         return 'тест'
 
     mr_links = [] # ссылки для вывода под таблицей
-    config = ConfigParser()
-    config.read('config.ini')
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
 
-    for pr in chain(projects_with_RC, docker_projects_with_RC):
+    for pr in projects:
         project = gl.projects.get(pr)
         source_branch = RC_name
         if pr in (110, 166, 167):    # проекты докера
