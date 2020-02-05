@@ -67,7 +67,7 @@ def get_links(config, merges):
         #           Подливаем Мастер в текущую задачу в RC. Выводим статус в таблицу
         #
         print_stage(f'Подливаем Мастер в {issue_number}')
-        status = master_to_slov(config, merge.project)
+        status = master_to_slov(config, merge)
         result += f'{status}|'
         print_stage(f'{status}')
         #

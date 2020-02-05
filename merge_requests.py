@@ -56,11 +56,23 @@ def get_merge_request_details(config, MR):
         return Merge_request_details('MR не найден', '')
 
 
-def master_to_slov(config, issue):
-    """ Подливаем Мастер в текущую задачу в RC. Возвращем статус МР """
+def master_to_slov(config, MR):
+    """ Подливаем Мастер в ветку задачи. Возвращем статус МР """
     if TEST:
         return '(/)Тест'
-    pass
+
+    gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
+    project = gl.projects.get(f'{PROJECTS_NAMES[MR.project]}')
+    _, target_branch = get_merge_request_details(config, MR)
+    mr = project.mergerequests.create({'source_branch': 'master',
+                                       'target_branch': target_branch,
+                                       'title': f"[skip-ci] Вливаем мастер в {(MR.issue).replace('-', '_')}",
+                                       'target_project_id': PROJECTS_NAMES[MR.project],
+                                       })
+    status = mr.attributes['merge_status']
+    if status == 'can_be_merged':  # бывает показывает, что нельзя вмержить, если нет изменений
+        mr.merge()
+    return MR_STATUS[status]
 
 
 def make_rc(config, MR, RC_name):
@@ -69,7 +81,6 @@ def make_rc(config, MR, RC_name):
         return '(/)Тест'
 
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
-
     project = gl.projects.get(f'{PROJECTS_NAMES[MR.project]}')
 
     target_branch = f'{RC_name}'
