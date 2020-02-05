@@ -88,7 +88,7 @@ def make_mr_to_staging(config, projects, RC_name):
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
 
     for pr in projects:
-        project = gl.projects.get(pr)
+        project = gl.projects.get(PROJECTS_NAMES[pr])
         source_branch = RC_name
         if pr in (110, 166, 167):    # проекты докера
             target_branch = 'master'
