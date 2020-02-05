@@ -21,7 +21,7 @@ def get_release_details(config, jira):
         if COMMAND_LINE_INPUT:
             release_input = argv[1]
         else:
-            release_input = 'kz.3.14.20'
+            release_input = 'ru.5.6.10'
     except IndexError:
         raise Exception('Enter release name')
     fix_issues = jira.search_issues(f'fixVersion={release_input}')
@@ -59,8 +59,10 @@ def get_links(config, merges):
     start = True # флаг первого МР, если их в задаче несколько
     for merge in merges:
         if not start: # если МР не первый - добавляем перенос на следующую строку и две пустых ячейки
-            result += '\r|||'
-        result += f'[{merge.project}/{merge.iid}|{merge.url}]|'
+            result += '\n|  |  |'
+        url_parts = merge.url.split('/')
+        table_project = f'{url_parts[3]}/{url_parts[4]}'
+        result += f'[{table_project}/{merge.iid}|{merge.url}]|'
         #
         #           Подливаем Мастер в текущую задачу в RC. Выводим статус в таблицу
         #
@@ -73,7 +75,7 @@ def get_links(config, merges):
         #
         print_stage(f'Пытаемся сделать MR из {issue_number} в {RC_name}')
         status = make_rc(config, merge, RC_name)
-        result += f'{status}|\r\n'
+        result += f'{status}|'
         print_stage(f'{status}')
         start = False
     return result
@@ -99,7 +101,7 @@ if __name__ == '__main__':
         #           До таблицы
         #
         message = f"[Состав релиза:|{RELEASE_URL.format(release_id)}]\r\n\r\n\r\n" \
-                  f"||№||Задача||Мердж реквесты SLOV -> RC||Подлит свежий мастер, статус||Статус МР SLOV -> RC||\r\n"
+                  f"||№||Задача||Мердж реквесты SLOV -> RC||Подлит свежий мастер, статус||Статус мердж реквеста SLOV -> RC||\r\n"
         #
         #           Выбираем задачи для релиза в нужных статусах
         #

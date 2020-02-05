@@ -16,7 +16,7 @@ PROJECTS_NAMES = {"chestnoe_slovo": 7, "crm4slovokz": 11, "4slovokz": 12, "chest
                   "python-scripts": 154, "landing": 159, "ru": 166, "ru-db": 167,
                   }
 MR_STATUS = {'can_be_merged': '(/) Нет конфликтов', 'cannot_be_merged': '(x) Конфликт!'}
-PRIORITY = {'Critical': 1, 'Highest': 2, 'High': 3, 'Medium': 4, 'Low': 5, 'Lowest': 6}
+PRIORITY = {'Critical': 1, 'Highest': 2, 'High': 3, 'Medium': 4, 'Low': 5, 'Lowest': 6, 'Критический': 1}
 
 MR_BY_TARGET_BRANCH = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?target_branch={}&{}' # не используются
 PROJECT_MERGE_REQUESTS = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?{}'
@@ -31,7 +31,7 @@ Merge_request_details = namedtuple('Merge_request_details', ['merge_status', 'so
 def delete_create_RC(config, project, RC_name):
     """ Для каждого затронутого релизом проекта удаляем RC, если есть. Затем создаем RC """
     if TEST:
-        return 'Тест'
+        return '(/)Тест'
 
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
     pr = gl.projects.get(f'{PROJECTS_NAMES[project]}')
@@ -59,14 +59,14 @@ def get_merge_request_details(config, MR):
 def master_to_slov(config, issue):
     """ Подливаем Мастер в текущую задачу в RC. Возвращем статус МР """
     if TEST:
-        return 'Тест'
+        return '(/)Тест'
     pass
 
 
 def make_rc(config, MR, RC_name):
     """ Создаем МР slov -> RC. Если нет конфликтов - мерджим МР. Возвращем статус МР """
     if TEST:
-        return 'Тест'
+        return '(/)Тест'
 
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
 
