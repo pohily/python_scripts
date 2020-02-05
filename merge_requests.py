@@ -1,4 +1,5 @@
 from collections import namedtuple
+from configparser import ConfigParser
 
 import gitlab
 import requests
@@ -67,11 +68,11 @@ def make_rc(config, MR, RC_name):
 
     mr = project.mergerequests.create({'source_branch': source_branch,
                                        'target_branch': target_branch,
-                                       'title': f'[skip-ci] {MR.issue} -> {RC_name}',
+                                       'title': f"[skip-ci] {(MR.issue).replace('-', '_')} -> {RC_name}",
                                        'target_project_id': PROJECTS_NAMES[MR.project],
                                        })
     status = mr.attributes['merge_status']
-    if status == 'can_be_merged':
+    if status == 'can_be_merged': # бывает показывает, что нельзя вмержить, если нет изменений
         mr.merge()
     return MR_STATUS[status]
 
@@ -101,7 +102,11 @@ def make_mr_to_staging(config, projects, RC_name):
 
 
 if __name__ == '__main__':
-
+    config = ConfigParser()
+    config.read('config.ini')
+    gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
+    pr = gl.projects.get('110')
+    editable_mr = pr.mergerequests.get(47, lazy=True)
     pass
 
 

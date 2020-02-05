@@ -53,14 +53,13 @@ def get_merge_requests(issue_number):
     return result
 
 
-def get_links(config, merges, max_lenth):
+def get_links(config, merges):
     """ принимает список кортежей. заполняет таблицу ссылками на МР SLOV -> RC и статусами МР """
     result = ''
     start = True
     for merge in merges:
-        padding = ' ' * (max_lenth - len(merge.project) + 1) # чтобы статус МР был на одном уровне в таблицы
         if start:
-            result += f'[{merge.project}/{merge.iid}|{merge.url}]' + padding
+            result += f'[{merge.project}/{merge.iid}|{merge.url}]'
             #
             #           Пытаемся сделать MR из текущей задачи в RC. Выводим статус в таблицу
             #
@@ -70,7 +69,7 @@ def get_links(config, merges, max_lenth):
             print_stage(f'{status}')
             start = False
         else:
-            result += f'\r[{merge.project}/{merge.iid}|{merge.url}]' + padding
+            result += f'\r[{merge.project}/{merge.iid}|{merge.url}]'
             print_stage(f'Пытаемся сделать MR из {issue_number} в {RC_name}')
             status = make_rc(config, merge, RC_name)
             result += f' - {status}'
@@ -115,7 +114,6 @@ if __name__ == '__main__':
         print_stage('Собираем мердж реквесты')
         merge_requests = defaultdict(list) # словарь- задача: список кортежей ссылок и проектов
         used_projects = set()
-        max_lenth = 0 # длина названия проекта
         MRless_issues_number = 1
         MRless_issues = []
         if issues_list:
@@ -129,8 +127,6 @@ if __name__ == '__main__':
                 for merge in MR_count:
                     if 'commit' in merge.url:
                         continue
-                    if len(merge.project) > max_lenth:
-                        max_lenth = len(merge.project)
                     used_projects.add(merge.project)
                     merge_requests[issue_number].append(merge)
 
@@ -149,7 +145,7 @@ if __name__ == '__main__':
         print_stage('Заполняем таблицу')
         for index, issue_number in enumerate(sorted(issues_list)): # Todo  сортировка задач по приоритету
             message += f"|{index + MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]|" \
-                       f"{get_links(config, merge_requests[issue_number], max_lenth)}|\r\n"
+                       f"{get_links(config, merge_requests[issue_number])}|\r\n"
 
         message += f'\n\r\n\r[*Отчет о тестировании*.|{confluence}]\r\n\r\n'
         #
@@ -211,7 +207,8 @@ if __name__ == '__main__':
         #
         file.write(f"""{message}""")
 
-
+        # тестить не на бою
+        # отдельным шагом вливать мастер в слов, потом уже slov -> rc. соответственно переделываем таблицу - новая колонка
         # деплойные действия
         # запуск скрипта на гитлабе вебхуком от жиры
         # развернуть стенд на нужных ветках и запустить тесты в гитлабе и регресс (в Дженкинс?)
