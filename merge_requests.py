@@ -36,7 +36,9 @@ def delete_create_RC(config, project, RC_name):
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
     pr = gl.projects.get(f'{PROJECTS_NAMES[project]}')
     try:
-        pr.branches.get(f'{RC_name}')
+        rc = pr.branches.get(f'{RC_name}')
+        rc.delete()
+        pr.branches.create({'branch': f'{RC_name}', 'ref': 'master'})
     except Exception:
         pr.branches.create({'branch': f'{RC_name}', 'ref': 'master'})
 
