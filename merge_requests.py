@@ -4,7 +4,7 @@ from configparser import ConfigParser
 import gitlab
 import requests
 
-TEST = False
+TEST = True
 
 PROJECTS_NAMES = {"chestnoe_slovo": 7, "crm4slovokz": 11, "4slovokz": 12, "chestnoe_slovo_backend": 20, "common": 91,
                   "chestnoe_slovo_landing": 62, "api": 97, "cache": 86, "sawmill": 90, "inn": 92, "finance": 94,
@@ -54,6 +54,13 @@ def get_merge_request_details(config, MR):
         return Merge_request_details(MR_STATUS[details['merge_status']], details['source_branch'])
     else:
         return Merge_request_details('MR не найден', '')
+
+
+def master_to_slov(config, issue):
+    """ Подливаем Мастер в текущую задачу в RC. Возвращем статус МР """
+    if TEST:
+        return 'Тест'
+    pass
 
 
 def make_rc(config, MR, RC_name):

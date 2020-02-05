@@ -6,7 +6,7 @@ from sys import argv
 import requests
 from jira import JIRA
 
-from merge_requests import make_rc, make_mr_to_staging, delete_create_RC, PRIORITY
+from merge_requests import make_rc, make_mr_to_staging, delete_create_RC, PRIORITY, master_to_slov
 from send_notifications import ISSUE_URL, RELEASE_URL, REMOTE_LINK, GIT_LAB, STATUS_FOR_RELEASE
 
 docker = False # флаг наличия мерджей на докер
@@ -54,26 +54,28 @@ def get_merge_requests(issue_number):
 
 
 def get_links(config, merges):
-    """ принимает список кортежей. заполняет таблицу ссылками на МР SLOV -> RC и статусами МР """
+    """ принимает список кортежей. заполняет таблицу ссылками на МР SLOV -> RC, и статусами МР Master -> SLOV и SLOV -> RC """
     result = ''
-    start = True
+    start = True # флаг первого МР, если их в задаче несколько
     for merge in merges:
-        if start:
-            result += f'[{merge.project}/{merge.iid}|{merge.url}]'
-            #
-            #           Пытаемся сделать MR из текущей задачи в RC. Выводим статус в таблицу
-            #
-            print_stage(f'Пытаемся сделать MR из {issue_number} в {RC_name}')
-            status = make_rc(config, merge, RC_name)
-            result += f' - {status}'
-            print_stage(f'{status}')
-            start = False
-        else:
-            result += f'\r[{merge.project}/{merge.iid}|{merge.url}]'
-            print_stage(f'Пытаемся сделать MR из {issue_number} в {RC_name}')
-            status = make_rc(config, merge, RC_name)
-            result += f' - {status}'
-            print_stage(f'{status}')
+        if not start: # если МР не первый - добавляем перенос на следующую строку и две пустых ячейки
+            result += '\r|||'
+        result += f'[{merge.project}/{merge.iid}|{merge.url}]|'
+        #
+        #           Подливаем Мастер в текущую задачу в RC. Выводим статус в таблицу
+        #
+        print_stage(f'Подливаем Мастер в {issue_number}')
+        status = master_to_slov(config, merge.project)
+        result += f'{status}|'
+        print_stage(f'{status}')
+        #
+        #           Пытаемся сделать MR из текущей задачи в RC. Выводим статус в таблицу
+        #
+        print_stage(f'Пытаемся сделать MR из {issue_number} в {RC_name}')
+        status = make_rc(config, merge, RC_name)
+        result += f'{status}|\r\n'
+        print_stage(f'{status}')
+        start = False
     return result
 
 
@@ -96,8 +98,8 @@ if __name__ == '__main__':
         #
         #           До таблицы
         #
-        message = f"[Состав релиза:|{RELEASE_URL.format(release_id)}]\r\n\r\n" \
-                  f"||№||Задача||Мердж реквесты SLOV -> RC. Статус||\r\n"
+        message = f"[Состав релиза:|{RELEASE_URL.format(release_id)}]\r\n\r\n\r\n" \
+                  f"||№||Задача||Мердж реквесты SLOV -> RC||Подлит свежий мастер, статус||Статус МР SLOV -> RC||\r\n"
         #
         #           Выбираем задачи для релиза в нужных статусах
         #
@@ -120,7 +122,7 @@ if __name__ == '__main__':
             for issue_number in issues_list:
                 MR_count = get_merge_requests(issue_number)
                 if not MR_count: # если в задаче нет МР
-                    message += f"|{MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]| Нет мердж реквестов - (/)|\r\n"
+                    message += f"|{MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]| Нет мердж реквестов |(/)|(/)|\r\n"
                     MRless_issues_number += 1
                     MRless_issues.append(issue_number)
                     continue
@@ -145,9 +147,9 @@ if __name__ == '__main__':
         print_stage('Заполняем таблицу')
         for index, issue_number in enumerate(sorted(issues_list)): # Todo  сортировка задач по приоритету
             message += f"|{index + MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]|" \
-                       f"{get_links(config, merge_requests[issue_number])}|\r\n"
+                       f"{get_links(config, merge_requests[issue_number])}\r\n"
 
-        message += f'\n\r\n\r[*Отчет о тестировании*.|{confluence}]\r\n\r\n'
+        message += f'\n\r\n\r\n\r[*Отчет о тестировании*.|{confluence}]\n\r\r\n\r\n'
         #
         #           Создаем MR RC -> Staging
         #
