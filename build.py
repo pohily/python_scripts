@@ -6,12 +6,13 @@ from sys import argv
 import requests
 from jira import JIRA
 
-from merge_requests import make_rc, make_mr_to_staging, delete_create_RC, PRIORITY, master_to_slov
+from merge_requests import make_rc, make_mr_to_staging, delete_create_RC, PRIORITY, master_to_slov, merge_rc
 from send_notifications import ISSUE_URL, RELEASE_URL, REMOTE_LINK, GIT_LAB, STATUS_FOR_RELEASE
 
 docker = False # флаг наличия мерджей на докер
 confluence = '' # ссылка на отчет о тестировании
 Merge_request = namedtuple('Merge_request', ['url', 'iid', 'project', 'issue']) # iid - номер МР в url'е, project - str
+MERGE_STATUS = {'(/) Нет конфликтов': '(/) Влит', '(x) Конфликт!': '(x) Не влит'}
 
 
 def get_release_details(config, jira):
@@ -57,28 +58,46 @@ def get_links(config, merges):
     """ принимает список кортежей. заполняет таблицу ссылками на МР SLOV -> RC,
     и статусами МР Master -> SLOV и SLOV -> RC """
 
-    result = ''
-    start = True # флаг первого МР, если их в задаче несколько
-    for merge in merges:
-        if not start: # если МР не первый - добавляем перенос на следующую строку и две пустых ячейки
-            result += '\n|  |  |'
+    statuses = {} # предварительно собираем статусы, затем все сразу вписываем в таблицу
+    conflict = False # флаг наличия конфликтов с RC
+    for index, merge in enumerate(merges):
         url_parts = merge.url.split('/')
-        table_project = f'{url_parts[3]}/{url_parts[4]}'
-        result += f'[{table_project}/{merge.iid}|{merge.url}]|'
+        table_project = f'{url_parts[3]}/{url_parts[4]}' # 0
+        statuses[index] = [f'[{table_project}/{merge.iid}|{merge.url}]|']
         #
         #           Подливаем Мастер в текущую задачу в RC. Выводим статус в таблицу
         #
         print_stage(f'Подливаем Мастер в {issue_number}')
         status = master_to_slov(config, merge)
-        result += f'{status}|'
+        statuses[index].append(f'{status}|') # 1
+        statuses[index].append(MERGE_STATUS[f'{status}|']) # 2
         print_stage(f'{status}')
         #
         #           Пытаемся сделать MR из текущей задачи в RC. Выводим статус в таблицу
         #
         print_stage(f'Пытаемся сделать MR из {issue_number} в {RC_name}')
-        status = make_rc(config, merge, RC_name)
-        result += f'{status}|'
+        status, mr = make_rc(config, merge, RC_name)
+        if status == '(x) Конфликт!':
+            conflict = True
+        statuses[index].append(f'{status}|') # 3
+        statuses[index].append(mr)  # 4
         print_stage(f'{status}')
+
+    if conflict:
+        status = '(x) Не влит'
+    else:
+        status = '(/) Влит'
+    for line in range(len(statuses)):
+        statuses[line].append(status) # 5
+        merge_rc(statuses[line][4])
+
+    result = ''
+    start = True  # флаг первого МР, если их в задаче несколько
+    # 0 - ссылка на МР, 1 - статус Мастер -> slov, 2 - влит/не влит, 3 - статус slov -> RC, 4 - mr, 5 - влит/не влит
+    for line in range(len(statuses)):
+        if not start: # если МР не первый - добавляем перенос на следующую строку и две пустых ячейки
+            result += f'\n|  |  |'
+        result += f'{statuses[line][0]}|{statuses[line][1]}, {statuses[line][2]}|{statuses[line][3]}, {statuses[line][5]}|'
         start = False
     return result
 
@@ -214,6 +233,7 @@ if __name__ == '__main__':
         file.write(f"""{message}""")
 
         #todo
+        # запуск pipeline
         # тестить не на бою
         # деплойные действия
         # запуск скрипта на гитлабе вебхуком от жиры

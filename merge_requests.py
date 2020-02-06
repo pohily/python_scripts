@@ -92,9 +92,15 @@ def make_rc(config, MR, RC_name):
                                        'target_project_id': PROJECTS_NAMES[MR.project],
                                        })
     status = mr.attributes['merge_status']
-    if status == 'can_be_merged': # бывает показывает, что нельзя вмержить, если нет изменений
-        mr.merge()
-    return MR_STATUS[status]
+    return MR_STATUS[status], mr
+
+
+def merge_rc (MR):
+    if TEST:
+        return
+
+    gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
+    MR.merge()
 
 
 def make_mr_to_staging(config, projects, RC_name):
