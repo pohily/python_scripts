@@ -78,7 +78,7 @@ def master_to_slov(config, MR):
 def make_rc(config, MR, RC_name):
     """ Создаем МР slov -> RC. Если нет конфликтов - мерджим МР. Возвращем статус МР """
     if TEST:
-        return '(/)Тест'
+        return '(/)Тест', 'тест'
 
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
     project = gl.projects.get(f'{PROJECTS_NAMES[MR.project]}')
@@ -106,7 +106,7 @@ def merge_rc (config, MR):
 def make_mr_to_staging(config, projects, RC_name):
     """ Делаем МР из RC в стейджинг и возвращаем список ссылок на МР """
     if TEST:
-        return 'тест'
+        return [projects]
 
     mr_links = [] # ссылки для вывода под таблицей
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])

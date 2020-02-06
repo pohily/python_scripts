@@ -13,7 +13,7 @@ docker = False  # флаг наличия мерджей на докер
 confluence = ''  # ссылка на отчет о тестировании
 conflict_projects = set()  # собираем проекты с конфликтами, чтобы не делать из них МР в стейджинг
 Merge_request = namedtuple('Merge_request', ['url', 'iid', 'project', 'issue'])  # iid - номер МР в url'е, project - str
-MERGE_STATUS = {'(/) Нет конфликтов': '(/) Влит', '(x) Конфликт!': '(x) Не влит'}
+MERGE_STATUS = {'(/) Нет конфликтов': '(/) Влит', '(x) Конфликт!': '(x) Не влит', '(/)Тест': '(/)Тест'}
 
 
 def get_release_details(config, jira):
@@ -23,7 +23,7 @@ def get_release_details(config, jira):
         if COMMAND_LINE_INPUT:
             release_input = argv[1]
         else:
-            release_input = 'ru.5.6.10'
+            release_input = 'ru.5.6.90'
     except IndexError:
         raise Exception('Enter release name')
     fix_issues = jira.search_issues(f'fixVersion={release_input}')
