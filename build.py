@@ -9,9 +9,10 @@ from jira import JIRA
 from merge_requests import make_rc, make_mr_to_staging, delete_create_RC, PRIORITY, master_to_slov, merge_rc
 from send_notifications import ISSUE_URL, RELEASE_URL, REMOTE_LINK, GIT_LAB, STATUS_FOR_RELEASE
 
-docker = False # флаг наличия мерджей на докер
-confluence = '' # ссылка на отчет о тестировании
-Merge_request = namedtuple('Merge_request', ['url', 'iid', 'project', 'issue']) # iid - номер МР в url'е, project - str
+docker = False  # флаг наличия мерджей на докер
+confluence = ''  # ссылка на отчет о тестировании
+conflict_projects = set()  # собираем проекты с конфликтами, чтобы не делать из них МР в стейджинг
+Merge_request = namedtuple('Merge_request', ['url', 'iid', 'project', 'issue'])  # iid - номер МР в url'е, project - str
 MERGE_STATUS = {'(/) Нет конфликтов': '(/) Влит', '(x) Конфликт!': '(x) Не влит'}
 
 
@@ -58,8 +59,8 @@ def get_links(config, merges):
     """ принимает список кортежей. заполняет таблицу ссылками на МР SLOV -> RC,
     и статусами МР Master -> SLOV и SLOV -> RC """
 
-    statuses = {} # предварительно собираем статусы, затем все сразу вписываем в таблицу
-    conflict = False # флаг наличия конфликтов с RC
+    statuses = {}  # предварительно собираем статусы, затем все сразу вписываем в таблицу
+    conflict = False  # флаг наличия конфликтов с RC
     for index, merge in enumerate(merges):
         url_parts = merge.url.split('/')
         table_project = f'{url_parts[3]}/{url_parts[4]}' # 0
@@ -78,6 +79,8 @@ def get_links(config, merges):
         print_stage(f'Пытаемся сделать MR из {issue_number} в {RC_name}')
         status, mr = make_rc(config, merge, RC_name)
         if status == '(x) Конфликт!':
+            global conflict_projects
+            conflict_projects.add(merge.project)
             conflict = True
         statuses[index].append(status)  # 3
         statuses[index].append(mr)  # 4
@@ -138,7 +141,7 @@ if __name__ == '__main__':
         #           Собираем мердж реквесты
         #
         print_stage('Собираем мердж реквесты')
-        merge_requests = defaultdict(list) # словарь- задача: список кортежей ссылок и проектов
+        merge_requests = defaultdict(list)  # словарь- задача: список кортежей ссылок и проектов
         used_projects = set()
         MRless_issues_number = 1
         MRless_issues = []
@@ -169,15 +172,15 @@ if __name__ == '__main__':
         #           Заполняем таблицу
         #
         print_stage('Заполняем таблицу')
-        for index, issue_number in enumerate(sorted(issues_list)): # Todo  сортировка задач по приоритету
+        for index, issue_number in enumerate(sorted(issues_list)):
             message += f"|{index + MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]|" \
                        f"{get_links(config, merge_requests[issue_number])}\r\n"
 
         message += f'\n\r\n\r\n\r[*Отчет о тестировании*.|{confluence}]\n\r\r\n\r\n'
         #
-        #           Создаем MR RC -> Staging
+        #           Создаем MR RC -> Staging для проектов, в которых не было конфликтов
         #
-        mr_links = make_mr_to_staging(config, used_projects, RC_name)
+        mr_links = make_mr_to_staging(config, used_projects - conflict_projects, RC_name)
         #
         #           Docker -> Master
         #
@@ -234,8 +237,8 @@ if __name__ == '__main__':
         file.write(f"""{message}""")
 
         #todo
+        # сортировка задач по приоритету
         # запуск pipeline
-        # тестить не на бою
         # деплойные действия
         # запуск скрипта на гитлабе вебхуком от жиры
         # развернуть стенд на нужных ветках и запустить тесты в гитлабе и регресс (в Дженкинс?)
