@@ -63,15 +63,15 @@ def get_links(config, merges):
     for index, merge in enumerate(merges):
         url_parts = merge.url.split('/')
         table_project = f'{url_parts[3]}/{url_parts[4]}' # 0
-        statuses[index] = [f'[{table_project}/{merge.iid}|{merge.url}]|']
+        statuses[index] = [f'[{table_project}/{merge.iid}|{merge.url}]']
         #
         #           Подливаем Мастер в текущую задачу в RC. Выводим статус в таблицу
         #
         print_stage(f'Подливаем Мастер в {issue_number}')
         status = master_to_slov(config, merge)
-        statuses[index].append(f'{status}|') # 1
-        statuses[index].append(MERGE_STATUS[f'{status}|']) # 2
-        print_stage(f'{status}')
+        statuses[index].append(status)  # 1
+        statuses[index].append(MERGE_STATUS[status])  # 2
+        print_stage(status)
         #
         #           Пытаемся сделать MR из текущей задачи в RC. Выводим статус в таблицу
         #
@@ -79,17 +79,18 @@ def get_links(config, merges):
         status, mr = make_rc(config, merge, RC_name)
         if status == '(x) Конфликт!':
             conflict = True
-        statuses[index].append(f'{status}|') # 3
+        statuses[index].append(status)  # 3
         statuses[index].append(mr)  # 4
-        print_stage(f'{status}')
+        print_stage(status)
 
     if conflict:
         status = '(x) Не влит'
     else:
         status = '(/) Влит'
     for line in range(len(statuses)):
-        statuses[line].append(status) # 5
-        merge_rc(statuses[line][4])
+        statuses[line].append(status)  # 5
+        if not conflict:
+            merge_rc(config, statuses[line][4])
 
     result = ''
     start = True  # флаг первого МР, если их в задаче несколько

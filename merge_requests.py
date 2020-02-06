@@ -95,7 +95,7 @@ def make_rc(config, MR, RC_name):
     return MR_STATUS[status], mr
 
 
-def merge_rc (MR):
+def merge_rc (config, MR):
     if TEST:
         return
 
