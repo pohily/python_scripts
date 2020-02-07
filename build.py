@@ -193,8 +193,11 @@ if __name__ == '__main__':
         #
         for merge in rc_merges:
             merge_rc(config, merge)
-
-        message += f'\n\r\n\r\n\r[*Отчет о тестировании*.|{confluence}]\n\r\r\n\r\n'
+        #
+        #           Мерджим SLOV -> RC
+        #
+        if confluence:
+            message += f'\n\r\n\r\n\r[*Отчет о тестировании*.|{confluence}]\n\r\r\n\r\n'
         #
         #           Создаем MR RC -> Staging для проектов, в которых не было конфликтов
         #
@@ -255,7 +258,8 @@ if __name__ == '__main__':
         file.write(f"""{message}""")
 
         #todo
-        # в табличку вносить ссылки не из задач, а
+        # для МР из slov в RC нужно брать не все МР задачи, а просто спиок проектов, использованных в задаче
+        # в таблицу вставлять ссылки на slov->rc
         # сортировка задач по приоритету
         # запуск pipeline
         # деплойные действия
