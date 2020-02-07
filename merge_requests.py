@@ -114,14 +114,14 @@ def make_mr_to_staging(config, projects, RC_name):
     for pr in projects:
         project = gl.projects.get(PROJECTS_NAMES[pr])
         source_branch = RC_name
-        if pr in (110, 166, 167):    # проекты докера
+        if PROJECTS_NAMES[pr] in (110, 166, 167):    # проекты докера
             target_branch = 'master'
         else:
             target_branch = 'staging'
         mr = project.mergerequests.create({'source_branch': source_branch,
                                            'target_branch': target_branch,
                                            'title': f'{RC_name} -> {target_branch}',
-                                           'target_project_id': pr,
+                                           'target_project_id': PROJECTS_NAMES[pr],
                                            })
         mr_links.append(mr.attributes['web_url'])
     return mr_links

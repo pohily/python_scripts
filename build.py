@@ -23,7 +23,7 @@ def get_release_details(config, jira):
         if COMMAND_LINE_INPUT:
             release_input = argv[1]
         else:
-            release_input = 'ru.5.6.90'
+            release_input = 'ru.5.6.15'
     except IndexError:
         raise Exception('Enter release name')
     fix_issues = jira.search_issues(f'fixVersion={release_input}')
@@ -68,31 +68,32 @@ def get_links(config, merges):
         #
         #           Подливаем Мастер в текущую задачу в RC. Выводим статус в таблицу
         #
-        print_stage(f'Подливаем Мастер из {merge.project} в {issue_number}')
-        status = master_to_slov(config, merge)
+        #print_stage(f'Подливаем Мастер из {merge.project} в {issue_number}')
+        #status = master_to_slov(config, merge)
+        status = '(/) Нет конфликтов'
         statuses[index].append(status)  # 1
         statuses[index].append(MERGE_STATUS[status])  # 2
-        print_stage(status)
+        #print_stage(status)
         #
         #           Пытаемся сделать MR из текущей задачи в RC. Выводим статус в таблицу
         #
         global conflict_projects
-        if status == '(x) Конфликт!':
+        """if status == '(x) Конфликт!':
             print_stage(f'Пропускаем MR из {issue_number} в {RC_name} из-за конфликта MR Мастер -> {issue_number}')
             conflict_projects.add(merge.project)
             conflict = True
             statuses[index].append(status)  # 3
             statuses[index].append(False)  # 4
             print_stage(status)
-        else:
-            print_stage(f'Пытаемся сделать MR из {issue_number} в {RC_name}')
-            status, mr = make_rc(config, merge, RC_name)
-            if status == '(x) Конфликт!':
-                conflict_projects.add(merge.project)
-                conflict = True
-            statuses[index].append(status)  # 3
-            statuses[index].append(mr)  # 4
-            print_stage(status)
+        else:"""
+        print_stage(f'Пытаемся сделать MR из {issue_number} в {RC_name}')
+        status, mr = make_rc(config, merge, RC_name)
+        if status == '(x) Конфликт!':
+            conflict_projects.add(merge.project)
+            conflict = True
+        statuses[index].append(status)  # 3
+        statuses[index].append(mr)  # 4
+        print_stage(status)
 
     if conflict:
         status = '(x) Не влит'
@@ -135,7 +136,7 @@ if __name__ == '__main__':
         #           До таблицы
         #
         message = f"[Состав релиза:|{RELEASE_URL.format(release_id)}]\r\n\r\n\r\n" \
-        f"||№||Задача||Мердж реквесты SLOV -> RC||Подлит свежий мастер, статус||Статус мердж реквеста SLOV -> RC||\r\n"
+        f"||№||Задача||Мердж реквесты SLOV -> Мастер||Подлит свежий мастер, статус||Статус мердж реквеста SLOV -> RC||\r\n"
         #
         #           Выбираем задачи для релиза в нужных статусах
         #
@@ -254,6 +255,7 @@ if __name__ == '__main__':
         file.write(f"""{message}""")
 
         #todo
+        # в табличку вносить ссылки не из задач, а
         # сортировка задач по приоритету
         # запуск pipeline
         # деплойные действия
