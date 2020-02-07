@@ -90,10 +90,11 @@ def get_links(config, merges):
         status = '(x) Не влит'
     else:
         status = '(/) Влит'
+    merges_to_rc = []
     for line in range(len(statuses)):
         statuses[line].append(status)  # 5
         if not conflict:
-            merge_rc(config, statuses[line][4])
+            merges_to_rc.append(statuses[line][4])
 
     result = ''
     start = True  # флаг первого МР, если их в задаче несколько
@@ -103,7 +104,7 @@ def get_links(config, merges):
             result += f'\n|  |  |'
         result += f'{statuses[line][0]}|{statuses[line][1]}, {statuses[line][2]}|{statuses[line][3]}, {statuses[line][5]}|'
         start = False
-    return result
+    return result, merges_to_rc
 
 
 def print_stage(text):
@@ -172,9 +173,16 @@ if __name__ == '__main__':
         #           Заполняем таблицу
         #
         print_stage('Заполняем таблицу')
+        rc_merges = []
         for index, issue_number in enumerate(sorted(issues_list)):
-            message += f"|{index + MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]|" \
-                       f"{get_links(config, merge_requests[issue_number])}\r\n"
+            result, merges_to_rc = get_links(config, merge_requests[issue_number])
+            message += f"|{index + MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]|{result}\r\n"
+            rc_merges += merges_to_rc
+        #
+        #           Мерджим SLOV -> RC
+        #
+        for merge in rc_merges:
+            merge_rc(config, merge)
 
         message += f'\n\r\n\r\n\r[*Отчет о тестировании*.|{confluence}]\n\r\r\n\r\n'
         #
