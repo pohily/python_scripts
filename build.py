@@ -68,7 +68,7 @@ def get_links(config, merges):
         #
         #           Подливаем Мастер в текущую задачу в RC. Выводим статус в таблицу
         #
-        print_stage(f'Подливаем Мастер в {issue_number}')
+        print_stage(f'Подливаем Мастер из {merge.project} в {issue_number}')
         status = master_to_slov(config, merge)
         statuses[index].append(status)  # 1
         statuses[index].append(MERGE_STATUS[status])  # 2
@@ -76,15 +76,23 @@ def get_links(config, merges):
         #
         #           Пытаемся сделать MR из текущей задачи в RC. Выводим статус в таблицу
         #
-        print_stage(f'Пытаемся сделать MR из {issue_number} в {RC_name}')
-        status, mr = make_rc(config, merge, RC_name)
+        global conflict_projects
         if status == '(x) Конфликт!':
-            global conflict_projects
+            print_stage(f'Пропускаем MR из {issue_number} в {RC_name} из-за конфликта MR Мастер -> {issue_number}')
             conflict_projects.add(merge.project)
             conflict = True
-        statuses[index].append(status)  # 3
-        statuses[index].append(mr)  # 4
-        print_stage(status)
+            statuses[index].append(status)  # 3
+            statuses[index].append(False)  # 4
+            print_stage(status)
+        else:
+            print_stage(f'Пытаемся сделать MR из {issue_number} в {RC_name}')
+            status, mr = make_rc(config, merge, RC_name)
+            if status == '(x) Конфликт!':
+                conflict_projects.add(merge.project)
+                conflict = True
+            statuses[index].append(status)  # 3
+            statuses[index].append(mr)  # 4
+            print_stage(status)
 
     if conflict:
         status = '(x) Не влит'
@@ -177,7 +185,8 @@ if __name__ == '__main__':
         for index, issue_number in enumerate(sorted(issues_list)):
             result, merges_to_rc = get_links(config, merge_requests[issue_number])
             message += f"|{index + MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]|{result}\r\n"
-            rc_merges += merges_to_rc
+            if rc_merges:
+                rc_merges += merges_to_rc
         #
         #           Мерджим SLOV -> RC
         #

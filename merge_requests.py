@@ -4,10 +4,10 @@ from configparser import ConfigParser
 import gitlab
 import requests
 
-TEST = True
+TEST = False
 
 PROJECTS_NAMES = {"chestnoe_slovo": 7, "crm4slovokz": 11, "4slovokz": 12, "chestnoe_slovo_backend": 20, "common": 91,
-                  "chestnoe_slovo_landing": 62, "api": 97, "cache": 86, "sawmill": 90, "inn": 92, "finance": 94,
+                  "chestnoe_slovo_landing": 62, "api": 79, "cache": 86, "sawmill": 90, "inn": 92, "finance": 94,
                   "ge": 100, "robotmailer": 102, "finance_client": 103, "kz": 110, "rabbitClient": 113,
                   "fs-client": 116, "fs": 117, "selenium-chrome": 118, "yaml-config": 119, "money": 120,
                   "enum-generator": 121, "helper": 122, "registry-generator": 123, "interface-generator": 124,
@@ -39,7 +39,7 @@ def delete_create_RC(config, project, RC_name):
         rc = pr.branches.get(f'{RC_name}')
         rc.delete()
         pr.branches.create({'branch': f'{RC_name}', 'ref': 'master'})
-    except Exception:
+    except gitlab.GitlabError:
         pr.branches.create({'branch': f'{RC_name}', 'ref': 'master'})
 
 
@@ -131,8 +131,12 @@ if __name__ == '__main__':
     config = ConfigParser()
     config.read('config.ini')
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
-    pr = gl.projects.get('110')
-    editable_mr = pr.mergerequests.get(47, lazy=True)
+    project = gl.projects.get(79)
+    mr = project.mergerequests.create({'source_branch': 'slov-4901',
+                                       'target_branch': 'slov-4902',
+                                       'title': f'[skip-ci] test',
+                                       'target_project_id': 20,
+                                       })
     pass
 
 
