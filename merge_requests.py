@@ -16,7 +16,7 @@ PROJECTS_NAMES = {"chestnoe_slovo": 7, "crm4slovokz": 11, "4slovokz": 12, "chest
                   "python-scripts": 154, "landing": 159, "ru": 166, "ru-db": 167,
                   }
 MR_STATUS = {'can_be_merged': '(/) Нет конфликтов', 'cannot_be_merged': '(x) Конфликт!'}
-PRIORITY = {'Critical': 1, 'Highest': 2, 'High': 3, 'Medium': 4, 'Low': 5, 'Lowest': 6, 'Критический': 1}
+PRIORITY = {'Critical': '(!)', 'Highest': '(*r)', 'High': '(*)', 'Medium': '(*g)', 'Low': '(*b)', 'Lowest': '(*b)', 'Критический': '(!)'}
 
 MR_BY_TARGET_BRANCH = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?target_branch={}&{}' # не используются
 PROJECT_MERGE_REQUESTS = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?{}'
@@ -56,27 +56,8 @@ def get_merge_request_details(config, MR):
         return Merge_request_details('MR не найден', '')
 
 
-def master_to_slov(config, MR):
-    """ Подливаем Мастер в ветку задачи. Возвращем статус МР """
-    if TEST:
-        return '(/)Тест'
-
-    gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
-    project = gl.projects.get(f'{PROJECTS_NAMES[MR.project]}')
-    _, target_branch = get_merge_request_details(config, MR)
-    mr = project.mergerequests.create({'source_branch': 'master',
-                                       'target_branch': target_branch,
-                                       'title': f"[skip-ci] Вливаем мастер в {(MR.issue).replace('-', '_')}",
-                                       'target_project_id': PROJECTS_NAMES[MR.project],
-                                       })
-    status = mr.attributes['merge_status']
-    if status == 'can_be_merged':  # бывает показывает, что нельзя вмержить, если нет изменений
-        mr.merge()
-    return MR_STATUS[status]
-
-
 def make_rc(config, MR, RC_name):
-    """ Создаем МР slov -> RC. Если нет конфликтов - мерджим МР. Возвращем статус МР """
+    """ Создаем МР slov -> RC. Если нет конфликтов - мерджим МР. Возвращем статус МР и сам МР"""
     if TEST:
         return '(/)Тест', 'тест'
 
@@ -114,7 +95,7 @@ def make_mr_to_staging(config, projects, RC_name):
     for pr in projects:
         project = gl.projects.get(PROJECTS_NAMES[pr])
         source_branch = RC_name
-        if PROJECTS_NAMES[pr] in (110, 166, 167):    # проекты докера
+        if PROJECTS_NAMES[pr] in (110, 166, 167, 86):    # проекты докера
             target_branch = 'master'
         else:
             target_branch = 'staging'
