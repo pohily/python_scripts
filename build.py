@@ -67,14 +67,13 @@ def get_links(config, merges):
         #           Пытаемся создать MR из текущей задачи в RC. Выводим статус в таблицу
         #
         print_stage(f'Пытаемся сделать MR из {issue_number} в {RC_name}')
-        status, mr = make_rc(config, merge, RC_name)
+        status, url, mr = make_rc(config, merge, RC_name)
         global conflict_projects
         if status == '(x) Конфликт!':
             conflict_projects.add(merge.project)
             conflict = True
         statuses[index] = [status]  # 0
         statuses[index].append(mr)  # 1
-        url = mr.attributes['web_url']
         url_parts = url.split('/')
         statuses[index].append(f'{url_parts[3]}/{url_parts[4]}/{url_parts[6]}')  # 2
         print_stage(status)
