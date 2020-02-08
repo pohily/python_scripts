@@ -4,7 +4,7 @@ from configparser import ConfigParser
 import gitlab
 import requests
 
-TEST = False
+TEST = True
 
 PROJECTS_NAMES = {"chestnoe_slovo": 7, "crm4slovokz": 11, "4slovokz": 12, "chestnoe_slovo_backend": 20, "common": 91,
                   "chestnoe_slovo_landing": 62, "api": 79, "cache": 86, "sawmill": 90, "inn": 92, "finance": 94,
@@ -16,8 +16,8 @@ PROJECTS_NAMES = {"chestnoe_slovo": 7, "crm4slovokz": 11, "4slovokz": 12, "chest
                   "python-scripts": 154, "landing": 159, "ru": 166, "ru-db": 167,
                   }
 MR_STATUS = {'can_be_merged': '(/) Нет конфликтов', 'cannot_be_merged': '(x) Конфликт!'}
-PRIORITY = {'Critical': '(!)', 'Highest': '(*r)', 'High': '(*)', 'Medium': '(*g)',
-            'Low': '(*b)', 'Lowest': '(*b)', 'Критический': '(!)'}
+PRIORITY = {'Critical': '(!) - Critical', 'Highest': '(*r) - Highest', 'High': '(*) - High', 'Medium': '(*g) - Medium',
+            'Low': '(*b) - Low', 'Lowest': '(*b) - Lowest', 'Критический': '(!) - Critical'}
 
 MR_BY_TARGET_BRANCH = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?target_branch={}&{}' # не используются
 PROJECT_MERGE_REQUESTS = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?{}'
@@ -60,7 +60,7 @@ def get_merge_request_details(config, MR):
 def make_rc(config, MR, RC_name):
     """ Создаем МР slov -> RC. Если нет конфликтов - мерджим МР. Возвращем статус МР и сам МР"""
     if TEST:
-        return '(/)Тест', 'https://gitlab.4slovo.ru/4slovo.ru/chestnoe_slovo_backend/merge_requests/тест', 'тест'
+        return '(/) Тест', 'https://gitlab.4slovo.ru/4slovo.ru/chestnoe_slovo_backend/merge_requests/тест', 'тест'
 
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
     project = gl.projects.get(f'{PROJECTS_NAMES[MR.project]}')

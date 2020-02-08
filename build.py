@@ -13,7 +13,7 @@ docker = False  # флаг наличия мерджей на докер
 confluence = ''  # ссылка на отчет о тестировании
 conflict_projects = set()  # собираем проекты с конфликтами, чтобы не делать из них МР в стейджинг
 Merge_request = namedtuple('Merge_request', ['url', 'iid', 'project', 'issue'])  # iid - номер МР в url'е, project - str
-MERGE_STATUS = {'(/) Нет конфликтов': '(/) Влит', '(x) Конфликт!': '(x) Не влит', '(/)Тест': '(/)Тест'}
+MERGE_STATUS = {'(/) Нет конфликтов': '(/) Влит', '(x) Конфликт!': '(x) Не влит', '(/)Тест': '(/) Тест'}
 
 
 def get_release_details(config, jira):
@@ -58,7 +58,8 @@ def get_merge_requests(issue_number):
 
 
 def get_links(config, merges):
-    """ принимает список кортежей. Делает МР SLOV -> RC. Заполняет таблицу ссылками на SLOV -> RC и статусами SLOV -> RC """
+    """ принимает список кортежей. Делает МР SLOV -> RC.
+    Заполняет таблицу ссылками на SLOV -> RC и статусами SLOV -> RC """
 
     statuses = {}  # предварительно собираем статусы, затем все сразу вписываем в таблицу
     conflict = False  # флаг наличия конфликтов с RC
@@ -75,7 +76,7 @@ def get_links(config, merges):
         statuses[index] = [status]  # 0
         statuses[index].append(mr)  # 1
         url_parts = url.split('/')
-        statuses[index].append(f'{url_parts[3]}/{url_parts[4]}/{url_parts[6]}')  # 2
+        statuses[index].append(f'[{url_parts[3]}/{url_parts[4]}/{url_parts[6]}|{url}]')  # 2
         print_stage(status)
     #
     #           Мержим MR из текущей задачи в RC. Выводим ссылку на МР в таблицу
@@ -87,7 +88,7 @@ def get_links(config, merges):
     for line in range(len(statuses)):
         statuses[line].append(status)  # 3
         if not conflict:
-            print_stage(f'Мержим {issue_number} в {RC_name} - {line}')
+            print_stage(f'Мержим {issue_number} в {RC_name}')
             merge_rc(config, statuses[line][1])
 
     result = ''
@@ -178,7 +179,7 @@ if __name__ == '__main__':
         #
         #           Docker -> Master
         #
-        print_stage('Заполняем ссылки на МР')
+        print_stage('Заполняем ссылки на МР RC -> Staging')
         if docker:
             message += '\n*Docker -> Master*\r\n\r'
             for link in mr_links:
