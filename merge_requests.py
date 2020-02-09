@@ -21,6 +21,7 @@ PRIORITY = {'Critical': '(!) - Critical', 'Highest': '(*r) - Highest', 'High': '
 
 MR_BY_TARGET_BRANCH = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?target_branch={}&{}' # не используются
 PROJECT_MERGE_REQUESTS = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?{}'
+MR_BY_SOURCE_AND_TARGET = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?target_branch={}&source_branch={}&{}'
 
 GET_BRANCH = 'https://gitlab.4slovo.ru/api/v4/projects/{}/repository/branches/{}&{}'
 MR_BY_IID = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?iids[]={}&{}'
@@ -67,12 +68,13 @@ def make_rc(config, MR, RC_name):
 
     target_branch = f'{RC_name}'
     _, source_branch = get_merge_request_details(config, MR)
-
-    mr = project.mergerequests.create({'source_branch': source_branch,
-                                       'target_branch': target_branch,
-                                       'title': f"[skip-ci] {(MR.issue).replace('-', '_')} -> {RC_name}",
-                                       'target_project_id': PROJECTS_NAMES[MR.project],
-                                       })
+    mr = project.mergerequests.list(state='opened', source_branch=source_branch, target_branch=target_branch)
+    if not mr:
+        mr = project.mergerequests.create({'source_branch': source_branch,
+                                           'target_branch': target_branch,
+                                           'title': f"[skip-ci] {(MR.issue).replace('-', '_')} -> {RC_name}",
+                                           'target_project_id': PROJECTS_NAMES[MR.project],
+                                           })
     status = mr.attributes['merge_status']
     url = mr.attributes['web_url']
     return MR_STATUS[status], url, mr
@@ -101,11 +103,13 @@ def make_mr_to_staging(config, projects, RC_name):
             target_branch = 'master'
         else:
             target_branch = 'staging'
-        mr = project.mergerequests.create({'source_branch': source_branch,
-                                           'target_branch': target_branch,
-                                           'title': f'{RC_name} -> {target_branch}',
-                                           'target_project_id': PROJECTS_NAMES[pr],
-                                           })
+        mr = project.mergerequests.list(state='opened', source_branch=source_branch, target_branch=target_branch)
+        if not mr:
+            mr = project.mergerequests.create({'source_branch': source_branch,
+                                               'target_branch': target_branch,
+                                               'title': f'{RC_name} -> {target_branch}',
+                                               'target_project_id': PROJECTS_NAMES[pr],
+                                               })
         mr_links.append(mr.attributes['web_url'])
     return mr_links
 
@@ -115,6 +119,7 @@ if __name__ == '__main__':
     config.read('config.ini')
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
     project = gl.projects.get(154)
+    mrs = project.mergerequests.list(state='opened', source_branch='AT-84', target_branch='master')
     try:
         mr = project.mergerequests.create({'source_branch': 'AT-85',
                                            'target_branch': 'master',

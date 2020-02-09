@@ -31,7 +31,7 @@ def get_release_details(config, jira):
     return release_input, fix_id, fix_issues
 
 
-def get_merge_requests(issue_number):
+def get_merge_requests(config, issue_number):
     """ Ищет ссылки на МР в задаче и возвращает список МР, по одному для каждого затронутого проекта в задаче """
     result = []
     projects = set()
@@ -143,7 +143,7 @@ if __name__ == '__main__':
         MRless_issues = []
         if issues_list:
             for issue_number in issues_list:
-                MR_count = get_merge_requests(issue_number)
+                MR_count = get_merge_requests(config, issue_number)
                 if not MR_count: # если в задаче нет МР
                     message += f"|{MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]|{issues_list[issue_number]}| Нет мердж реквестов |(/)|\r\n"
                     MRless_issues_number += 1
