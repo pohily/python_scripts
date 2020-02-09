@@ -114,12 +114,14 @@ if __name__ == '__main__':
     config = ConfigParser()
     config.read('config.ini')
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
-    project = gl.projects.get(79)
-    mr = project.mergerequests.create({'source_branch': 'slov-4901',
-                                       'target_branch': 'slov-4902',
-                                       'title': f'[skip-ci] test',
-                                       'target_project_id': 20,
-                                       })
-    pass
+    project = gl.projects.get(154)
+    try:
+        mr = project.mergerequests.create({'source_branch': 'AT-85',
+                                           'target_branch': 'master',
+                                           'title': f'[skip-ci] test',
+                                           'target_project_id': 154,
+                                           })
+    except [gitlab.exceptions.GitlabHttpError, gitlab.exceptions.GitlabCreateError]:
+        pass
 
 
