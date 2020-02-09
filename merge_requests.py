@@ -58,7 +58,7 @@ def get_merge_request_details(config, MR):
 
 
 def make_rc(config, MR, RC_name):
-    """ Создаем МР slov -> RC. Если нет конфликтов - мерджим МР. Возвращем статус МР и сам МР"""
+    """ Создаем МР slov -> RC. Возвращем статус МР, его url и сам МР"""
     if TEST:
         return '(/) Тест', 'https://gitlab.4slovo.ru/4slovo.ru/chestnoe_slovo_backend/merge_requests/тест', 'тест'
 
@@ -87,7 +87,7 @@ def merge_rc (config, MR):
 
 
 def make_mr_to_staging(config, projects, RC_name):
-    """ Делаем МР из RC в стейджинг и возвращаем список ссылок на МР """
+    """ Делаем МР из RC в стейджинг для всех затронутых проектов и возвращаем список ссылок на МР """
     if TEST:
         return [projects]
 

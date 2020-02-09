@@ -32,7 +32,7 @@ def get_release_details(config, jira):
 
 
 def get_merge_requests(issue_number):
-    """ Ищет ссылки на мердж реквесты в задаче и возвращает список ссылок и проектов"""
+    """ Ищет ссылки на МР в задаче и возвращает список МР, по одному для каждого затронутого проекта в задаче """
     result = []
     projects = set()
     links_json = requests.get(url=REMOTE_LINK.format(issue_number),
@@ -58,7 +58,7 @@ def get_merge_requests(issue_number):
 
 
 def get_links(config, merges):
-    """ принимает список кортежей. Делает МР SLOV -> RC.
+    """ принимает список кортежей МР одной задачи. Делает МР SLOV -> RC.
     Заполняет таблицу ссылками на SLOV -> RC и статусами SLOV -> RC """
 
     statuses = {}  # предварительно собираем статусы, затем все сразу вписываем в таблицу
@@ -79,7 +79,7 @@ def get_links(config, merges):
         statuses[index].append(f'[{url_parts[3]}/{url_parts[4]}/{url_parts[6]}|{url}]')  # 2
         print_stage(status)
     #
-    #           Мержим MR из текущей задачи в RC. Выводим ссылку на МР в таблицу
+    #           Мержим MR из текущей задачи в RC
     #
     if conflict:
         status = '(x) Не влит'
@@ -95,7 +95,7 @@ def get_links(config, merges):
     start = True  # флаг первого МР, если их в задаче несколько
     # 0 - статус slov -> RC, 1 - mr, 2 - MR url, 3 - влит/не влит
     for line in range(len(statuses)):
-        if not start: # если МР не первый - добавляем перенос на следующую строку и две пустых ячейки
+        if not start: # если МР не первый - добавляем перенос на следующую строку и три пустых ячейки
             result += f'\n|  |  |  |'
         result += f'{statuses[line][2]}|{statuses[line][0]}, {statuses[line][3]}|'
         start = False
