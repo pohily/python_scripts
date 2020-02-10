@@ -13,7 +13,8 @@ docker = False  # флаг наличия мерджей на докер
 confluence = ''  # ссылка на отчет о тестировании
 conflict_projects = set()  # собираем проекты с конфликтами, чтобы не делать из них МР в стейджинг
 Merge_request = namedtuple('Merge_request', ['url', 'iid', 'project', 'issue'])  # iid - номер МР в url'е, project - str
-MERGE_STATUS = {'(/) Нет конфликтов': '(/) Влит', '(x) Конфликт!': '(x) Не влит', '(/)Тест': '(/) Тест'}
+MERGE_STATUS = {'(/) Нет конфликтов': '(/) Влит', '(x) Конфликт!': '(x) Не влит', '(/)Тест': '(/) Тест',
+                'pipeline fail': '(x) Тесты slov->master не прошли!'}
 
 
 def get_release_details(config, jira):
@@ -70,13 +71,20 @@ def get_links(config, merges):
         print_stage(f'Пытаемся сделать MR из {issue_number} в {RC_name}')
         status, url, mr = make_rc(config, merge, RC_name)
         global conflict_projects
-        if status == '(x) Конфликт!':
+        if status != '(/) Нет конфликтов':
+            if status == 'pipeline fail':   # - случай, когда МР не создавался из-за pipeline fail
+                status = MERGE_STATUS[status]
             conflict_projects.add(merge.project)
             conflict = True
+
         statuses[index] = [status]  # 0
-        statuses[index].append(mr)  # 1
-        url_parts = url.split('/')
-        statuses[index].append(f'[{url_parts[3]}/{url_parts[4]}/{url_parts[6]}|{url}]')  # 2
+        if mr:
+            statuses[index].append(mr)  # 1
+            url_parts = url.split('/')
+            statuses[index].append(f'[{url_parts[3]}/{url_parts[4]}/{url_parts[6]}|{url}]')  # 2
+        else:
+            statuses[index].append('')  # 1  - случай, когда МР не создавался из-за pipeline fail
+            statuses[index].append('')  # 2
         print_stage(status)
     #
     #           Мержим MR из текущей задачи в RC
@@ -86,6 +94,8 @@ def get_links(config, merges):
     else:
         status = '(/) Влит'
     for line in range(len(statuses)):
+        if not statuses[line][-1]:   # - случай, когда МР не создавался из-за pipeline fail
+            statuses[line].append('(x) Не создан')
         statuses[line].append(status)  # 3
         if not conflict:
             print_stage(f'Мержим {issue_number} в {RC_name}')
@@ -232,7 +242,7 @@ if __name__ == '__main__':
         file.write(f"""{message}""")
 
         #todo
-        # проверять pipeline slov-> master, если не прошли - не вливать в rc
+        # сделал проверку pipeline slov-> master, проверить
         # нужна проверка на МР: если они есть но зактрыты, вновь открыть их или удалить и созать новый
         # запуск pipeline
         # деплойные действия

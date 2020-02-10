@@ -18,6 +18,7 @@ PROJECTS_NAMES = {"chestnoe_slovo": 7, "crm4slovokz": 11, "4slovokz": 12, "chest
 MR_STATUS = {'can_be_merged': '(/) Нет конфликтов', 'cannot_be_merged': '(x) Конфликт!'}
 PRIORITY = {'Critical': '(!) - Critical', 'Highest': '(*r) - Highest', 'High': '(*) - High', 'Medium': '(*g) - Medium',
             'Low': '(*b) - Low', 'Lowest': '(*b) - Lowest', 'Критический': '(!) - Critical'}
+PIPELINE_STATUSES = {'running': 0, 'pending': 0, 'success': 1, 'failed': 0, 'canceled': 0, 'skipped': 0}
 
 MR_BY_TARGET_BRANCH = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?target_branch={}&{}' # не используются
 PROJECT_MERGE_REQUESTS = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?{}'
@@ -68,6 +69,18 @@ def make_rc(config, MR, RC_name):
 
     target_branch = f'{RC_name}'
     _, source_branch = get_merge_request_details(config, MR)
+    #
+    #           проверка статусов pipeline
+    #
+    pipelines = project.pipelines.list(ref=f'{MR.issue}')
+    if isinstance(pipelines, list):
+        pipelines = pipelines[0]
+    status = pipelines.attributes['status']
+    if status != 'success':
+        return 'pipeline fail', '', ''
+    #
+    #           если тесты прошли - мержим
+    #
     mr = project.mergerequests.list(state='opened', source_branch=source_branch, target_branch=target_branch)
     if not mr:
         mr = project.mergerequests.create({'source_branch': source_branch,
@@ -122,15 +135,17 @@ if __name__ == '__main__':
     config = ConfigParser()
     config.read('config.ini')
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
-    project = gl.projects.get(154)
-    mrs = project.mergerequests.list(source_branch='AT-84', target_branch='master')
-    try:
+    project = gl.projects.get(20)
+    mr = project.mergerequests.list(source_branch='slov-4811', target_branch='master')
+    pipelines = project.pipelines.list(ref='slov-4811')
+    if not mr:
         mr = project.mergerequests.create({'source_branch': 'AT-85',
                                            'target_branch': 'master',
                                            'title': f'[skip-ci] test',
-                                           'target_project_id': 154,
+                                           'target_project_id': 79,
                                            })
-    except [gitlab.exceptions.GitlabHttpError, gitlab.exceptions.GitlabCreateError]:
-        pass
+    if isinstance(mr, list):
+        mr = mr[0]
+    pass
 
 
