@@ -4,7 +4,7 @@ from configparser import ConfigParser
 import gitlab
 import requests
 
-TEST = True
+TEST = False
 
 PROJECTS_NAMES = {"chestnoe_slovo": 7, "crm4slovokz": 11, "4slovokz": 12, "chestnoe_slovo_backend": 20, "common": 91,
                   "chestnoe_slovo_landing": 62, "api": 79, "cache": 86, "sawmill": 90, "inn": 92, "finance": 94,
@@ -75,6 +75,8 @@ def make_rc(config, MR, RC_name):
                                            'title': f"[skip-ci] {(MR.issue).replace('-', '_')} -> {RC_name}",
                                            'target_project_id': PROJECTS_NAMES[MR.project],
                                            })
+    if isinstance(mr, list):
+        mr = mr[0]
     status = mr.attributes['merge_status']
     url = mr.attributes['web_url']
     return MR_STATUS[status], url, mr
@@ -103,13 +105,15 @@ def make_mr_to_staging(config, projects, RC_name):
             target_branch = 'master'
         else:
             target_branch = 'staging'
-        mr = project.mergerequests.list(state='opened', source_branch=source_branch, target_branch=target_branch)
+        mr = project.mergerequests.list(source_branch=source_branch, target_branch=target_branch)
         if not mr:
             mr = project.mergerequests.create({'source_branch': source_branch,
                                                'target_branch': target_branch,
                                                'title': f'{RC_name} -> {target_branch}',
                                                'target_project_id': PROJECTS_NAMES[pr],
                                                })
+        if isinstance(mr, list):
+            mr = mr[0]
         mr_links.append(mr.attributes['web_url'])
     return mr_links
 
@@ -119,7 +123,7 @@ if __name__ == '__main__':
     config.read('config.ini')
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
     project = gl.projects.get(154)
-    mrs = project.mergerequests.list(state='opened', source_branch='AT-84', target_branch='master')
+    mrs = project.mergerequests.list(source_branch='AT-84', target_branch='master')
     try:
         mr = project.mergerequests.create({'source_branch': 'AT-85',
                                            'target_branch': 'master',
