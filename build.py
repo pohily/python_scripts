@@ -14,7 +14,7 @@ confluence = ''  # ссылка на отчет о тестировании
 conflict_projects = set()  # собираем проекты с конфликтами, чтобы не делать из них МР в стейджинг
 Merge_request = namedtuple('Merge_request', ['url', 'iid', 'project', 'issue'])  # iid - номер МР в url'е, project - str
 MERGE_STATUS = {'(/) Нет конфликтов': '(/) Влит', '(x) Конфликт!': '(x) Не влит', '(/)Тест': '(/) Тест',
-                'pipeline fail': '(x) Тесты slov->master не прошли!'}
+                'pipeline fail': '(x) Тесты не прошли!'}
 
 
 def get_release_details(config, jira):
@@ -95,8 +95,9 @@ def get_links(config, merges):
         status = '(/) Влит'
     for line in range(len(statuses)):
         if not statuses[line][-1]:   # - случай, когда МР не создавался из-за pipeline fail
-            statuses[line].append('(x) Не создан')
-        statuses[line].append(status)  # 3
+            statuses[line].append('(x) Не создан')  # 3
+        else:
+            statuses[line].append(status)  # 3
         if not conflict:
             print_stage(f'Мержим {issue_number} в {RC_name}')
             merge_rc(config, statuses[line][1])
