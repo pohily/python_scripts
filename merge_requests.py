@@ -72,16 +72,17 @@ def make_rc(config, MR, RC_name):
     #
     #           проверка статусов pipeline
     #
-    pipelines = project.pipelines.list(ref=f'{MR.issue}')
-    if isinstance(pipelines, list):
-        pipelines = pipelines[0]
-    status = pipelines.attributes['status']
-    if status != 'success':
-        return 'pipeline fail', '', ''
+    if PROJECTS_NAMES[MR.project] in [20, 79]:  # проекты, в которых есть тесты
+        pipelines = project.pipelines.list(ref=f'{MR.issue}')
+        if isinstance(pipelines, list):
+            pipelines = pipelines[0]
+        status = pipelines.attributes['status']
+        if status != 'success':
+            return 'pipeline fail', '', ''
     #
     #           если тесты прошли - мержим
     #
-    mr = project.mergerequests.list(state='opened', source_branch=source_branch, target_branch=target_branch)
+    mr = project.mergerequests.list(source_branch=source_branch, target_branch=target_branch)
     if not mr:
         mr = project.mergerequests.create({'source_branch': source_branch,
                                            'target_branch': target_branch,
@@ -135,9 +136,9 @@ if __name__ == '__main__':
     config = ConfigParser()
     config.read('config.ini')
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
-    project = gl.projects.get(20)
-    mr = project.mergerequests.list(source_branch='slov-4811', target_branch='master')
-    pipelines = project.pipelines.list(ref='slov-4811')
+    project = gl.projects.get(7)
+    mr = project.mergerequests.list(source_branch='slov-3935', target_branch='master')
+    pipelines = project.pipelines.list(ref='3935')
     if not mr:
         mr = project.mergerequests.create({'source_branch': 'AT-85',
                                            'target_branch': 'master',
