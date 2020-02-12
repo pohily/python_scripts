@@ -72,7 +72,7 @@ def make_rc(config, MR, RC_name):
     #
     #           проверка статусов pipeline
     #
-    if PROJECTS_NAMES[MR.project] in [20, 79]:  # проекты, в которых есть тесты
+    if PROJECTS_NAMES[MR.project] in [20, 79, 110, 166]:  # проекты, в которых есть тесты
         pipelines = project.pipelines.list(ref=f'{MR.issue}')
         if isinstance(pipelines, list):
             pipelines = pipelines[0]
@@ -104,7 +104,7 @@ def merge_rc (config, MR):
     MR.merge()
 
 
-def make_mr_to_staging(config, projects, RC_name):
+def make_mr_to_staging_master(config, projects, RC_name, target):
     """ Делаем МР из RC в стейджинг для всех затронутых проектов и возвращаем список ссылок на МР """
     if TEST:
         return [projects]
@@ -114,16 +114,24 @@ def make_mr_to_staging(config, projects, RC_name):
 
     for pr in projects:
         project = gl.projects.get(PROJECTS_NAMES[pr])
-        source_branch = RC_name
-        if PROJECTS_NAMES[pr] in (110, 166, 167, 86):    # проекты докера
-            target_branch = 'master'
+        if target == 'staging':
+            if PROJECTS_NAMES[pr] in (110, 166, 167):    # проекты докера
+                target_branch = 'master'
+            else:
+                target_branch = 'staging'
+            source_branch = RC_name
+            title = f'{RC_name} -> {target_branch}'
         else:
-            target_branch = 'staging'
+            if PROJECTS_NAMES[pr] in (110, 166, 167):    # проекты докера
+                continue
+            target_branch = 'master'
+            source_branch = 'staging'
+            title = 'staging -> master'
         mr = project.mergerequests.list(source_branch=source_branch, target_branch=target_branch)
         if not mr:
             mr = project.mergerequests.create({'source_branch': source_branch,
                                                'target_branch': target_branch,
-                                               'title': f'{RC_name} -> {target_branch}',
+                                               'title': title,
                                                'target_project_id': PROJECTS_NAMES[pr],
                                                })
         if isinstance(mr, list):

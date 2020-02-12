@@ -6,7 +6,7 @@ from sys import argv
 import requests
 from jira import JIRA
 
-from merge_requests import make_rc, make_mr_to_staging, delete_create_RC, PRIORITY, merge_rc
+from merge_requests import make_rc, make_mr_to_staging_master, delete_create_RC, PRIORITY, merge_rc
 from send_notifications import ISSUE_URL, RELEASE_URL, REMOTE_LINK, GIT_LAB, STATUS_FOR_RELEASE
 
 docker = False  # флаг наличия мерджей на докер
@@ -133,7 +133,7 @@ if __name__ == '__main__':
         #           До таблицы
         #
         message = f"[*Состав релиза:*|{RELEASE_URL.format(release_id)}]\r\n\r\n\r\n" \
-        f"||№||Задача||Приоритет||Мердж реквесты SLOV -> RC||Статус мердж реквеста SLOV -> RC||\r\n"
+                  f"||№||Задача||Приоритет||Мердж реквесты SLOV -> RC||Статус мердж реквеста SLOV -> RC||\r\n"
         #
         #           Выбираем задачи для релиза в нужных статусах
         #
@@ -184,29 +184,37 @@ if __name__ == '__main__':
         if confluence:
             message += f'\n\r\n\r\n\r[*Отчет о тестировании*.|{confluence}]\n\r\r\n\r\n'
         #
-        #           Создаем MR RC -> Staging для проектов, в которых не было конфликтов
+        #           Создаем MR RC -> Staging для всех проектов (передумали вычитать проекты с конфликтами)
         #
-        mr_links = make_mr_to_staging(config, used_projects - conflict_projects, RC_name)
+        print_stage('Делаем МР RC -> Staging')
+        staging_links = make_mr_to_staging_master(config, used_projects, RC_name, 'staging')
         #
         #           Docker -> Master
         #
-        print_stage('Заполняем ссылки на МР RC -> Staging')
+        print_stage('Заполняем ссылки на МР RC -> Staging, Staging -> Master')
         if docker:
             message += '\n*Docker -> Master*\r\n\r'
-            for link in mr_links:
+            for link in staging_links:
                 if 'docker' in link:
                     message += f'\n[{link}]\r'
         #
         #           RC -> Staging
         #
         message += '\n\r\n*RC -> Staging*\r\n\r'
-        for link in mr_links:
+        for link in staging_links:
             if 'docker' not in link:
                 message += f'\n[{link}]\r'
+        #
+        #           Создаем MR Staging -> Master
+        #
+        print_stage('Делаем МР Staging -> Master')
+        master_links = make_mr_to_staging_master(config, used_projects, RC_name, 'master')
         #
         #           Staging -> Master
         #
         message += '\n\r\n*Staging -> Master*\r\n\r'
+        for link in master_links:
+            message += f'\n[{link}]\r'
         #
         #           Преддеплойные действия
         #
@@ -222,12 +230,12 @@ if __name__ == '__main__':
         print_stage('Вывод результата в Jira')
         issue_dict = {
             "fixVersions": [
-        {
-            "self": f"{RELEASE_URL.format(release_id)}",
-            "id": f"{release_id}",
-            "name": f"{release_name}",
-        }
-        ],
+                {
+                    "self": f"{RELEASE_URL.format(release_id)}",
+                    "id": f"{release_id}",
+                    "name": f"{release_name}",
+                }
+            ],
             'project': {'key': 'SLOV'},
             'summary': f"Сборка {release_name}",
             'description': f'{message}',
@@ -244,7 +252,6 @@ if __name__ == '__main__':
 
         #todo
         # сделал проверку pipeline slov-> master, проверить
-        # нужна проверка на МР: если они есть но зактрыты, вновь открыть их или удалить и созать новый
         # запуск pipeline
         # деплойные действия
         # запуск скрипта на гитлабе вебхуком от жиры
