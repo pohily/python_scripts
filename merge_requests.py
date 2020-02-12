@@ -20,10 +20,6 @@ PRIORITY = {'Critical': '(!) - Critical', 'Highest': '(*r) - Highest', 'High': '
             'Low': '(*b) - Low', 'Lowest': '(*b) - Lowest', 'Критический': '(!) - Critical'}
 PIPELINE_STATUSES = {'running': 0, 'pending': 0, 'success': 1, 'failed': 0, 'canceled': 0, 'skipped': 0}
 
-MR_BY_TARGET_BRANCH = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?target_branch={}&{}' # не используются
-PROJECT_MERGE_REQUESTS = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?{}'
-MR_BY_SOURCE_AND_TARGET = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?target_branch={}&source_branch={}&{}'
-
 GET_BRANCH = 'https://gitlab.4slovo.ru/api/v4/projects/{}/repository/branches/{}&{}'
 MR_BY_IID = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?iids[]={}&{}'
 PROJECTS = 'https://gitlab.4slovo.ru/api/v4/projects/{}?{}'

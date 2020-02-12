@@ -24,7 +24,7 @@ def get_release_details(config, jira):
         if COMMAND_LINE_INPUT:
             release_input = argv[1]
         else:
-            release_input = 'ru.5.6.20'
+            release_input = 'ru.5.7.0'
     except IndexError:
         raise Exception('Enter release name')
     fix_issues = jira.search_issues(f'fixVersion={release_input}')
