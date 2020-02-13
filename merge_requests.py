@@ -13,7 +13,7 @@ PROJECTS_NAMES = {"chestnoe_slovo": 7, "crm4slovokz": 11, "4slovokz": 12, "chest
                   "enum-generator": 121, "helper": 122, "registry-generator": 123, "interface-generator": 124,
                   "expression": 125, "almalge": 128, "crmalmalge": 129, "python-tests": 130, "logging": 135,
                   "timeservice": 138, "timeservice_client": 139, "consul-swarm": 140, "elk": 141, "Replicator": 144,
-                  "python-scripts": 154, "landing": 159, "ru": 166, "ru-db": 167,
+                  "python-scripts": 154, "landing": 159, "ru": 166, "ru-db": 167, "fias": 61,
                   }
 MR_STATUS = {'can_be_merged': '(/) Нет конфликтов', 'cannot_be_merged': '(x) Конфликт!'}
 PRIORITY = {'Critical': '(!) - Critical', 'Highest': '(*r) - Highest', 'High': '(*) - High', 'Medium': '(*g) - Medium',
@@ -69,24 +69,25 @@ def make_rc(config, MR, RC_name):
     #           проверка статусов pipeline
     #
     if PROJECTS_NAMES[MR.project] in [20, 79, 110, 166]:  # проекты, в которых есть тесты
-        pipelines = project.pipelines.list(ref=f'{MR.issue}')
-        if isinstance(pipelines, list):
+        issue = MR.issue.lower()
+        pipelines = project.pipelines.list(ref=f'{issue}')
+        if pipelines:
             pipelines = pipelines[0]
-        status = pipelines.attributes['status']
-        if status != 'success':
-            return 'pipeline fail', '', ''
+            status = pipelines.attributes['status']
+            if status != 'success':
+                return 'pipeline fail', '', ''
     #
     #           если тесты прошли - мержим
     #
     mr = project.mergerequests.list(source_branch=source_branch, target_branch=target_branch)
-    if not mr:
+    if mr:
+        mr = mr[0]
+    else:
         mr = project.mergerequests.create({'source_branch': source_branch,
                                            'target_branch': target_branch,
                                            'title': f"[skip-ci] {(MR.issue).replace('-', '_')} -> {RC_name}",
                                            'target_project_id': PROJECTS_NAMES[MR.project],
                                            })
-    if isinstance(mr, list):
-        mr = mr[0]
     status = mr.attributes['merge_status']
     url = mr.attributes['web_url']
     return MR_STATUS[status], url, mr
@@ -97,7 +98,8 @@ def merge_rc (config, MR):
         return
 
     gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
-    MR.merge()
+    if MR.attributes['state'] != 'merged':
+        MR.merge()
 
 
 def make_mr_to_staging_master(config, projects, RC_name, target):
@@ -124,14 +126,14 @@ def make_mr_to_staging_master(config, projects, RC_name, target):
             source_branch = 'staging'
             title = 'staging -> master'
         mr = project.mergerequests.list(source_branch=source_branch, target_branch=target_branch)
-        if not mr:
+        if mr:
+            mr = mr[0]
+        else:
             mr = project.mergerequests.create({'source_branch': source_branch,
                                                'target_branch': target_branch,
                                                'title': title,
                                                'target_project_id': PROJECTS_NAMES[pr],
                                                })
-        if isinstance(mr, list):
-            mr = mr[0]
         mr_links.append(mr.attributes['web_url'])
     return mr_links
 
@@ -140,9 +142,12 @@ if __name__ == '__main__':
     config = ConfigParser()
     config.read('config.ini')
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
-    project = gl.projects.get(7)
-    mr = project.mergerequests.list(source_branch='slov-3935', target_branch='master')
-    pipelines = project.pipelines.list(ref='3935')
+    project = gl.projects.get(79)
+    mr = project.mergerequests.list(source_branch='slov-4628', target_branch='master')
+    pipelines = project.pipelines.list(ref='slov-4628')
+    if isinstance(pipelines, list):
+        pipelines = pipelines[0]
+    status = pipelines.attributes['status']
     if not mr:
         mr = project.mergerequests.create({'source_branch': 'AT-85',
                                            'target_branch': 'master',
