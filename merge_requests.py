@@ -15,7 +15,7 @@ PROJECTS_NAMES = {"chestnoe_slovo": 7, "crm4slovokz": 11, "4slovokz": 12, "chest
                   "timeservice": 138, "timeservice_client": 139, "consul-swarm": 140, "elk": 141, "Replicator": 144,
                   "python-scripts": 154, "landing": 159, "ru": 166, "ru-db": 167, "fias": 61,
                   }
-MR_STATUS = {'can_be_merged': '(/) Нет конфликтов', 'cannot_be_merged': '(x) Конфликт!'}
+MR_STATUS = {'can_be_merged': '(/) Нет конфликтов, ', 'cannot_be_merged': '(x) Конфликт!, '}
 PRIORITY = {'Critical': '(!) - Critical', 'Highest': '(*r) - Highest', 'High': '(*) - High', 'Medium': '(*g) - Medium',
             'Low': '(*b) - Low', 'Lowest': '(*b) - Lowest', 'Критический': '(!) - Critical'}
 PIPELINE_STATUSES = {'running': 0, 'pending': 0, 'success': 1, 'failed': 0, 'canceled': 0, 'skipped': 0}
@@ -68,29 +68,27 @@ def make_rc(config, MR, RC_name):
     #
     #           проверка статусов pipeline
     #
+    status = ''
     if PROJECTS_NAMES[MR.project] in [20, 79, 110, 166]:  # проекты, в которых есть тесты
         issue = MR.issue.lower()
         pipelines = project.pipelines.list(ref=f'{issue}')
         if pipelines:
             pipelines = pipelines[0]
-            status = pipelines.attributes['status']
-            if status != 'success':
-                return 'pipeline fail', '', ''
-    #
-    #           если тесты прошли - мержим
-    #
+            if pipelines.attributes['status'] != 'success':
+                status = '(x) Тесты не прошли!, '
+
     mr = project.mergerequests.list(source_branch=source_branch, target_branch=target_branch)
     if mr:
         mr = mr[0]
     else:
         mr = project.mergerequests.create({'source_branch': source_branch,
                                            'target_branch': target_branch,
-                                           'title': f"[skip-ci] {(MR.issue).replace('-', '_')} -> {RC_name}",
+                                           'title': f"{(MR.issue).replace('-', '_')} -> {RC_name}",
                                            'target_project_id': PROJECTS_NAMES[MR.project],
                                            })
-    status = mr.attributes['merge_status']
+    status += MR_STATUS[mr.attributes['merge_status']]
     url = mr.attributes['web_url']
-    return MR_STATUS[status], url, mr
+    return status, url, mr
 
 
 def merge_rc (config, MR):

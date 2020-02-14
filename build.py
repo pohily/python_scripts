@@ -6,15 +6,12 @@ from sys import argv
 import requests
 from jira import JIRA
 
-from merge_requests import make_rc, make_mr_to_staging, make_mr_to_master, delete_create_RC, PRIORITY, merge_rc
+from merge_requests import make_rc, make_mr_to_staging, make_mr_to_master, delete_create_RC, PRIORITY, merge_rc, MR_STATUS
 from send_notifications import ISSUE_URL, RELEASE_URL, REMOTE_LINK, GIT_LAB, STATUS_FOR_RELEASE
 
 docker = False  # флаг наличия мерджей на докер
 confluence = ''  # ссылка на отчет о тестировании
-conflict_projects = set()  # собираем проекты с конфликтами, чтобы не делать из них МР в стейджинг
 Merge_request = namedtuple('Merge_request', ['url', 'iid', 'project', 'issue'])  # iid - номер МР в url'е, project - str
-MERGE_STATUS = {'(/) Нет конфликтов': '(/) Влит', '(x) Конфликт!': '(x) Не влит', '(/)Тест': '(/) Тест',
-                'pipeline fail': '(x) Тесты не прошли!'}
 
 
 def get_release_details(config, jira):
@@ -69,22 +66,15 @@ def get_links(config, merges):
         #           Пытаемся создать MR из текущей задачи в RC. Выводим статус в таблицу
         #
         print_stage(f'Пытаемся сделать MR из {issue_number} в {RC_name}')
+
         status, url, mr = make_rc(config, merge, RC_name)
-        global conflict_projects
-        if status != '(/) Нет конфликтов':
-            if status == 'pipeline fail':   # - случай, когда МР не создавался из-за pipeline fail
-                status = MERGE_STATUS[status]
-            conflict_projects.add(merge.project)
+        if status != MR_STATUS['can_be_merged']:
             conflict = True
 
         statuses[index] = [status]  # 0
-        if mr:
-            statuses[index].append(mr)  # 1
-            url_parts = url.split('/')
-            statuses[index].append(f'[{url_parts[3]}/{url_parts[4]}/{url_parts[6]}|{url}]')  # 2
-        else:
-            statuses[index].append('')  # 1  - случай, когда МР не создавался из-за pipeline fail
-            statuses[index].append('')  # 2
+        statuses[index].append(mr)  # 1
+        url_parts = url.split('/')
+        statuses[index].append(f'[{url_parts[3]}/{url_parts[4]}/{url_parts[6]}|{url}]')  # 2
         print_stage(status)
     #
     #           Мержим MR из текущей задачи в RC
@@ -94,10 +84,7 @@ def get_links(config, merges):
     else:
         status = '(/) Влит'
     for line in range(len(statuses)):
-        if not statuses[line][-1]:   # - случай, когда МР не создавался из-за pipeline fail
-            statuses[line].append('(x) Не создан')  # 3
-        else:
-            statuses[line].append(status)  # 3
+        statuses[line].append(status)  # 3
         if not conflict:
             print_stage(f'Мержим {issue_number} в {RC_name}')
             merge_rc(config, statuses[line][1])
@@ -108,7 +95,7 @@ def get_links(config, merges):
     for line in range(len(statuses)):
         if not start: # если МР не первый - добавляем перенос на следующую строку и три пустых ячейки
             result += f'\n|  |  |  |'
-        result += f'{statuses[line][2]}|{statuses[line][0]}, {statuses[line][3]}|'
+        result += f'{statuses[line][2]}|{statuses[line][0]}{statuses[line][3]}|'
         start = False
     return result
 
