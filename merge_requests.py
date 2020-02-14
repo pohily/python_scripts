@@ -102,29 +102,21 @@ def merge_rc (config, MR):
         MR.merge()
 
 
-def make_mr_to_staging_master(config, projects, RC_name, target):
+def make_mr_to_staging(config, projects, RC_name):
     """ Делаем МР из RC в стейджинг для всех затронутых проектов и возвращаем список ссылок на МР """
     if TEST:
         return [projects]
 
     mr_links = [] # ссылки для вывода под таблицей
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
-
     for pr in projects:
         project = gl.projects.get(PROJECTS_NAMES[pr])
-        if target == 'staging':
-            if PROJECTS_NAMES[pr] in (110, 166, 167):    # проекты докера
-                target_branch = 'master'
-            else:
-                target_branch = 'staging'
-            source_branch = RC_name
-            title = f'{RC_name} -> {target_branch}'
-        else:
-            if PROJECTS_NAMES[pr] in (110, 166, 167):    # проекты докера
-                continue
+        source_branch = RC_name
+        if PROJECTS_NAMES[pr] in (110, 166, 167):    # проекты докера
             target_branch = 'master'
-            source_branch = 'staging'
-            title = 'staging -> master'
+        else:
+            target_branch = 'staging'
+        title = f'{RC_name} -> {target_branch}'
         mr = project.mergerequests.list(source_branch=source_branch, target_branch=target_branch)
         if mr:
             mr = mr[0]
@@ -137,6 +129,25 @@ def make_mr_to_staging_master(config, projects, RC_name, target):
         mr_links.append(mr.attributes['web_url'])
     return mr_links
 
+
+def make_mr_to_master(config, projects):
+    """ Делаем МР из стейджинга в мастер для всех затронутых проектов и возвращаем список ссылок на МР """
+    if TEST:
+        return [projects]
+
+    mr_links = [] # ссылки для вывода под таблицей
+    gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
+    for pr in projects:
+        if PROJECTS_NAMES[pr] in (110, 166, 167):  # проекты докера
+            continue
+        project = gl.projects.get(PROJECTS_NAMES[pr])
+        mr = project.mergerequests.create({'source_branch': 'staging',
+                                           'target_branch': 'master',
+                                           'title': 'staging -> master',
+                                           'target_project_id': PROJECTS_NAMES[pr],
+                                           })
+        mr_links.append(mr.attributes['web_url'])
+    return mr_links
 
 if __name__ == '__main__':
     config = ConfigParser()

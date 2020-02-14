@@ -6,7 +6,7 @@ from sys import argv
 import requests
 from jira import JIRA
 
-from merge_requests import make_rc, make_mr_to_staging_master, delete_create_RC, PRIORITY, merge_rc
+from merge_requests import make_rc, make_mr_to_staging, make_mr_to_master, delete_create_RC, PRIORITY, merge_rc
 from send_notifications import ISSUE_URL, RELEASE_URL, REMOTE_LINK, GIT_LAB, STATUS_FOR_RELEASE
 
 docker = False  # флаг наличия мерджей на докер
@@ -187,7 +187,7 @@ if __name__ == '__main__':
         #           Создаем MR RC -> Staging для всех проектов (передумали вычитать проекты с конфликтами)
         #
         print_stage('Делаем МР RC -> Staging')
-        staging_links = make_mr_to_staging_master(config, used_projects, RC_name, 'staging')
+        staging_links = make_mr_to_staging(config, used_projects, RC_name)
         #
         #           Docker -> Master
         #
@@ -208,7 +208,7 @@ if __name__ == '__main__':
         #           Создаем MR Staging -> Master
         #
         print_stage('Делаем МР Staging -> Master')
-        master_links = make_mr_to_staging_master(config, used_projects, RC_name, 'master')
+        master_links = make_mr_to_master(config, used_projects)
         #
         #           Staging -> Master
         #
@@ -251,7 +251,6 @@ if __name__ == '__main__':
         file.write(f"""{message}""")
 
         #todo
-        # сделал проверку pipeline slov-> master, проверить
         # запуск pipeline
         # деплойные действия
         # запуск скрипта на гитлабе вебхуком от жиры
