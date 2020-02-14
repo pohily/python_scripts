@@ -139,11 +139,15 @@ def make_mr_to_master(config, projects):
         if PROJECTS_NAMES[pr] in (110, 166, 167):  # проекты докера
             continue
         project = gl.projects.get(PROJECTS_NAMES[pr])
-        mr = project.mergerequests.create({'source_branch': 'staging',
-                                           'target_branch': 'master',
-                                           'title': 'staging -> master',
-                                           'target_project_id': PROJECTS_NAMES[pr],
-                                           })
+        mr = project.mergerequests.list(state='opened', source_branch='staging', target_branch='master')
+        if mr:
+            mr = mr[0]
+        else:
+            mr = project.mergerequests.create({'source_branch': 'staging',
+                                               'target_branch': 'master',
+                                               'title': 'staging -> master',
+                                               'target_project_id': PROJECTS_NAMES[pr],
+                                               })
         mr_links.append(mr.attributes['web_url'])
     return mr_links
 
