@@ -218,14 +218,14 @@ if __name__ == '__main__':
         issue_dict = {
             "fixVersions": [
                 {
-                    "self": f"{RELEASE_URL.format(release_id)}",
-                    "id": f"{release_id}",
-                    "name": f"{release_name}",
+                    "self": RELEASE_URL.format(release_id),
+                    "id": release_id,
+                    "name": release_name,
                 }
             ],
             'project': {'key': 'SLOV'},
             'summary': f"Сборка {release_name}",
-            'description': f'{message}',
+            'description': message,
             'issuetype': {'name': 'Задача'},
 
         }
@@ -235,7 +235,7 @@ if __name__ == '__main__':
         #
         #           Вывод результата в файл
         #
-        file.write(f"""{message}""")
+        file.write(message)
 
         #todo
         # запуск pipeline

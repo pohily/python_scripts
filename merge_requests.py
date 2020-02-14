@@ -156,7 +156,7 @@ if __name__ == '__main__':
     config.read('config.ini')
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
     project = gl.projects.get(79)
-    mr = project.mergerequests.list(source_branch='slov-4628', target_branch='master')
+    mr = project.mergerequests.list(state='opened', source_branch='rc-ru-5-6-20', target_branch='staging')
     pipelines = project.pipelines.list(ref='slov-4628')
     if isinstance(pipelines, list):
         pipelines = pipelines[0]
