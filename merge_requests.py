@@ -77,7 +77,7 @@ def make_rc(config, MR, RC_name):
             if pipelines.attributes['status'] != 'success':
                 status = '(x) Тесты не прошли!, '
 
-    mr = project.mergerequests.list(source_branch=source_branch, target_branch=target_branch)
+    mr = project.mergerequests.list(state='opened', source_branch=source_branch, target_branch=target_branch)
     if mr:
         mr = mr[0]
     else:
@@ -115,7 +115,7 @@ def make_mr_to_staging(config, projects, RC_name):
         else:
             target_branch = 'staging'
         title = f'{RC_name} -> {target_branch}'
-        mr = project.mergerequests.list(source_branch=source_branch, target_branch=target_branch)
+        mr = project.mergerequests.list(state='opened', source_branch=source_branch, target_branch=target_branch)
         if mr:
             mr = mr[0]
         else:
