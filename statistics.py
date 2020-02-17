@@ -22,7 +22,6 @@ config = ConfigParser()
 config.read('config.ini')
 jira_options = {'server': 'https://jira.4slovo.ru/'}
 jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
-#this_build = jira.issue('Сборка ru.5.6.20')
 release_input, _, fix_issues = get_release_details(config, jira)
 used_projects = set()
 issue_count = 0

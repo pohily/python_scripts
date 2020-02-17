@@ -214,24 +214,29 @@ if __name__ == '__main__':
         #
         #           Вывод результата в Jira
         #
-        print_stage('Вывод результата в Jira')
-        issue_dict = {
-            "fixVersions": [
-                {
-                    "self": RELEASE_URL.format(release_id),
-                    "id": release_id,
-                    "name": release_name,
-                }
-            ],
-            'project': {'key': 'SLOV'},
-            'summary': f"Сборка {release_name}",
-            'description': message,
-            'issuetype': {'name': 'Задача'},
-
-        }
         CREATE_JIRA_ISSUE = eval(config['options']['CREATE_JIRA_ISSUE'])
         if CREATE_JIRA_ISSUE:
-            new_issue = jira.create_issue(fields=issue_dict)
+            print_stage('Вывод результата в Jira')
+            existing_issue = jira.search_issues(f'project=SLOV AND summary ~ "Сборка {release_name}"')
+            if existing_issue:
+                existing_issue = existing_issue[0]
+                existing_issue.update(fields={'description': message})
+            else:
+                issue_dict = {
+                    "fixVersions": [
+                        {
+                            "self": RELEASE_URL.format(release_id),
+                            "id": release_id,
+                            "name": release_name,
+                        }
+                    ],
+                    'project': {'key': 'SLOV'},
+                    'summary': f"Сборка {release_name}",
+                    'description': message,
+                    'issuetype': {'name': 'Задача'},
+
+                }
+                new_issue = jira.create_issue(fields=issue_dict)
         #
         #           Вывод результата в файл
         #
