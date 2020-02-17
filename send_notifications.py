@@ -29,15 +29,14 @@ def get_release_details(config, jira):
     except IndexError:
         raise Exception('Enter release name')
     fix_issues = jira.search_issues(f'fixVersion={release_input}')
-    fix_date = jira.issue(fix_issues.iterable[0]).fields.fixVersions[0].releaseDate
-    fix_id = jira.issue(fix_issues.iterable[0]).fields.fixVersions[0].id
+    fix_date = fix_issues[0].fields.fixVersions[0].releaseDate
     if 'ru' in release_input.lower():
         release_country = 'Россия'
     elif 'kz' in release_input.lower():
         release_country = 'Казахстан'
     else:
         release_country = 'Грузия'
-    return datetime.strptime(fix_date, '%Y-%m-%d').strftime('%d.%m.%Y'), release_input, release_country, fix_id, fix_issues
+    return datetime.strptime(fix_date, '%Y-%m-%d').strftime('%d.%m.%Y'), release_input, release_country, fix_issues
 
 
 def get_release_message(release_date, release_country, release_name):
@@ -65,7 +64,7 @@ if __name__ == '__main__':
     config.read('config.ini')
     jira_options = {'server': 'https://jira.4slovo.ru/'}
     jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
-    release_date, release_name, release_country, release_id, release_issues = get_release_details(config, jira)
+    release_date, release_name, release_country, release_issues = get_release_details(config, jira)
     issues_of_release_link = RELEASE_ISSUES_URL.format(release_name)
     issues_list = {}
     message = get_release_message(release_date, release_country, release_name)

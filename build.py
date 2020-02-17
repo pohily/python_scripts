@@ -25,7 +25,7 @@ def get_release_details(config, jira):
     except IndexError:
         raise Exception('Enter release name')
     fix_issues = jira.search_issues(f'fixVersion={release_input}')
-    fix_id = jira.issue(fix_issues.iterable[0]).fields.fixVersions[0].id
+    fix_id = fix_issues[0].fields.fixVersions[0].id
     return release_input, fix_id, fix_issues
 
 
