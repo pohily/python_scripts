@@ -6,7 +6,8 @@ from sys import argv
 import requests
 from jira import JIRA
 
-from merge_requests import make_rc, make_mr_to_staging, make_mr_to_master, delete_create_RC, PRIORITY, merge_rc, MR_STATUS
+from merge_requests import make_rc, make_mr_to_staging, make_mr_to_master, delete_create_RC, PRIORITY, merge_rc, \
+    MR_STATUS, get_merge_request_details
 from send_notifications import ISSUE_URL, RELEASE_URL, REMOTE_LINK, GIT_LAB, STATUS_FOR_RELEASE
 
 docker = False  # флаг наличия мерджей на докер
@@ -49,6 +50,9 @@ def get_merge_requests(config, issue_number):
         project = f'{url_parts[4]}'
         iid = url_parts[6]
         merge_link = Merge_request(link['object']['url'], iid, project, issue_number)
+        _, source_branch, state = get_merge_request_details(config, merge_link)
+        if source_branch == 'master' and state == 'merged': # если МР в мастер уже влит - не берем его в RC
+            continue
         if project not in projects and GIT_LAB in merge_link.url:
             projects.add(project)
             result.append(merge_link)

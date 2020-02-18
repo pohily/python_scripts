@@ -24,7 +24,7 @@ GET_BRANCH = 'https://gitlab.4slovo.ru/api/v4/projects/{}/repository/branches/{}
 MR_BY_IID = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?iids[]={}&{}'
 PROJECTS = 'https://gitlab.4slovo.ru/api/v4/projects/{}?{}'
 
-Merge_request_details = namedtuple('Merge_request_details', ['merge_status', 'source_branch'])
+Merge_request_details = namedtuple('Merge_request_details', ['merge_status', 'source_branch', 'state'])
 
 
 def delete_create_RC(config, project, RC_name):
@@ -50,9 +50,9 @@ def get_merge_request_details(config, MR):
     details = requests.get(url=MR_BY_IID.format(project_id, iid, token)).json()
     if details:
         details = details[0]
-        return Merge_request_details(MR_STATUS[details['merge_status']], details['source_branch'])
+        return Merge_request_details(MR_STATUS[details['merge_status']], details['source_branch'], details['state'])
     else:
-        return Merge_request_details('MR не найден', '')
+        return Merge_request_details('MR не найден', '', '')
 
 
 def make_rc(config, MR, RC_name):
@@ -64,7 +64,7 @@ def make_rc(config, MR, RC_name):
     project = gl.projects.get(f'{PROJECTS_NAMES[MR.project]}')
 
     target_branch = f'{RC_name}'
-    _, source_branch = get_merge_request_details(config, MR)
+    _, source_branch, _ = get_merge_request_details(config, MR)
     #
     #           проверка статусов pipeline
     #
