@@ -130,9 +130,17 @@ if __name__ == '__main__':
         #
         print_stage('Выбираем задачи для релиза в нужных статусах')
         issues_list = {}
+        before_deploy = []
+        post_deploy = []
         for issue in release_issues:
             if 'сборка' not in issue.fields.summary.lower() and issue.fields.status.name in STATUS_FOR_RELEASE:
                 issues_list[issue.key] = PRIORITY[issue.fields.priority.name]
+                bd = issue.fields.customfield_15300  # переддеплойные действия
+                if bd:
+                    before_deploy.append((issue.key, bd))
+                pd = issue.fields.customfield_15302  # постдеплойные действия
+                if pd:
+                    post_deploy.append((issue.key, pd))
         #
         #           Собираем мердж реквесты
         #
@@ -208,12 +216,18 @@ if __name__ == '__main__':
         #           Преддеплойные действия
         #
         print_stage('Заполняем деплойные действия')
-        message += '\n\r\n\r'
-        #
+        message_before_deploy = ''
+        if before_deploy:
+            for issue in before_deploy:
+                message_before_deploy += f'{issue[0]}: {issue[1]}\n'
+                #
         #           Постдеплойные действия
         #
-        message += '\n\r\n\r'
-        #
+        message_post_deploy = ''
+        if post_deploy:
+            for issue in post_deploy:
+                message_post_deploy += f'{issue[0]}: {issue[1]}\n'
+                #
         #           Вывод результата в Jira
         #
         CREATE_JIRA_ISSUE = eval(config['options']['CREATE_JIRA_ISSUE'])
@@ -222,21 +236,20 @@ if __name__ == '__main__':
             existing_issue = jira.search_issues(f'project=SLOV AND summary ~ "Сборка {release_name}"')
             if existing_issue:
                 existing_issue = existing_issue[0]
-                existing_issue.update(fields={'description': message})
+                existing_issue.update(fields={
+                    'description': message,
+                    'customfield_15300': message_before_deploy,
+                    'customfield_15302': message_post_deploy,
+                })
             else:
                 issue_dict = {
-                    "fixVersions": [
-                        {
-                            "self": RELEASE_URL.format(release_id),
-                            "id": release_id,
-                            "name": release_name,
-                        }
-                    ],
+                    "fixVersions": [{"name": release_name,}],
                     'project': {'key': 'SLOV'},
                     'summary': f"Сборка {release_name}",
                     'description': message,
                     'issuetype': {'name': 'Задача'},
-
+                    'customfield_15300': message_before_deploy,
+                    'customfield_15302': message_post_deploy,
                 }
                 new_issue = jira.create_issue(fields=issue_dict)
         #
