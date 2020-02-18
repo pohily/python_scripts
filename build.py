@@ -127,9 +127,7 @@ if __name__ == '__main__':
         print_stage('Выбираем задачи для релиза в нужных статусах')
         issues_list = {}
         for issue in release_issues:
-            if 'сборка' not in issue.fields.summary.lower() \
-                    and issue.fields.status.name in STATUS_FOR_RELEASE \
-                    and issue.fields.issuetype.name != 'Defect':
+            if 'сборка' not in issue.fields.summary.lower() and issue.fields.status.name in STATUS_FOR_RELEASE:
                 issues_list[issue.key] = PRIORITY[issue.fields.priority.name]
         #
         #           Собираем мердж реквесты
