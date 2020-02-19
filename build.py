@@ -218,15 +218,15 @@ if __name__ == '__main__':
         print_stage('Заполняем деплойные действия')
         message_before_deploy = ''
         if before_deploy:
-            for issue in before_deploy:
-                message_before_deploy += f'{issue[0]}: {issue[1]}\n'
+            for index, issue in enumerate(before_deploy):
+                message_before_deploy += f'{index}. - {issue[0]}: {issue[1]}\r\n'
                 #
         #           Постдеплойные действия
         #
         message_post_deploy = ''
         if post_deploy:
-            for issue in post_deploy:
-                message_post_deploy += f'{issue[0]}: {issue[1]}\n'
+            for index, issue in enumerate(post_deploy):
+                message_post_deploy += f'{index}. - {issue[0]}: {issue[1]}\r\n'
                 #
         #           Вывод результата в Jira
         #
@@ -247,7 +247,7 @@ if __name__ == '__main__':
                     'project': {'key': 'SLOV'},
                     'summary': f"Сборка {release_name}",
                     'description': message,
-                    'issuetype': {'name': 'Задача'},
+                    'issuetype': {'name': 'RC'},  #  специальный тип задачи для сборок
                     'customfield_15300': message_before_deploy,
                     'customfield_15302': message_post_deploy,
                 }

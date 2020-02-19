@@ -22,21 +22,6 @@ config = ConfigParser()
 config.read('config.ini')
 jira_options = {'server': 'https://jira.4slovo.ru/'}
 jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
-message = 'test'
-issue_dict = {
-                    "fixVersions": [
-                        {
-                            "name": 'ru.5.6.20',
-                        }
-                    ],
-                    'project': {'key': 'SLOV'},
-                    'summary': f"Сборка ru.5.6.20",
-                    'description': message,
-                    'issuetype': {'name': 'Задача'},
-                    'customfield_15300': 'test before',
-                    'customfield_15302': 'test post',
-                }
-new_issue = jira.create_issue(fields=issue_dict)
 release_input, _, fix_issues = get_release_details(config, jira)
 used_projects = set()
 issue_count = 0
