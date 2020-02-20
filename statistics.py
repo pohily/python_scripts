@@ -15,7 +15,7 @@ PROJECTS_COUNTRIES = {"chestnoe_slovo": 'ru', "chestnoe_slovo_backend": 'ru',"co
                       "logging": 'ru', "timeservice_client": 'ru', "ru": 'ru', "ru-db": 'ru', "helper": 'ru',
                       "registry-generator": 'ru', "finance": 'ru', "fs-client": 'ru', "timeservice": 'ru',
                       "crm4slovokz": "kz", "4slovokz": "kz", "kz": "kz", "landing": 'kz',
-                      "sawmill": 'ru, kz',"robotmailer": 'ru, kz', "rabbitClient": 'ru, kz', "finance_client": 'ru, kz',
+                      "sawmill": 'ru, kz',"robotmailer": 'ru, kz', "rabbitсlient": 'ru, kz', "finance_client": 'ru, kz',
                       "fs": 'ru, kz', "ge": "ge", "almalge": "ge", "crmalmalge": "ge",
                       }
 
@@ -61,4 +61,4 @@ for action in chain(before_deploy, post_deploy):
 if wrong_release_issues:
     print(f'\033[34m Следующие задачи не подходят для данного релиза (неправильная страна):\033[0m')
     for issue in sorted(wrong_release_issues):
-        print(f'\033[31m {issue}\033[0m' , sep=', ')
+        print(f'\033[31m {issue}\033[0m', sep=', ')

@@ -222,7 +222,7 @@ if __name__ == '__main__':
         if before_deploy:
             for index, issue in enumerate(before_deploy):
                 message_before_deploy += f'* *{issue[0]}*: {issue[1]}\r\n'
-                #
+        #
         #           Постдеплойные действия
         #
         message_post_deploy = ''
