@@ -8,11 +8,11 @@ TEST = False
 
 PROJECTS_NAMES = {"chestnoe_slovo": 7, "crm4slovokz": 11, "4slovokz": 12, "chestnoe_slovo_backend": 20, "common": 91,
                   "chestnoe_slovo_landing": 62, "api": 79, "cache": 86, "sawmill": 90, "inn": 92, "finance": 94,
-                  "ge": 100, "robotmailer": 102, "finance_client": 103, "kz": 110, "rabbitClient": 113,
+                  "ge": 100, "robotmailer": 102, "finance_client": 103, "kz": 110, "rabbitclient": 113,
                   "fs-client": 116, "fs": 117, "selenium-chrome": 118, "yaml-config": 119, "money": 120,
                   "enum-generator": 121, "helper": 122, "registry-generator": 123, "interface-generator": 124,
                   "expression": 125, "almalge": 128, "crmalmalge": 129, "python-tests": 130, "logging": 135,
-                  "timeservice": 138, "timeservice_client": 139, "consul-swarm": 140, "elk": 141, "Replicator": 144,
+                  "timeservice": 138, "timeservice_client": 139, "consul-swarm": 140, "elk": 141, "replicator": 144,
                   "python-scripts": 154, "landing": 159, "ru": 166, "ru-db": 167, "fias": 61,
                   }
 MR_STATUS = {'can_be_merged': '(/) Нет конфликтов, ', 'cannot_be_merged': '(x) Конфликт!, '}

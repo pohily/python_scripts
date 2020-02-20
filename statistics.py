@@ -1,4 +1,5 @@
 from configparser import ConfigParser
+from itertools import chain
 
 from jira import JIRA
 
@@ -28,10 +29,20 @@ used_projects = set()
 issue_count = 0
 wrong_release_issues = set()
 country = release_input.split('.')[0].lower()
+before_deploy = []
+post_deploy = []
 for issue_number in fix_issues:
-    MR_count = get_merge_requests(config, issue_number)
     if issue_number.fields.status.name in STATUS_FOR_RELEASE:
         issue_count += 1
+        bd = issue_number.fields.customfield_15303  # переддеплойные действия
+        if bd:
+            before_deploy.append((issue_number.key, bd))
+        pd = issue_number.fields.customfield_15302  # постдеплойные действия
+        if pd:
+            post_deploy.append((issue_number.key, pd))
+    else:
+        continue
+    MR_count = get_merge_requests(config, issue_number)
     for merge in MR_count:
         used_projects.add(merge.project)
         try:
@@ -40,8 +51,15 @@ for issue_number in fix_issues:
                 wrong_release_issues.add(issue)
         except:
             pass
-print(f'\033[34m В релизе {release_input} есть изменения в \033[31m {len(used_projects)} \033[34m проектах: \033[31m {", ".join(sorted(used_projects))}.')
-print(f'\033[34m Всего \033[31m{issue_count}\033[34m задач в статусах выше "Passed QA".')
+print(f'\033[34m В релизе {release_input} \033[31m{issue_count}\033[34m задач в статусах выше "Passed QA".')
+print(f'\033[34m Изменения в них затронули \033[31m {len(used_projects)} \033[34m проект(-а, -ов): \033[31m {", ".join(sorted(used_projects))}.')
+if before_deploy or post_deploy:
+    print(f'\033[34m Есть следующие деплойные действия:')
+for action in chain(before_deploy, post_deploy):
+    action[1].strip()
+    action[1].replace('# ', '')
+    action[1].replace('h4', '')
+    print(f'\033[31m{action[0]} - \033[0m{action[1]}')
 if wrong_release_issues:
     print(f'\033[34m Следующие задачи не подходят для данного релиза (неправильная страна):\033[0m')
     for issue in sorted(wrong_release_issues):
