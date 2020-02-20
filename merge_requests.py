@@ -83,7 +83,7 @@ def make_rc(config, MR, RC_name):
     else:
         mr = project.mergerequests.create({'source_branch': source_branch,
                                            'target_branch': target_branch,
-                                           'title': f"{(MR.issue).replace('-', '_')} -> {RC_name}",
+                                           'title': f"[skip-ci] {(MR.issue).replace('-', '_')} -> {RC_name}",
                                            'target_project_id': PROJECTS_NAMES[MR.project],
                                            })
     status += MR_STATUS[mr.attributes['merge_status']]
