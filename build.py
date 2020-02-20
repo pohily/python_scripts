@@ -22,7 +22,7 @@ def get_release_details(config, jira):
         if COMMAND_LINE_INPUT:
             release_input = argv[1]
         else:
-            release_input = 'ru.5.6.20'
+            release_input = 'ru.5.6.21'
     except IndexError:
         raise Exception('Enter release name')
     fix_issues = jira.search_issues(f'fixVersion={release_input}')
@@ -37,6 +37,8 @@ def get_merge_requests(config, issue_number):
     links_json = requests.get(url=REMOTE_LINK.format(issue_number),
                                  auth=(config['user_data']['login'], config['user_data']['jira_password'])).json()
     for link in links_json:
+        if 'commit' in link['object']['url']:
+            continue
         url_parts = link['object']['url'].split('/')
         global confluence
         if not confluence:
@@ -135,7 +137,7 @@ if __name__ == '__main__':
         for issue in release_issues:
             if 'сборка' not in issue.fields.summary.lower() and issue.fields.status.name in STATUS_FOR_RELEASE:
                 issues_list[issue.key] = PRIORITY[issue.fields.priority.name]
-                bd = issue.fields.customfield_15300  # переддеплойные действия
+                bd = issue.fields.customfield_15303  # переддеплойные действия
                 if bd:
                     before_deploy.append((issue.key, bd))
                 pd = issue.fields.customfield_15302  # постдеплойные действия
@@ -238,7 +240,7 @@ if __name__ == '__main__':
                 existing_issue = existing_issue[0]
                 existing_issue.update(fields={
                     'description': message,
-                    'customfield_15300': message_before_deploy,
+                    'customfield_15303': message_before_deploy,
                     'customfield_15302': message_post_deploy,
                 })
             else:
@@ -248,7 +250,7 @@ if __name__ == '__main__':
                     'summary': f"Сборка {release_name}",
                     'description': message,
                     'issuetype': {'name': 'RC'},  #  специальный тип задачи для сборок
-                    'customfield_15300': message_before_deploy,
+                    'customfield_15303': message_before_deploy,
                     'customfield_15302': message_post_deploy,
                 }
                 new_issue = jira.create_issue(fields=issue_dict)
