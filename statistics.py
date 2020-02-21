@@ -1,5 +1,6 @@
 from configparser import ConfigParser
 from itertools import chain
+from re import sub
 
 from jira import JIRA
 
@@ -51,13 +52,14 @@ for issue_number in fix_issues:
                 wrong_release_issues.add(issue)
         except:
             pass
-print(f'\033[34m В релизе {release_input} \033[31m{issue_count}\033[34m задач в статусах выше "Passed QA".')
-print(f'\033[34m Изменения в них затронули \033[31m {len(used_projects)} \033[34m проект(-а, -ов): \033[31m {", ".join(sorted(used_projects))}.')
+print(f'\033[34m В релизе {release_input} \033[31m{issue_count}\033[34m задач(-a, -и) в статусах выше "Passed QA".')
+print(f'\033[34m Изменения в них затронули \033[31m {len(used_projects)} \033[34m проект(-а, -ов): \033[31m {", ".join(sorted(used_projects))}. \033[0m')
 if before_deploy or post_deploy:
-    print(f'\033[34m Есть следующие деплойные действия:')
+    print(f'Есть следующие деплойные действия:')
 for action in chain(before_deploy, post_deploy):
-    action = action[1].replace('# ', '').strip()
-    print(f'\033[31m{action[0]} - \033[0m{action}')
+    summary = action[1].replace('# ', '').strip()
+    summary = sub('h\d\.', '', summary)
+    print(f'\033[31m{action[0]} - \033[0m{summary}')
 if wrong_release_issues:
     print(f'\033[34m Следующие задачи не подходят для данного релиза (неправильная страна):\033[0m')
     for issue in sorted(wrong_release_issues):
