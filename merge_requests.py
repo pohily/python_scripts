@@ -155,20 +155,20 @@ if __name__ == '__main__':
     config = ConfigParser()
     config.read('config.ini')
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
-    project = gl.projects.get(79)
-    mr = project.mergerequests.list(state='opened', source_branch='rc-ru-5-6-20', target_branch='staging')
-    pipelines = project.pipelines.list(ref='slov-4628')
-    if isinstance(pipelines, list):
-        pipelines = pipelines[0]
-    status = pipelines.attributes['status']
-    if not mr:
-        mr = project.mergerequests.create({'source_branch': 'AT-85',
-                                           'target_branch': 'master',
-                                           'title': f'[skip-ci] test',
-                                           'target_project_id': 79,
-                                           })
-    if isinstance(mr, list):
-        mr = mr[0]
-    pass
-
+    project = gl.projects.get(11)
+    mr = project.mergerequests.list(source_branch='staging', target_branch='master')
+    sha = mr[0].attributes['sha']
+    rc = 'rc-kz-3-14-30'
+    commit_json = {
+        "branch": f"{rc}",
+        "commit_message": "start pipeline commit",
+        "actions": [
+            {
+                "action": "update",
+                "file_path": f"build.{rc}",
+                "content": f"{sha}"
+            },
+        ]
+    }
+    commit = project.commits.create(commit_json)
 
