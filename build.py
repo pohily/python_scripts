@@ -32,33 +32,30 @@ def get_release_details(config, jira):
 
 def get_merge_requests(config, issue_number):
     """ Ищет ссылки на МР в задаче и возвращает список МР, по одному для каждого затронутого проекта в задаче """
-    result = []
     projects = set()
     links_json = requests.get(url=REMOTE_LINK.format(issue_number),
                                  auth=(config['user_data']['login'], config['user_data']['jira_password'])).json()
     for link in links_json:
-        if 'commit' in link['object']['url']:
-            continue
-        url_parts = link['object']['url'].split('/')
-        global confluence
-        if not confluence:
-            if 'confluence' in link['object']['url'] and link['relationship'] == "mentioned in":
-                confluence = link['object']['url']
-        if len(url_parts) < 6:
+        if 'commit' in link['object']['url'] or GIT_LAB not in link['object']['url']:
             continue
         if 'docker' in link['object']['url']:
             global docker
             docker = True
+        global confluence
+        if not confluence:
+            if 'confluence' in link['object']['url'] and link['relationship'] == "mentioned in":
+                confluence = link['object']['url']
+        url_parts = link['object']['url'].split('/')
+        if len(url_parts) < 6:
+            continue
         project = f'{url_parts[4]}'
         iid = url_parts[6]
         merge_link = Merge_request(link['object']['url'], iid, project, issue_number)
         _, source_branch, state = get_merge_request_details(config, merge_link)
         if source_branch == 'master' and state == 'merged': # если МР в мастер уже влит - не берем его в RC
             continue
-        if project not in projects and GIT_LAB in merge_link.url:
-            projects.add(project)
-            result.append(merge_link)
-    return result
+        projects.add(project)
+    return projects
 
 
 def get_links(config, merges):
