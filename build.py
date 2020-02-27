@@ -119,7 +119,7 @@ if __name__ == '__main__':
         #
         #           До таблицы
         #
-        message = f"[*Состав релиза:*|{RELEASE_URL.format(release_id)}]\r\n\r\n\r\n" \
+        message = f"[*Состав релиза:*|{RELEASE_URL.format(release_id)}]\r\n" \
                   f"||№||Задача||Приоритет||Мердж реквесты SLOV -> RC||Статус мердж реквеста SLOV -> RC||\r\n"
         #
         #           Выбираем задачи для релиза в нужных статусах
@@ -175,7 +175,7 @@ if __name__ == '__main__':
             message += f"|{index + MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]|{priority}|{result}\r\n"
 
         if confluence:
-            message += f'\n\r\n\r\n\r[*Отчет о тестировании*.|{confluence}]\n\r\r\n\r\n'
+            message += f'\n\r[*Отчет о тестировании*.|{confluence}]\n\r'
         #
         #           Создаем MR RC -> Staging для всех проектов (передумали вычитать проекты с конфликтами)
         #
@@ -186,14 +186,14 @@ if __name__ == '__main__':
         #
         print_stage('Заполняем ссылки на МР RC -> Staging, Staging -> Master')
         if docker:
-            message += '\n*Docker -> Master*\r\n\r'
+            message += '\r\n*Docker -> Master*\r\n'
             for link in staging_links:
                 if 'docker' in link:
                     message += f'\n[{link}]\r'
         #
         #           RC -> Staging
         #
-        message += '\n\r\n*RC -> Staging*\r\n\r'
+        message += '\n\r*RC -> Staging*\r\n'
         for link in staging_links:
             if 'docker' not in link:
                 message += f'\n[{link}]\r'
@@ -205,7 +205,7 @@ if __name__ == '__main__':
         #
         #           Staging -> Master
         #
-        message += '\n\r\n*Staging -> Master*\r\n\r'
+        message += '\n\r*Staging -> Master*\r\n'
         for link in master_links:
             message += f'\n[{link}]\r'
         #
