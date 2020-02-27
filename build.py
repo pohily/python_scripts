@@ -6,8 +6,7 @@ from sys import argv
 import requests
 from jira import JIRA
 
-from merge_requests import make_rc, make_mr_to_staging, make_mr_to_master, delete_create_RC, PRIORITY, merge_rc, \
-    MR_STATUS, get_merge_request_details
+from merge_requests import make_rc, make_mr_to_staging, make_mr_to_master, delete_create_RC, PRIORITY, merge_rc, MR_STATUS
 from send_notifications import ISSUE_URL, RELEASE_URL, REMOTE_LINK, GIT_LAB, STATUS_FOR_RELEASE
 
 docker = False  # флаг наличия мерджей на докер

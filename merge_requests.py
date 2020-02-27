@@ -27,7 +27,7 @@ GET_BRANCH = 'https://gitlab.4slovo.ru/api/v4/projects/{}/repository/branches/{}
 MR_BY_IID = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?iids[]={}&{}'
 PROJECTS = 'https://gitlab.4slovo.ru/api/v4/projects/{}?{}'
 
-Merge_request_details = namedtuple('Merge_request_details', ['merge_status', 'source_branch', 'state'])
+Merge_request_details = namedtuple('Merge_request_details', ['merge_status', 'source_branch', 'target_branch', 'state'])
 
 
 def delete_create_RC(config, project, RC_name):
@@ -52,14 +52,16 @@ def get_merge_request_details(config, MR):
         project_id = PROJECTS_NAMES[project]
     except KeyError:
         print(f"\033[31m Проверьте МР в задаче {MR.issue} \033[0m")
-        return Merge_request_details('MR не найден', '', '')
+        return Merge_request_details('MR не найден', '', '', '')
     token = f"private_token={(config['user_data']['GITLAB_PRIVATE_TOKEN'])}"
     details = requests.get(url=MR_BY_IID.format(project_id, iid, token)).json()
     if details:
         details = details[0]
-        return Merge_request_details(MR_STATUS[details['merge_status']], details['source_branch'], details['state'])
+        return Merge_request_details(
+            MR_STATUS[details['merge_status']], details['source_branch'], details['target_branch'], details['state']
+        )
     else:
-        return Merge_request_details('MR не найден', '', '')
+        return Merge_request_details('MR не найден', '', '', '')
 
 
 def make_rc(config, MR, RC_name):
@@ -70,10 +72,10 @@ def make_rc(config, MR, RC_name):
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
     project = gl.projects.get(f'{PROJECTS_NAMES[MR.project]}')
 
-    target_branch = f'{RC_name}'
-    _, source_branch, state = get_merge_request_details(config, MR)
-    if state == 'merged':  # если МР в мастер уже влит - не берем его в RC
+    _, source_branch, target_branch, state = get_merge_request_details(config, MR)
+    if state == 'merged' and target_branch == 'master':              # если МР уже влит в мастер - не берем его в RC
         return '(/) Уже в мастере', MR.url, False
+    target_branch = f'{RC_name}'
     #
     #           проверка статусов pipeline
     #
