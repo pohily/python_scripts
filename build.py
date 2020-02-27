@@ -51,9 +51,6 @@ def get_merge_requests(config, issue_number):
         project = f'{url_parts[4]}'
         iid = url_parts[6]
         merge_link = Merge_request(link['object']['url'], iid, project, issue_number)
-        _, source_branch, state = get_merge_request_details(config, merge_link)
-        if state == 'merged': # если МР в мастер уже влит - не берем его в RC
-            continue
         result.append(merge_link)
     return result
 

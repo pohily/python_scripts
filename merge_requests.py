@@ -71,7 +71,9 @@ def make_rc(config, MR, RC_name):
     project = gl.projects.get(f'{PROJECTS_NAMES[MR.project]}')
 
     target_branch = f'{RC_name}'
-    _, source_branch, _ = get_merge_request_details(config, MR)
+    _, source_branch, state = get_merge_request_details(config, MR)
+    if state == 'merged':  # если МР в мастер уже влит - не берем его в RC
+        return '(/) Уже в мастере', MR.url, False
     #
     #           проверка статусов pipeline
     #
