@@ -1,3 +1,4 @@
+import shelve
 from collections import defaultdict, namedtuple
 from configparser import ConfigParser
 from datetime import datetime
@@ -159,6 +160,8 @@ if __name__ == '__main__':
             if MRless_issues:
                 for item in MRless_issues:
                     issues_list.pop(item)
+        with shelve.open('used_projects') as projects:  # сохраняем использованные проекты на диске
+            projects[f'{RC_name}'] = list(used_projects)
         #
         #           Удаляем и создаем RC
         #
