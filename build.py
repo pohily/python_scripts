@@ -22,7 +22,7 @@ def get_release_details(config, jira):
         if COMMAND_LINE_INPUT:
             release_input = argv[1]
         else:
-            release_input = 'kz.3.14.30'
+            release_input = 'ge.3.7.10'
     except IndexError:
         raise Exception('Enter release name')
     fix_issues = jira.search_issues(f'fixVersion={release_input}')
@@ -257,6 +257,7 @@ if __name__ == '__main__':
         file.write(message)
 
         #todo
+        # если МР в мастере - пишет нет МР - поправить
         # запуск pipeline - сделал - не будет ли конфликтов при апдейте файла
         # запуск скрипта на гитлабе вебхуком от жиры
         # развернуть стенд на нужных ветках и запустить тесты в гитлабе и регресс (в Дженкинс?)

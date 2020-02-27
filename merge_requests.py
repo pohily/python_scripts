@@ -13,7 +13,8 @@ PROJECTS_NAMES = {"chestnoe_slovo": 7, "crm4slovokz": 11, "4slovokz": 12, "chest
                   "enum-generator": 121, "helper": 122, "registry-generator": 123, "interface-generator": 124,
                   "expression": 125, "almalge": 128, "crmalmalge": 129, "python-tests": 130, "logging": 135,
                   "timeservice": 138, "timeservice_client": 139, "consul-swarm": 140, "elk": 141, "replicator": 144,
-                  "python-scripts": 154, "landing": 159, "ru": 166, "ru-db": 167, "fias": 61,
+                  "python-scripts": 154, "landing": 159, "ru": 166, "ru-db": 167, "fias": 61, "mrloange": 23,
+                  "crmmrloange": 24,
                   }
 MR_STATUS = {'can_be_merged': '(/) Нет конфликтов, ', 'cannot_be_merged': '(x) Конфликт!, '}
 PRIORITY = {'Critical': '(!) - Critical', 'Highest': '(*r) - Highest', 'High': '(*) - High', 'Medium': '(*g) - Medium',
@@ -47,7 +48,11 @@ def delete_create_RC(config, project, RC_name):
 def get_merge_request_details(config, MR):
     """ Возвращает статус (есть или нет конфликты), source_branch """
     _, iid, project, _ = MR
-    project_id = PROJECTS_NAMES[project]
+    try:
+        project_id = PROJECTS_NAMES[project]
+    except KeyError:
+        print(f"\033[31m Проверьте МР в задаче {MR.issue} \033[0m")
+        return Merge_request_details('MR не найден', '', '')
     token = f"private_token={(config['user_data']['GITLAB_PRIVATE_TOKEN'])}"
     details = requests.get(url=MR_BY_IID.format(project_id, iid, token)).json()
     if details:

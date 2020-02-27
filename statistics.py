@@ -17,7 +17,8 @@ PROJECTS_COUNTRIES = {"chestnoe_slovo": 'ru', "chestnoe_slovo_backend": 'ru',"co
                       "registry-generator": 'ru', "finance": 'ru', "fs-client": 'ru', "timeservice": 'ru',
                       "crm4slovokz": "kz", "4slovokz": "kz", "kz": "kz", "landing": 'kz',
                       "sawmill": 'ru, kz',"robotmailer": 'ru, kz', "rabbitсlient": 'ru, kz', "finance_client": 'ru, kz',
-                      "fs": 'ru, kz', "ge": "ge", "almalge": "ge", "crmalmalge": "ge",
+                      "fs": 'ru, kz', "ge": "ge", "almalge": "ge", "crmalmalge": "ge", "mrloange": "ge",
+                      "crmmrloange": "ge",
                       }
 
 config = ConfigParser()
