@@ -52,7 +52,7 @@ def get_merge_requests(config, issue_number):
         iid = url_parts[6]
         merge_link = Merge_request(link['object']['url'], iid, project, issue_number)
         _, source_branch, state = get_merge_request_details(config, merge_link)
-        if source_branch == 'master' and state == 'merged': # если МР в мастер уже влит - не берем его в RC
+        if state == 'merged': # если МР в мастер уже влит - не берем его в RC
             continue
         projects.add(project)
     return projects
