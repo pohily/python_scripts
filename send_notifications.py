@@ -7,11 +7,9 @@ from sys import argv
 
 from jira import JIRA
 
-ISSUE_API_LINK = 'https://jira.4slovo.ru/rest/api/latest/issue/{}'
 ISSUE_URL = 'https://jira.4slovo.ru/browse/'
 GIT_LAB = 'https://gitlab'
 RELEASE_ISSUES_URL = 'https://jira.4slovo.ru/rest/api/latest/search?jql=fixVersion={}'
-RELEASES_LIST_URL = 'https://jira.4slovo.ru/rest/api/latest/project/SLOV/versions'
 RELEASE_URL = 'https://jira.4slovo.ru/projects/SLOV/versions/{}'
 REMOTE_LINK = 'https://jira.4slovo.ru/rest/api/latest/issue/{}/remotelink'
 STATUS_FOR_RELEASE = ['Released to production', 'Passed QA', 'In regression test', 'Ready for release', 'Закрыт', 'Fixed']

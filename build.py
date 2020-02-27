@@ -6,7 +6,8 @@ from sys import argv
 import requests
 from jira import JIRA
 
-from merge_requests import make_rc, make_mr_to_staging, make_mr_to_master, delete_create_RC, PRIORITY, merge_rc, MR_STATUS
+from merge_requests import make_mr_to_rc, make_mr_to_staging, make_mr_to_master, delete_create_RC, PRIORITY, merge_rc, \
+    MR_STATUS
 from send_notifications import ISSUE_URL, RELEASE_URL, REMOTE_LINK, GIT_LAB, STATUS_FOR_RELEASE
 
 docker = False  # флаг наличия мерджей на докер
@@ -30,7 +31,7 @@ def get_release_details(config, jira):
 
 
 def get_merge_requests(config, issue_number):
-    """ Ищет ссылки на МР в задаче и возвращает список МР, по одному для каждого затронутого проекта в задаче """
+    """ Ищет ссылки на МР в задаче и возвращает список МР """
     result = []
     links_json = requests.get(url=REMOTE_LINK.format(issue_number),
                                  auth=(config['user_data']['login'], config['user_data']['jira_password'])).json()
@@ -66,7 +67,7 @@ def get_links(config, merges):
         #
         print_stage(f'Пытаемся сделать MR из {issue_number} в {RC_name}')
 
-        status, url, mr = make_rc(config, merge, RC_name)
+        status, url, mr = make_mr_to_rc(config, merge, RC_name)
         if status != MR_STATUS['can_be_merged']:
             conflict = True
 
@@ -213,14 +214,14 @@ if __name__ == '__main__':
         print_stage('Заполняем деплойные действия')
         message_before_deploy = ''
         if before_deploy:
-            for index, issue in enumerate(before_deploy):
+            for issue in before_deploy:
                 message_before_deploy += f'* *{issue[0]}*: {issue[1]}\r\n'
         #
         #           Постдеплойные действия
         #
         message_post_deploy = ''
         if post_deploy:
-            for index, issue in enumerate(post_deploy):
+            for issue in post_deploy:
                 message_post_deploy += f'* *{issue[0]}*: {issue[1]}\r\n'
                 #
         #           Вывод результата в Jira

@@ -6,26 +6,23 @@ import requests
 
 TEST = False
 
-PROJECTS_NAMES = {"chestnoe_slovo": 7, "crm4slovokz": 11, "4slovokz": 12, "chestnoe_slovo_backend": 20, "common": 91,
-                  "chestnoe_slovo_landing": 62, "api": 79, "cache": 86, "sawmill": 90, "inn": 92, "finance": 94,
-                  "ge": 100, "robotmailer": 102, "finance_client": 103, "kz": 110, "rabbitclient": 113,
-                  "fs-client": 116, "fs": 117, "selenium-chrome": 118, "yaml-config": 119, "money": 120,
-                  "enum-generator": 121, "helper": 122, "registry-generator": 123, "interface-generator": 124,
-                  "expression": 125, "almalge": 128, "crmalmalge": 129, "python-tests": 130, "logging": 135,
-                  "timeservice": 138, "timeservice_client": 139, "consul-swarm": 140, "elk": 141, "replicator": 144,
-                  "python-scripts": 154, "landing": 159, "ru": 166, "ru-db": 167, "fias": 61, "mrloange": 23,
-                  "crmmrloange": 24,
+PROJECTS_NAMES = {"chestnoe_slovo": 7, "crm4slovokz": 11, "4slovokz": 12, "chestnoe_slovo_backend": 20, "mrloange": 23,
+                  "crmmrloange": 24, "fias": 61, "chestnoe_slovo_landing": 62, "api": 79, "cache": 86, "sawmill": 90,
+                  "common": 91, "inn": 92, "finance": 94, "ge": 100, "robotmailer": 102, "finance_client": 103,
+                  "kz": 110, "rabbitclient": 113, "fs-client": 116, "fs": 117, "selenium-chrome": 118,
+                  "yaml-config": 119, "money": 120, "enum-generator": 121, "helper": 122, "registry-generator": 123,
+                  "interface-generator": 124, "expression": 125, "almalge": 128, "crmalmalge": 129, "logging": 135,
+                  "timeservice": 138, "timeservice_client": 139, "consul-swarm": 140, "elk": 141,
+                  "landing": 159, "ru": 166, "ru-db": 167,
                   }
 MR_STATUS = {'can_be_merged': '(/) Нет конфликтов, ', 'cannot_be_merged': '(x) Конфликт!, '}
 PRIORITY = {'Critical': '(!) - Critical', 'Highest': '(*r) - Highest', 'High': '(*) - High', 'Medium': '(*g) - Medium',
             'Low': '(*b) - Low', 'Lowest': '(*b) - Lowest', 'Критический': '(!) - Critical'}
-PIPELINE_STATUSES = {'running': 0, 'pending': 0, 'success': 1, 'failed': 0, 'canceled': 0, 'skipped': 0}
-PROJECTS_WITH_TESTS = [11, 20, 79, 110, 166]
-DOCKER_PROJECTS = [110, 166]
 
-GET_BRANCH = 'https://gitlab.4slovo.ru/api/v4/projects/{}/repository/branches/{}&{}'
+PROJECTS_WITH_TESTS = [11, 20, 79, 110, 166]
+DOCKER_PROJECTS = [100, 110, 166, 167]
+
 MR_BY_IID = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?iids[]={}&{}'
-PROJECTS = 'https://gitlab.4slovo.ru/api/v4/projects/{}?{}'
 
 Merge_request_details = namedtuple('Merge_request_details', ['merge_status', 'source_branch', 'target_branch', 'state'])
 
@@ -64,7 +61,7 @@ def get_merge_request_details(config, MR):
         return Merge_request_details('MR не найден', '', '', '')
 
 
-def make_rc(config, MR, RC_name):
+def make_mr_to_rc(config, MR, RC_name):
     """ Создаем МР slov -> RC. Возвращем статус МР, его url и сам МР"""
     if TEST:
         return '(/) Тест', 'https://gitlab.4slovo.ru/4slovo.ru/chestnoe_slovo_backend/merge_requests/тест', 'тест'
@@ -80,7 +77,7 @@ def make_rc(config, MR, RC_name):
     #           проверка статусов pipeline
     #
     status = ''
-    if PROJECTS_NAMES[MR.project] in PROJECTS_WITH_TESTS and PROJECTS_NAMES[MR.project] != 11:  # не проверяем 11 - там они всегда падают
+    if PROJECTS_NAMES[MR.project] in PROJECTS_WITH_TESTS and PROJECTS_NAMES[MR.project] != 11:  # пока не проверяем 11 - там они всегда падают
         issue = MR.issue.lower()
         pipelines = project.pipelines.list(ref=f'{issue}')
         if pipelines:
@@ -121,7 +118,7 @@ def make_mr_to_staging(config, projects, RC_name, docker):
     for pr in projects:
         project = gl.projects.get(PROJECTS_NAMES[pr])
         source_branch = RC_name
-        if PROJECTS_NAMES[pr] in (110, 166, 167):    # проекты докера
+        if PROJECTS_NAMES[pr] in DOCKER_PROJECTS:
             target_branch = 'master'
         else:
             target_branch = 'staging'
@@ -186,7 +183,7 @@ def make_mr_to_master(config, projects):
     mr_links = [] # ссылки для вывода под таблицей
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
     for pr in projects:
-        if PROJECTS_NAMES[pr] in (110, 166, 167):  # проекты докера
+        if PROJECTS_NAMES[pr] in DOCKER_PROJECTS:
             continue
         project = gl.projects.get(PROJECTS_NAMES[pr])
         mr = project.mergerequests.list(state='opened', source_branch='staging', target_branch='master')
