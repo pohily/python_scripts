@@ -19,6 +19,8 @@ MR_STATUS = {'can_be_merged': '(/) Нет конфликтов, ', 'cannot_be_me
 PRIORITY = {'Critical': '(!) - Critical', 'Highest': '(*r) - Highest', 'High': '(*) - High', 'Medium': '(*g) - Medium',
             'Low': '(*b) - Low', 'Lowest': '(*b) - Lowest', 'Критический': '(!) - Critical'}
 PIPELINE_STATUSES = {'running': 0, 'pending': 0, 'success': 1, 'failed': 0, 'canceled': 0, 'skipped': 0}
+PROJECTS_WITH_TESTS = [11, 20, 79, 110, 166]
+DOCKER_PROJECTS = [110, 166]
 
 GET_BRANCH = 'https://gitlab.4slovo.ru/api/v4/projects/{}/repository/branches/{}&{}'
 MR_BY_IID = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?iids[]={}&{}'
@@ -69,7 +71,7 @@ def make_rc(config, MR, RC_name):
     #           проверка статусов pipeline
     #
     status = ''
-    if PROJECTS_NAMES[MR.project] in [20, 79, 110, 166]:  # проекты, в которых есть тесты
+    if PROJECTS_NAMES[MR.project] in PROJECTS_WITH_TESTS and PROJECTS_NAMES[MR.project] != 11:  # не проверяем 11 - там они всегда падают
         issue = MR.issue.lower()
         pipelines = project.pipelines.list(ref=f'{issue}')
         if pipelines:
@@ -100,7 +102,7 @@ def merge_rc (config, MR):
         MR.merge()
 
 
-def make_mr_to_staging(config, projects, RC_name):
+def make_mr_to_staging(config, projects, RC_name, docker):
     """ Делаем МР из RC в стейджинг для всех затронутых проектов и возвращаем список ссылок на МР """
     if TEST:
         return [projects]
@@ -125,6 +127,41 @@ def make_mr_to_staging(config, projects, RC_name):
                                                'target_project_id': PROJECTS_NAMES[pr],
                                                })
         mr_links.append(mr.attributes['web_url'])
+        #
+        #           Делаем коммит запускающий тесты и билд контейнеров докера, после пропуска этого шага при создании RC
+        #
+        if docker:
+            tests = DOCKER_PROJECTS
+            print('\033[31m Запустите тесты в Gitlab после сборки контейнеров докера в RC вручную! \033[0m')
+        else:
+            tests = PROJECTS_WITH_TESTS
+        if pr in tests:
+            try:
+                commit_json = {
+                    "branch": f"{RC_name}",
+                    "commit_message": "start pipeline commit",
+                    "actions": [
+                        {
+                            "action": "update",
+                            "file_path": f"last_build",
+                            "content": f"{RC_name}"
+                        },
+                    ]
+                }
+                project.commits.create(commit_json)
+            except gitlab.exceptions.GitlabCreateError:
+                commit_json = {
+                    "branch": f"{rc}",
+                    "commit_message": "start pipeline commit",
+                    "actions": [
+                        {
+                            "action": "create",
+                            "file_path": f"last_build",
+                            "content": f"{rc}"
+                        },
+                    ]
+                }
+                project.commits.create(commit_json)
     return mr_links
 
 
@@ -155,20 +192,33 @@ if __name__ == '__main__':
     config = ConfigParser()
     config.read('config.ini')
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
-    project = gl.projects.get(11)
-    mr = project.mergerequests.list(source_branch='staging', target_branch='master')
-    sha = mr[0].attributes['sha']
-    rc = 'rc-kz-3-14-30'
-    commit_json = {
-        "branch": f"{rc}",
-        "commit_message": "start pipeline commit",
-        "actions": [
-            {
-                "action": "update",
-                "file_path": f"build.{rc}",
-                "content": f"{sha}"
-            },
-        ]
-    }
-    commit = project.commits.create(commit_json)
+    rc = 'rc-kz-3-14-32'
+    project = gl.projects.get(110)
+    try:
+        commit_json = {
+            "branch": f"{rc}",
+            "commit_message": "start pipeline commit",
+            "actions": [
+                {
+                    "action": "update",
+                    "file_path": f"last_build",
+                    "content": f"{rc}"
+                },
+            ]
+        }
+        commit = project.commits.create(commit_json)
+    except gitlab.exceptions.GitlabCreateError:
+        commit_json = {
+            "branch": f"{rc}",
+            "commit_message": "start pipeline commit",
+            "actions": [
+                {
+                    "action": "create",
+                    "file_path": f"last_build",
+                    "content": f"{rc}"
+                },
+            ]
+        }
+        commit = project.commits.create(commit_json)
+
 

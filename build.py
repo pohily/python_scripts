@@ -32,7 +32,7 @@ def get_release_details(config, jira):
 
 def get_merge_requests(config, issue_number):
     """ Ищет ссылки на МР в задаче и возвращает список МР, по одному для каждого затронутого проекта в задаче """
-    projects = set()
+    result = []
     links_json = requests.get(url=REMOTE_LINK.format(issue_number),
                                  auth=(config['user_data']['login'], config['user_data']['jira_password'])).json()
     for link in links_json:
@@ -54,8 +54,8 @@ def get_merge_requests(config, issue_number):
         _, source_branch, state = get_merge_request_details(config, merge_link)
         if state == 'merged': # если МР в мастер уже влит - не берем его в RC
             continue
-        projects.add(project)
-    return projects
+        result.append(merge_link)
+    return result
 
 
 def get_links(config, merges):
@@ -183,7 +183,7 @@ if __name__ == '__main__':
         #           Создаем MR RC -> Staging для всех проектов (передумали вычитать проекты с конфликтами)
         #
         print_stage('Делаем МР RC -> Staging')
-        staging_links = make_mr_to_staging(config, used_projects, RC_name)
+        staging_links = make_mr_to_staging(config, used_projects, RC_name, docker)
         #
         #           Docker -> Master
         #
@@ -257,7 +257,7 @@ if __name__ == '__main__':
         file.write(message)
 
         #todo
-        # запуск pipeline
+        # запуск pipeline - сделал - не будет ли конфликтов при апдейте файла
         # запуск скрипта на гитлабе вебхуком от жиры
         # развернуть стенд на нужных ветках и запустить тесты в гитлабе и регресс (в Дженкинс?)
 
