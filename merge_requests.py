@@ -146,31 +146,35 @@ def make_mr_to_staging(config, projects, RC_name, docker):
             tests = PROJECTS_WITH_TESTS
         if pr in tests:
             try:
-                commit_json = {
-                    "branch": f"{RC_name}",
-                    "commit_message": "start pipeline commit",
-                    "actions": [
-                        {
-                            "action": "update",
-                            "file_path": f"last_build",
-                            "content": f"{RC_name}"
-                        },
-                    ]
-                }
-                project.commits.create(commit_json)
-            except gitlab.exceptions.GitlabCreateError:
-                commit_json = {
-                    "branch": f"{RC_name}",
-                    "commit_message": "start pipeline commit",
-                    "actions": [
-                        {
-                            "action": "create",
-                            "file_path": f"last_build",
-                            "content": f"{RC_name}"
-                        },
-                    ]
-                }
-                project.commits.create(commit_json)
+                project.branches.get(RC_name)   # если в проетке нет RC,то и коммит не нужен
+                try:
+                    commit_json = {
+                        "branch": f"{RC_name}",
+                        "commit_message": "start pipeline commit",
+                        "actions": [
+                            {
+                                "action": "update",
+                                "file_path": f"last_build",
+                                "content": f"{RC_name}"
+                            },
+                        ]
+                    }
+                    project.commits.create(commit_json)
+                except gitlab.exceptions.GitlabCreateError:
+                    commit_json = {
+                        "branch": f"{RC_name}",
+                        "commit_message": "start pipeline commit",
+                        "actions": [
+                            {
+                                "action": "create",
+                                "file_path": f"last_build",
+                                "content": f"{RC_name}"
+                            },
+                        ]
+                    }
+                    project.commits.create(commit_json)
+            except gitlab.exceptions.GitlabGetError:
+                pass
     return mr_links
 
 
@@ -201,8 +205,12 @@ if __name__ == '__main__':
     config = ConfigParser()
     config.read('config.ini')
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
-    rc = 'rc-kz-3-14-32'
-    project = gl.projects.get(110)
+    rc = 'rc-ge-3-7-10'
+    project = gl.projects.get(100)
+    try:
+        branch = project.branches.get(rc)
+    except gitlab.exceptions.GitlabGetError:
+        pass
     try:
         commit_json = {
             "branch": f"{rc}",
