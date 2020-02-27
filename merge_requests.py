@@ -151,13 +151,13 @@ def make_mr_to_staging(config, projects, RC_name, docker):
                 project.commits.create(commit_json)
             except gitlab.exceptions.GitlabCreateError:
                 commit_json = {
-                    "branch": f"{rc}",
+                    "branch": f"{RC_name}",
                     "commit_message": "start pipeline commit",
                     "actions": [
                         {
                             "action": "create",
                             "file_path": f"last_build",
-                            "content": f"{rc}"
+                            "content": f"{RC_name}"
                         },
                     ]
                 }
