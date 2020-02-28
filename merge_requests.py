@@ -8,7 +8,7 @@ TEST = False
 
 PROJECTS_NAMES = {"chestnoe_slovo": 7, "crm4slovokz": 11, "4slovokz": 12, "chestnoe_slovo_backend": 20, "mrloange": 23,
                   "crmmrloange": 24, "fias": 61, "chestnoe_slovo_landing": 62, "api": 79, "cache": 86, "sawmill": 90,
-                  "common": 91, "inn": 92, "finance": 94, "ge": 100, "robotmailer": 102, "finance_client": 103,
+                  "common": 91, "inn": 92, "finance": 93, "ge": 100, "robotmailer": 102, "finance_client": 103,
                   "kz": 110, "rabbitclient": 113, "fs-client": 116, "fs": 117, "selenium-chrome": 118,
                   "yaml-config": 119, "money": 120, "enum-generator": 121, "helper": 122, "registry-generator": 123,
                   "interface-generator": 124, "expression": 125, "almalge": 128, "crmalmalge": 129, "logging": 135,
@@ -20,7 +20,7 @@ PRIORITY = {'Critical': '(!) - Critical', 'Highest': '(*r) - Highest', 'High': '
             'Low': '(*b) - Low', 'Lowest': '(*b) - Lowest', 'Критический': '(!) - Critical'}
 
 PROJECTS_WITH_TESTS = [11, 20, 79, 110, 166]
-DOCKER_PROJECTS = [100, 110, 166, 167]
+DOCKER_PROJECTS = [94, 100, 110, 166, 167]
 
 MR_BY_IID = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?iids[]={}&{}'
 
@@ -38,7 +38,7 @@ def delete_create_RC(config, project, RC_name):
         rc = pr.branches.get(f'{RC_name}')
         rc.delete()
         pr.branches.create({'branch': f'{RC_name}', 'ref': 'master'})
-    except gitlab.GitlabError:
+    except (gitlab.exceptions.GitlabGetError, gitlab.exceptions.GitlabHttpError):
         pr.branches.create({'branch': f'{RC_name}', 'ref': 'master'})
 
 
@@ -71,7 +71,7 @@ def make_mr_to_rc(config, MR, RC_name):
 
     _, source_branch, target_branch, state = get_merge_request_details(config, MR)
     if state == 'merged' and target_branch == 'master':              # если МР уже влит в мастер - не берем его в RC
-        return '(/) Уже в мастере', MR.url, False
+        return '(/) Уже в мастере, ', MR.url, False
     target_branch = f'{RC_name}'
     #
     #           проверка статусов pipeline

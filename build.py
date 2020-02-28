@@ -8,7 +8,7 @@ import requests
 from jira import JIRA
 
 from merge_requests import make_mr_to_rc, make_mr_to_staging, make_mr_to_master, delete_create_RC, PRIORITY, merge_rc, \
-    MR_STATUS
+    MR_STATUS, PROJECTS_NAMES
 from send_notifications import ISSUE_URL, RELEASE_URL, REMOTE_LINK, GIT_LAB, STATUS_FOR_RELEASE
 
 docker = False  # флаг наличия мерджей на докер
@@ -23,7 +23,7 @@ def get_release_details(config, jira):
         if COMMAND_LINE_INPUT:
             release_input = argv[1]
         else:
-            release_input = 'ge.3.7.10'
+            release_input = 'ru.5.6.30'
     except IndexError:
         raise Exception('Enter release name')
     fix_issues = jira.search_issues(f'fixVersion={release_input}')
@@ -69,7 +69,7 @@ def get_links(config, merges):
         print_stage(f'Пытаемся сделать MR из {issue_number} в {RC_name}')
 
         status, url, mr = make_mr_to_rc(config, merge, RC_name)
-        if status != MR_STATUS['can_be_merged']:
+        if status == MR_STATUS['cannot_be_merged']:
             conflict = True
 
         statuses[index] = [status]  # 0
@@ -161,7 +161,7 @@ if __name__ == '__main__':
                 for item in MRless_issues:
                     issues_list.pop(item)
         with shelve.open('used_projects') as projects:  # сохраняем использованные проекты на диске
-            projects[f'{RC_name}'] = list(used_projects)
+            projects[f'{RC_name}'] = [PROJECTS_NAMES[pr] for pr in used_projects]
         #
         #           Удаляем и создаем RC
         #
