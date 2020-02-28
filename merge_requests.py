@@ -35,7 +35,7 @@ def delete_create_RC(config, project, RC_name):
         return '(/)Тест'
 
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
-    pr = gl.projects.get(f'{PROJECTS_NAMES[project]}')
+    pr = gl.projects.get(f'{project}')
     try:
         rc = pr.branches.get(f'{RC_name}')
         rc.delete()
@@ -47,13 +47,8 @@ def delete_create_RC(config, project, RC_name):
 def get_merge_request_details(config, MR):
     """ Возвращает статус (есть или нет конфликты), source_branch """
     _, iid, project, _ = MR
-    try:
-        project_id = PROJECTS_NAMES[project]
-    except KeyError:
-        print(f"\033[31m Проверьте МР в задаче {MR.issue} \033[0m")
-        return Merge_request_details('MR не найден', '', '', '')
     token = f"private_token={(config['user_data']['GITLAB_PRIVATE_TOKEN'])}"
-    details = requests.get(url=MR_BY_IID.format(project_id, iid, token)).json()
+    details = requests.get(url=MR_BY_IID.format(project, iid, token)).json()
     if details:
         details = details[0]
         return Merge_request_details(
@@ -69,7 +64,7 @@ def make_mr_to_rc(config, MR, RC_name):
         return '(/) Тест', 'https://gitlab.4slovo.ru/4slovo.ru/chestnoe_slovo_backend/merge_requests/тест', 'тест'
 
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
-    project = gl.projects.get(f'{PROJECTS_NAMES[MR.project]}')
+    project = gl.projects.get(f'{MR.project}')
 
     _, source_branch, target_branch, state = get_merge_request_details(config, MR)
     if state == 'merged' and target_branch == 'master':              # если МР уже влит в мастер - не берем его в RC
@@ -79,7 +74,7 @@ def make_mr_to_rc(config, MR, RC_name):
     #           проверка статусов pipeline
     #
     status = ''
-    if PROJECTS_NAMES[MR.project] in PROJECTS_WITH_TESTS and PROJECTS_NAMES[MR.project] != 11:  # пока не проверяем 11 - там они всегда падают
+    if MR.project in PROJECTS_WITH_TESTS and MR.project != 11:  # пока не проверяем 11 - там они всегда падают
         issue = MR.issue.lower()
         pipelines = project.pipelines.list(ref=f'{issue}')
         if pipelines:
@@ -94,7 +89,7 @@ def make_mr_to_rc(config, MR, RC_name):
         mr = project.mergerequests.create({'source_branch': source_branch,
                                            'target_branch': target_branch,
                                            'title': f"[skip-ci] {(MR.issue).replace('-', '_')} -> {RC_name}",
-                                           'target_project_id': PROJECTS_NAMES[MR.project],
+                                           'target_project_id': MR.project,
                                            })
     status += MR_STATUS[mr.attributes['merge_status']]
     url = mr.attributes['web_url']
@@ -118,9 +113,9 @@ def make_mr_to_staging(config, projects, RC_name, docker):
     mr_links = [] # ссылки для вывода под таблицей
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
     for pr in projects:
-        project = gl.projects.get(PROJECTS_NAMES[pr])
+        project = gl.projects.get(pr)
         source_branch = RC_name
-        if PROJECTS_NAMES[pr] in DOCKER_PROJECTS:
+        if pr in DOCKER_PROJECTS:
             target_branch = 'master'
         else:
             target_branch = 'staging'
@@ -132,7 +127,7 @@ def make_mr_to_staging(config, projects, RC_name, docker):
             mr = project.mergerequests.create({'source_branch': source_branch,
                                                'target_branch': target_branch,
                                                'title': title,
-                                               'target_project_id': PROJECTS_NAMES[pr],
+                                               'target_project_id': pr,
                                                })
         mr_links.append(mr.attributes['web_url'])
         #
@@ -185,9 +180,9 @@ def make_mr_to_master(config, projects):
     mr_links = [] # ссылки для вывода под таблицей
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
     for pr in projects:
-        if PROJECTS_NAMES[pr] in DOCKER_PROJECTS:
+        if pr in DOCKER_PROJECTS:
             continue
-        project = gl.projects.get(PROJECTS_NAMES[pr])
+        project = gl.projects.get(pr)
         mr = project.mergerequests.list(state='opened', source_branch='staging', target_branch='master')
         if mr:
             mr = mr[0]
@@ -195,7 +190,7 @@ def make_mr_to_master(config, projects):
             mr = project.mergerequests.create({'source_branch': 'staging',
                                                'target_branch': 'master',
                                                'title': 'staging -> master',
-                                               'target_project_id': PROJECTS_NAMES[pr],
+                                               'target_project_id': pr,
                                                })
         mr_links.append(mr.attributes['web_url'])
     return mr_links
@@ -210,16 +205,6 @@ if __name__ == '__main__':
             mr = project.mergerequests.list()
             mr = mr[0]
             mr = mr.attributes['web_url'].split('/')
-            result = ""
-            pr = f'"{mr[3]}/{mr[4]}"'
-            if "ru" in pr:
-                result += "ru, "
-            if "kz" in pr:
-                result += "kz, "
-            if "ge" in pr:
-                result += "ge, "
-            if "ru" not in pr and "kz" not in pr and "ge" not in pr:
-                result = "ru, kz, ge"
-            print(f'"{mr[3]}/{mr[4]}": "{result}", ')
+            print(f'{rep}: "{mr[3]}/{mr[4]}", ')
         except:
             pass

@@ -13,7 +13,7 @@ from send_notifications import ISSUE_URL, RELEASE_URL, REMOTE_LINK, GIT_LAB, STA
 
 docker = False  # флаг наличия мерджей на докер
 confluence = ''  # ссылка на отчет о тестировании
-Merge_request = namedtuple('Merge_request', ['url', 'iid', 'project', 'issue'])  # iid - номер МР в url'е, project - str
+Merge_request = namedtuple('Merge_request', ['url', 'iid', 'project', 'issue'])  # iid - номер МР в url'е, project - int
 
 
 def get_release_details(config, jira):
@@ -51,7 +51,7 @@ def get_merge_requests(config, issue_number):
             continue
         project = f'{url_parts[3]}/{url_parts[4]}'
         iid = url_parts[6]
-        merge_link = Merge_request(link['object']['url'], iid, project, issue_number)
+        merge_link = Merge_request(link['object']['url'], iid, PROJECTS_NAMES[project], issue_number)
         result.append(merge_link)
     return result
 
@@ -161,7 +161,7 @@ if __name__ == '__main__':
                 for item in MRless_issues:
                     issues_list.pop(item)
         with shelve.open('used_projects') as projects:  # сохраняем использованные проекты на диске
-            projects[f'{RC_name}'] = [PROJECTS_NAMES[pr] for pr in used_projects]
+            projects[f'{RC_name}'] = list(used_projects)
         #
         #           Удаляем и создаем RC
         #
