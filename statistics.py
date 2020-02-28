@@ -10,15 +10,19 @@ from send_notifications import STATUS_FOR_RELEASE
 """ Показывает статистику по запрошенному релизу: количество задач, проетов и названия проектов, 
 также показываются задачи, которые не подходят для данного релиза (неправильная страна) """
 
-PROJECTS_COUNTRIES = {"chestnoe_slovo": 'ru', "chestnoe_slovo_backend": 'ru',"common": 'ru',
-                      "chestnoe_slovo_landing": 'ru', "api": 'ru', "cache": 'ru', "inn": 'ru', "yaml-config": 'ru',
-                      "money": 'ru', "enum-generator": 'ru', "interface-generator": 'ru', "expression": 'ru',
-                      "logging": 'ru', "timeservice_client": 'ru', "ru": 'ru', "ru-db": 'ru', "helper": 'ru',
-                      "registry-generator": 'ru', "finance": 'ru', "fs-client": 'ru', "timeservice": 'ru',
-                      "crm4slovokz": "kz", "4slovokz": "kz", "kz": "kz", "landing": 'kz',
-                      "sawmill": 'ru, kz',"robotmailer": 'ru, kz', "rabbitсlient": 'ru, kz', "finance_client": 'ru, kz',
-                      "fs": 'ru, kz', "ge": "ge", "almalge": "ge", "crmalmalge": "ge", "mrloange": "ge",
-                      "crmmrloange": "ge",
+PROJECTS_COUNTRIES = {"4slovo.ru/chestnoe_slovo": "ru, ", "4slovo.kz/crm4slovokz": "kz, ", "4slovo.kz/4slovokz": "kz, ",
+                      "4slovo.ru/chestnoe_slovo_backend": "ru, ", "4slovo.ru/common": "ru, ",
+                      "mrloan.ge/mrloange": "ge, ", "mrloan.ge/crmmrloange": "ge, ", "4slovo.ru/fias": "ru, ",
+                      "4slovo.ru/chestnoe_slovo_landing": "ru, ", "4slovo.ru/api": "ru, ", "4slovo/cache": "ru, kz, ge",
+                      "4slovo/sawmill": "ru, kz, ge", "4slovo/common": "ru, kz, ge", "4slovo/inn": "ru, kz, ge",
+                      "4slovo/finance": "ru, kz, ge", "docker/finance": "ru, kz, ge", "docker/api": "ru, kz, ge",
+                      "docker/ge": "ge, ", "4slovo/finance_client": "ru, kz, ge", "docker/kz": "kz, ",
+                      "4slovo/rabbitclient": "ru, kz, ge", "4slovo/fs-client": "ru, kz, ge", "4slovo/fs": "ru, kz, ge",
+                      "4slovo/enum-generator": "ge, ", "4slovo/expression": "ru, kz, ge", "almal.ge/almalge": "ge, ",
+                      "almal.ge/crmalmalge": "ge, ", "4slovo.ru/python-tests": "ru, ", "4slovo/logging": "ru, kz, ge",
+                      "4slovo/timeservice": "ru, kz, ge", "4slovo/timeservice_client": "ru, kz, ge",
+                      "docker/replicator": "ru, kz, ge", "4slovo.ru/python-scripts": "ru, ",
+                      "4slovo.kz/landing": "kz, ", "docker/ru": "ru, ", "docker/ru-db": "ru, ",
                       }
 
 config = ConfigParser()

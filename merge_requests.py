@@ -6,21 +6,23 @@ import requests
 
 TEST = False
 
-PROJECTS_NAMES = {"chestnoe_slovo": 7, "crm4slovokz": 11, "4slovokz": 12, "chestnoe_slovo_backend": 20, "mrloange": 23,
-                  "crmmrloange": 24, "fias": 61, "chestnoe_slovo_landing": 62, "api": 79, "cache": 86, "sawmill": 90,
-                  "common": 91, "inn": 92, "finance": 93, "ge": 100, "robotmailer": 102, "finance_client": 103,
-                  "kz": 110, "rabbitclient": 113, "fs-client": 116, "fs": 117, "selenium-chrome": 118,
-                  "yaml-config": 119, "money": 120, "enum-generator": 121, "helper": 122, "registry-generator": 123,
-                  "interface-generator": 124, "expression": 125, "almalge": 128, "crmalmalge": 129, "logging": 135,
-                  "timeservice": 138, "timeservice_client": 139, "consul-swarm": 140, "elk": 141,
-                  "landing": 159, "ru": 166, "ru-db": 167,
+PROJECTS_NAMES = {"4slovo.ru/chestnoe_slovo": 7, "4slovo.kz/crm4slovokz": 11, "4slovo.kz/4slovokz": 12,
+                  "4slovo.ru/chestnoe_slovo_backend": 20, "4slovo.ru/common": 22, "mrloan.ge/mrloange": 23,
+                  "mrloan.ge/crmmrloange": 24, "4slovo.ru/fias": 61, "4slovo.ru/chestnoe_slovo_landing": 62,
+                  "4slovo.ru/api": 79, "4slovo/cache": 86, "4slovo/sawmill": 90, "4slovo/common": 91, "4slovo/inn": 92,
+                  "4slovo/finance": 93, "docker/finance": 94, "docker/api": 97, "docker/ge": 100,
+                  "4slovo/finance_client": 103, "docker/kz": 110, "4slovo/rabbitclient": 113, "4slovo/fs-client": 116,
+                  "4slovo/fs": 117, "4slovo/enum-generator": 121, "4slovo/expression": 125, "almal.ge/almalge": 128,
+                  "almal.ge/crmalmalge": 129, "4slovo.ru/python-tests": 130, "4slovo/logging": 135,
+                  "4slovo/timeservice": 138, "4slovo/timeservice_client": 139, "docker/replicator": 144,
+                  "4slovo.ru/python-scripts": 154, "4slovo.kz/landing": 159, "docker/ru": 166, "docker/ru-db": 167,
                   }
 MR_STATUS = {'can_be_merged': '(/) Нет конфликтов, ', 'cannot_be_merged': '(x) Конфликт!, '}
 PRIORITY = {'Critical': '(!) - Critical', 'Highest': '(*r) - Highest', 'High': '(*) - High', 'Medium': '(*g) - Medium',
             'Low': '(*b) - Low', 'Lowest': '(*b) - Lowest', 'Критический': '(!) - Critical'}
 
 PROJECTS_WITH_TESTS = [11, 20, 79, 110, 166]
-DOCKER_PROJECTS = [94, 100, 110, 166, 167]
+DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167]
 
 MR_BY_IID = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?iids[]={}&{}'
 
@@ -202,37 +204,22 @@ if __name__ == '__main__':
     config = ConfigParser()
     config.read('config.ini')
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
-    rc = 'rc-ge-3-7-10'
-    project = gl.projects.get(100)
-    try:
-        branch = project.branches.get(rc)
-    except gitlab.exceptions.GitlabGetError:
-        pass
-    try:
-        commit_json = {
-            "branch": f"{rc}",
-            "commit_message": "start pipeline commit",
-            "actions": [
-                {
-                    "action": "update",
-                    "file_path": f"last_build",
-                    "content": f"{rc}"
-                },
-            ]
-        }
-        commit = project.commits.create(commit_json)
-    except gitlab.exceptions.GitlabCreateError:
-        commit_json = {
-            "branch": f"{rc}",
-            "commit_message": "start pipeline commit",
-            "actions": [
-                {
-                    "action": "create",
-                    "file_path": f"last_build",
-                    "content": f"{rc}"
-                },
-            ]
-        }
-        commit = project.commits.create(commit_json)
-
-
+    for rep in range(170):
+        try:
+            project = gl.projects.get(rep)
+            mr = project.mergerequests.list()
+            mr = mr[0]
+            mr = mr.attributes['web_url'].split('/')
+            result = ""
+            pr = f'"{mr[3]}/{mr[4]}"'
+            if "ru" in pr:
+                result += "ru, "
+            if "kz" in pr:
+                result += "kz, "
+            if "ge" in pr:
+                result += "ge, "
+            if "ru" not in pr and "kz" not in pr and "ge" not in pr:
+                result = "ru, kz, ge"
+            print(f'"{mr[3]}/{mr[4]}": "{result}", ')
+        except:
+            pass

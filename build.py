@@ -49,7 +49,7 @@ def get_merge_requests(config, issue_number):
         url_parts = link['object']['url'].split('/')
         if len(url_parts) < 6:
             continue
-        project = f'{url_parts[4]}'
+        project = f'{url_parts[3]}/{url_parts[4]}'
         iid = url_parts[6]
         merge_link = Merge_request(link['object']['url'], iid, project, issue_number)
         result.append(merge_link)
