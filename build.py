@@ -51,8 +51,8 @@ def get_merge_requests(config, issue_number):
             continue
         try:
             project = PROJECTS_NAMES[f'{url_parts[3]}/{url_parts[4]}']
-        except KeyError:
-            logging.error(f'Проверьте задачу {issue_number} - не найден проект {url_parts[3]}/{url_parts[4]}')
+        except KeyError as e:
+            logging.exception(f'Проверьте задачу {issue_number} - не найден проект {url_parts[3]}/{url_parts[4]}')
             continue
         iid = url_parts[6]
         merge_link = Merge_request(link['object']['url'], iid, project, issue_number)
