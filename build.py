@@ -1,3 +1,4 @@
+import logging
 import shelve
 from collections import defaultdict, namedtuple
 from configparser import ConfigParser
@@ -66,7 +67,7 @@ def get_links(config, merges):
         #
         #           Пытаемся создать MR из текущей задачи в RC. Выводим статус в таблицу
         #
-        print_stage(f'Пытаемся сделать MR из {issue_number} в {RC_name}')
+        logging.info(f'Пытаемся сделать MR из {issue_number} в {RC_name}')
 
         status, url, mr = make_mr_to_rc(config, merge, RC_name)
         if status == MR_STATUS['cannot_be_merged']:
@@ -76,7 +77,7 @@ def get_links(config, merges):
         statuses[index].append(mr)  # 1
         url_parts = url.split('/')
         statuses[index].append(f'[{url_parts[3]}/{url_parts[4]}/{url_parts[6]}|{url}]')  # 2
-        print_stage(status)
+        logging.info(status)
     #
     #           Мержим MR из текущей задачи в RC
     #
@@ -87,7 +88,7 @@ def get_links(config, merges):
     for line in range(len(statuses)):
         statuses[line].append(status)  # 3
         if not conflict:
-            print_stage(f'Мержим {issue_number} в {RC_name}')
+            logging.info(f'Мержим {issue_number} в {RC_name}')
             merge_rc(config, statuses[line][1])
 
     result = ''
@@ -101,11 +102,10 @@ def get_links(config, merges):
     return result
 
 
-def print_stage(text):
-    print(f'{datetime.now().strftime("%H:%M:%S")} {text}')
-
-
 if __name__ == '__main__':
+    logging.basicConfig(
+        format = u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s', level = logging.INFO
+    )
     with open('message.txt', 'w') as file:
         config = ConfigParser()
         config.read('config.ini')
@@ -114,7 +114,7 @@ if __name__ == '__main__':
         #
         #           Определяем состав релиза
         #
-        print_stage('Определяем состав релиза')
+        logging.info('Определяем состав релиза')
         release_name, release_id, release_issues = get_release_details(config, jira)
         RC_name = f'rc-{release_name.replace(".", "-")}'
         #
@@ -125,7 +125,7 @@ if __name__ == '__main__':
         #
         #           Выбираем задачи для релиза в нужных статусах
         #
-        print_stage('Выбираем задачи для релиза в нужных статусах')
+        logging.info('Выбираем задачи для релиза в нужных статусах')
         issues_list = {}
         before_deploy = []
         post_deploy = []
@@ -141,7 +141,7 @@ if __name__ == '__main__':
         #
         #           Собираем мердж реквесты
         #
-        print_stage('Собираем мердж реквесты')
+        logging.info('Собираем мердж реквесты')
         merge_requests = defaultdict(list)  # словарь- задача: список кортежей ссылок и проектов
         used_projects = set()
         MRless_issues_number = 1
@@ -165,13 +165,13 @@ if __name__ == '__main__':
         #
         #           Удаляем и создаем RC
         #
-        print_stage('Удаляем и создаем RC')
+        logging.info('Удаляем и создаем RC')
         for project in used_projects:
             delete_create_RC(config, project, RC_name)
         #
         #           Заполняем таблицу
         #
-        print_stage('Заполняем таблицу')
+        logging.info('Заполняем таблицу')
         for index, issue_number in enumerate(sorted(issues_list)):
             priority = issues_list[issue_number]
             result = get_links(config, merge_requests[issue_number])
@@ -182,12 +182,12 @@ if __name__ == '__main__':
         #
         #           Создаем MR RC -> Staging для всех проектов (передумали вычитать проекты с конфликтами)
         #
-        print_stage('Делаем МР RC -> Staging')
+        logging.info('Делаем МР RC -> Staging')
         staging_links = make_mr_to_staging(config, used_projects, RC_name, docker)
         #
         #           Docker -> Master
         #
-        print_stage('Заполняем ссылки на МР RC -> Staging, Staging -> Master')
+        logging.info('Заполняем ссылки на МР RC -> Staging, Staging -> Master')
         if docker:
             message += '\r\n*Docker -> Master*\r\n'
             for link in staging_links:
@@ -203,7 +203,7 @@ if __name__ == '__main__':
         #
         #           Создаем MR Staging -> Master
         #
-        print_stage('Делаем МР Staging -> Master')
+        logging.info('Делаем МР Staging -> Master')
         master_links = make_mr_to_master(config, used_projects)
         #
         #           Staging -> Master
@@ -214,7 +214,7 @@ if __name__ == '__main__':
         #
         #           Преддеплойные действия
         #
-        print_stage('Заполняем деплойные действия')
+        logging.info('Заполняем деплойные действия')
         message_before_deploy = ''
         if before_deploy:
             for issue in before_deploy:
@@ -231,7 +231,7 @@ if __name__ == '__main__':
         #
         CREATE_JIRA_ISSUE = eval(config['options']['CREATE_JIRA_ISSUE'])
         if CREATE_JIRA_ISSUE:
-            print_stage('Вывод результата в Jira')
+            logging.info('Вывод результата в Jira')
             existing_issue = jira.search_issues(f'project=SLOV AND summary ~ "Сборка {release_name}"')
             if existing_issue:
                 existing_issue = existing_issue[0]
