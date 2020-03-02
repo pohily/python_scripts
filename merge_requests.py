@@ -1,3 +1,4 @@
+import logging
 from collections import namedtuple
 from configparser import ConfigParser
 
@@ -55,6 +56,7 @@ def get_merge_request_details(config, MR):
             MR_STATUS[details['merge_status']], details['source_branch'], details['target_branch'], details['state']
         )
     else:
+        logging.error('MR не найден')
         return Merge_request_details('MR не найден', '', '', '')
 
 
@@ -68,6 +70,7 @@ def make_mr_to_rc(config, MR, RC_name):
 
     _, source_branch, target_branch, state = get_merge_request_details(config, MR)
     if state == 'merged' and target_branch == 'master':              # если МР уже влит в мастер - не берем его в RC
+        logging.warning(f'В задаче {MR.issue} мердж реквест {MR.project} уже в мастере')
         return '(/) Уже в мастере, ', MR.url, False
     target_branch = f'{RC_name}'
     #
@@ -80,6 +83,7 @@ def make_mr_to_rc(config, MR, RC_name):
         if pipelines:
             pipelines = pipelines[0]
             if pipelines.attributes['status'] != 'success':
+                logging.warning(f'В задаче {MR.issue} в мердж реквесте {MR.project} уже в не прошли тесты')
                 status = '(x) Тесты не прошли!, '
 
     mr = project.mergerequests.list(state='opened', source_branch=source_branch, target_branch=target_branch)
@@ -135,7 +139,7 @@ def make_mr_to_staging(config, projects, RC_name, docker):
         #
         if docker:
             tests = DOCKER_PROJECTS
-            print('\033[31m Запустите тесты в Gitlab после сборки контейнеров докера в RC вручную! \033[0m')
+            logging.warning('\033[31m Запустите тесты в Gitlab после сборки контейнеров докера в RC вручную! \033[0m')
         else:
             tests = PROJECTS_WITH_TESTS
         if pr in tests:

@@ -10,12 +10,12 @@ from send_notifications import STATUS_FOR_RELEASE
 """ Показывает статистику по запрошенному релизу: количество задач, проетов и названия проектов, 
 также показываются задачи, которые не подходят для данного релиза (неправильная страна) """
 
-PROJECTS_COUNTRIES = {7: "ru, ", 11: "kz, ", 12: "kz, ", 20: "ru, ", 22: "ru, ", 23: "ge, ", 24: "ge, ", 61: "ru, ",
-                      62: "ru, ", 79: "ru, ", 86: "ru, kz, ge", 90: "ru, kz, ge", 91: "ru, kz, ge", 92: "ru, kz, ge",
-                      93: "ru, kz, ge", 94: "ru, kz, ge", 97: "ru, kz, ge", 100: "ge, ", 103: "ru, kz, ge", 110: "kz, ",
-                      113: "ru, kz, ge", 116: "ru, kz, ge", 117: "ru, kz, ge", 121: "ge, ", 125: "ru, kz, ge",
-                      128: "ge, ", 129: "ge, ", 130: "ru, ", 135: "ru, kz, ge", 138: "ru, kz, ge", 139: "ru, kz, ge",
-                      144: "ru, kz, ge", 154: "ru, ", 159: "kz, ", 166: "ru, ", 167: "ru, ",
+PROJECTS_COUNTRIES = {7: "ru", 11: "kz", 12: "kz", 20: "ru", 22: "ru", 23: "ge", 24: "ge", 61: "ru",
+                      62: "ru", 79: "ru", 86: "ru, kz, ge", 90: "ru, kz, ge", 91: "ru, kz, ge", 92: "ru, kz, ge",
+                      93: "ru, kz, ge", 94: "ru, kz, ge", 97: "ru, kz, ge", 100: "ge", 103: "ru, kz, ge", 110: "kz",
+                      113: "ru, kz, ge", 116: "ru, kz, ge", 117: "ru, kz, ge", 121: "ge", 125: "ru, kz, ge",
+                      128: "ge", 129: "ge", 130: "ru", 135: "ru, kz, ge", 138: "ru, kz, ge", 139: "ru, kz, ge",
+                      144: "ru, kz, ge", 154: "ru", 159: "kz", 166: "ru", 167: "ru",
                       }
 PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo", 11: "4slovo.kz/crm4slovokz", 12: "4slovo.kz/4slovokz",
                     20: "4slovo.ru/chestnoe_slovo_backend", 22: "4slovo.ru/common", 23: "mrloan.ge/mrloange",

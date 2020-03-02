@@ -2,7 +2,6 @@ import logging
 import shelve
 from collections import defaultdict, namedtuple
 from configparser import ConfigParser
-from datetime import datetime
 from sys import argv
 
 import requests
@@ -50,9 +49,13 @@ def get_merge_requests(config, issue_number):
         url_parts = link['object']['url'].split('/')
         if len(url_parts) < 6:
             continue
-        project = f'{url_parts[3]}/{url_parts[4]}'
+        try:
+            project = PROJECTS_NAMES[f'{url_parts[3]}/{url_parts[4]}']
+        except KeyError:
+            logging.error(f'Проверьте задачу {issue_number} - не найден проект {url_parts[3]}/{url_parts[4]}')
+            continue
         iid = url_parts[6]
-        merge_link = Merge_request(link['object']['url'], iid, PROJECTS_NAMES[project], issue_number)
+        merge_link = Merge_request(link['object']['url'], iid, project, issue_number)
         result.append(merge_link)
     return result
 
