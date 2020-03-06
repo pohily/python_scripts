@@ -8,7 +8,7 @@ import requests
 from jira import JIRA
 
 from merge_requests import make_mr_to_rc, make_mr_to_staging, make_mr_to_master, delete_create_RC, PRIORITY, merge_rc, \
-    MR_STATUS, PROJECTS_NAMES
+    MR_STATUS, PROJECTS_NAMES, is_merged
 from send_notifications import ISSUE_URL, RELEASE_URL, REMOTE_LINK, GIT_LAB, STATUS_FOR_RELEASE
 
 docker = False  # флаг наличия мерджей на докер
@@ -55,8 +55,10 @@ def get_merge_requests(config, issue_number):
             logging.exception(f'Проверьте задачу {issue_number} - не найден проект {url_parts[3]}/{url_parts[4]}')
             continue
         iid = url_parts[6]
-        merge_link = Merge_request(link['object']['url'], iid, project, issue_number)
-        result.append(merge_link)
+        merge = Merge_request(link['object']['url'], iid, project, issue_number)
+        issue_branch = str(issue_number).lower()
+        if not is_merged(config, issue_branch, project):
+            result.append(merge)
     return result
 
 
@@ -153,7 +155,7 @@ if __name__ == '__main__':
             for issue_number in issues_list:
                 MR_count = get_merge_requests(config, issue_number)
                 if not MR_count: # если в задаче нет МР
-                    message += f"|{MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]|{issues_list[issue_number]}| Нет мердж реквестов |(/)|\r\n"
+                    message += f"|{MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]|{issues_list[issue_number]}| Нет изменений |(/)|\r\n"
                     MRless_issues_number += 1
                     MRless_issues.append(issue_number)
                     continue
