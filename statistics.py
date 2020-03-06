@@ -3,6 +3,7 @@ from itertools import chain
 from re import sub
 
 from jira import JIRA
+import gitlab
 
 from build import get_release_details, get_merge_requests
 from send_notifications import STATUS_FOR_RELEASE
@@ -61,8 +62,27 @@ for issue_number in fix_issues:
         except:
             pass
 projects = [PROJECTS_NUMBERS[pr] for pr in used_projects]
+gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
+user_id = 0
+users = gl.users.list()
+for user in users:
+    if user.attributes['username'] == config['user_data']['login']:
+        user_id = user.attributes['id']
+reporter = []
+for project in projects:
+    pr = gl.projects.get(project)
+    member = pr.members.get(user_id)
+    access_level = member.attributes['access_level']
+    if access_level < 30:
+        reporter.append(project)
 print(f'\033[34m В релизе {release_input} \033[31m{issue_count}\033[34m задач(-a, -и) в статусах выше "Passed QA".')
-print(f'\033[34m Изменения в них затронули \033[31m {len(used_projects)} \033[34m проект(-а, -ов): \033[31m {", ".join(sorted(projects))}. \033[0m')
+print(f'\033[34m Изменения в них затронули \033[31m {len(used_projects)} \033[34m проект(-а, '
+      f'-ов): \033[31m {", ".join(sorted(projects))}. \033[0m')
+if reporter:
+    print('\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n')
+    print(f'\033[34m Вам надо получить доступ Developer в проект(-е,'
+          f' -ах): \033[31m {", ".join(sorted(reporter))}. \033[0m')
+    print('\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n')
 if before_deploy or post_deploy:
     print(f'Есть следующие деплойные действия:')
 for action in chain(before_deploy, post_deploy):

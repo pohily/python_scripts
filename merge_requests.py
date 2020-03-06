@@ -199,6 +199,7 @@ def make_mr_to_master(config, projects):
         mr_links.append(mr.attributes['web_url'])
     return mr_links
 
+
 if __name__ == '__main__':
     config = ConfigParser()
     config.read('config.ini')
