@@ -60,6 +60,17 @@ def get_merge_request_details(config, MR):
         return Merge_request_details('MR не найден', '', '', '')
 
 
+def is_merged(config, source, project):
+    """ Возвращаем статус МР в мастер """
+    gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
+    pr = gl.projects.get(f'{project}')
+    mr = pr.mergerequests.list(state='merged', source_branch=source, target_branch='master')
+    if mr:
+        return True
+    else:
+        return False
+
+
 def make_mr_to_rc(config, MR, RC_name):
     """ Создаем МР slov -> RC. Возвращем статус МР, его url и сам МР"""
     if TEST:
@@ -105,7 +116,7 @@ def merge_rc (config, MR):
         return
 
     gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
-    if MR.attributes['state'] != 'merged':
+    if not isinstance(MR, bool) and MR.attributes['state'] != 'merged':
         MR.merge()
 
 
