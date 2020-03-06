@@ -76,11 +76,13 @@ for project in projects:
     if access_level < 30:
         reporter.append(project)
 print(f'\033[34m В релизе {release_input} \033[31m{issue_count}\033[34m задач(-a, -и) в статусах выше "Passed QA".')
-print(f'\033[34m Изменения в них затронули \033[31m {len(used_projects)} \033[34m проект(-а, -ов): \033[31m {", ".join(sorted(projects))}. \033[0m')
+print(f'\033[34m Изменения в них затронули \033[31m {len(used_projects)} \033[34m проект(-а, '
+      f'-ов): \033[31m {", ".join(sorted(projects))}. \033[0m')
 if reporter:
-    print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-    print(f'\033[34m Вам надо получить доступ Developer в проект(-е, -ах): \033[31m {", ".join(sorted(reporter))}. \033[0m')
-    print('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+    print('\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n')
+    print(f'\033[34m Вам надо получить доступ Developer в проект(-е,'
+          f' -ах): \033[31m {", ".join(sorted(reporter))}. \033[0m')
+    print('\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n')
 if before_deploy or post_deploy:
     print(f'Есть следующие деплойные действия:')
 for action in chain(before_deploy, post_deploy):
