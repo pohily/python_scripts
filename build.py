@@ -11,6 +11,17 @@ from merge_requests import make_mr_to_rc, make_mr_to_staging, make_mr_to_master,
     MR_STATUS, PROJECTS_NAMES, is_merged
 from send_notifications import ISSUE_URL, RELEASE_URL, REMOTE_LINK, GIT_LAB, STATUS_FOR_RELEASE
 
+PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo", 11: "4slovo.kz/crm4slovokz", 12: "4slovo.kz/4slovokz",
+                    20: "4slovo.ru/chestnoe_slovo_backend", 22: "4slovo.ru/common", 23: "mrloan.ge/mrloange",
+                    24: "mrloan.ge/crmmrloange", 61: "4slovo.ru/fias", 62: "4slovo.ru/chestnoe_slovo_landing",
+                    79: "4slovo.ru/api", 86: "4slovo/cache", 90: "4slovo/sawmill", 91: "4slovo/common",
+                    92: "4slovo/inn", 93: "4slovo/finance", 94: "docker/finance", 97: "docker/api", 100: "docker/ge",
+                    103: "4slovo/finance_client", 110: "docker/kz", 113: "4slovo/rabbitclient", 116: "4slovo/fs-client",
+                    117: "4slovo/fs", 121: "4slovo/enum-generator", 125: "4slovo/expression", 128: "almal.ge/almalge",
+                    129: "almal.ge/crmalmalge", 130: "4slovo.ru/python-tests", 135: "4slovo/logging",
+                    138: "4slovo/timeservice", 139: "4slovo/timeservice_client", 144: "docker/replicator",
+                    154: "4slovo.ru/python-scripts", 159: "4slovo.kz/landing", 166: "docker/ru",167: "docker/ru-db",
+                    }
 docker = False  # флаг наличия мерджей на докер
 confluence = ''  # ссылка на отчет о тестировании
 Merge_request = namedtuple('Merge_request', ['url', 'iid', 'project', 'issue'])  # iid - номер МР в url'е, project - int
@@ -23,7 +34,7 @@ def get_release_details(config, jira):
         if COMMAND_LINE_INPUT:
             release_input = argv[1]
         else:
-            release_input = 'ru.5.6.30'
+            release_input = 'ru.5.7.0'
     except IndexError:
         raise Exception('Enter release name')
     fix_issues = jira.search_issues(f'fixVersion={release_input}')
@@ -56,8 +67,7 @@ def get_merge_requests(config, issue_number):
             continue
         iid = url_parts[6]
         merge = Merge_request(link['object']['url'], iid, project, issue_number)
-        issue_branch = str(issue_number).lower()
-        if not is_merged(config, issue_branch, project):
+        if not is_merged(config, merge):
             result.append(merge)
     return result
 
@@ -72,7 +82,7 @@ def get_links(config, merges):
         #
         #           Пытаемся создать MR из текущей задачи в RC. Выводим статус в таблицу
         #
-        logging.info(f'Пытаемся сделать MR из {issue_number} в {RC_name}')
+        logging.info(f'Пытаемся сделать MR из {merge.issue} в {RC_name} в {PROJECTS_NUMBERS[merge.project]}')
 
         status, url, mr = make_mr_to_rc(config, merge, RC_name)
         if status == MR_STATUS['cannot_be_merged']:
