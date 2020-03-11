@@ -34,7 +34,7 @@ def get_release_details(config, jira):
         if COMMAND_LINE_INPUT:
             release_input = argv[1]
         else:
-            release_input = 'ru.5.7.0'
+            release_input = 'kz.3.14.35'
     except IndexError:
         raise Exception('Enter release name')
     fix_issues = jira.search_issues(f'fixVersion={release_input}')
@@ -120,10 +120,10 @@ def get_links(config, merges):
 
 if __name__ == '__main__':
     level = logging.INFO
-    handlers = [logging.FileHandler('log.txt'), logging.StreamHandler()]
+    handlers = [logging.FileHandler('logs/log.txt'), logging.StreamHandler()]
     format = u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s'
-    logging.basicConfig(level = level, format = format, handlers = handlers)
-    with open('message.txt', 'w') as file:
+    logging.basicConfig(level=level, format=format, handlers=handlers)
+    with open('logs/message.txt', 'w') as file:
         config = ConfigParser()
         config.read('config.ini')
         jira_options = {'server': 'https://jira.4slovo.ru/'}
@@ -183,7 +183,7 @@ if __name__ == '__main__':
             if MRless_issues:  # убираем задачу без МР из списка задач для сборки RC
                 for item in MRless_issues:
                     issues_list.pop(item)
-        with shelve.open('used_projects') as projects:  # сохраняем использованные проекты на диске
+        with shelve.open('logs/used_projects') as projects:  # сохраняем использованные проекты на диске
             projects[f'{RC_name}'] = list(used_projects)
         #
         #           Удаляем и создаем RC
@@ -280,8 +280,5 @@ if __name__ == '__main__':
         file.write(message)
 
         #todo
-        # если МР в мастере - пишет нет МР - поправить
-        # запуск pipeline - сделал - не будет ли конфликтов при апдейте файла
-        # запуск скрипта на гитлабе вебхуком от жиры
+        # # запуск скрипта на гитлабе вебхуком от жиры
         # развернуть стенд на нужных ветках и запустить тесты в гитлабе и регресс (в Дженкинс?)
-

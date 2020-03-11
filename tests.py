@@ -6,6 +6,10 @@ import gitlab
 
 from merge_requests import PROJECTS_WITH_TESTS, DOCKER_PROJECTS
 
+""" с помощью следующей команды можно запустить тесты в остальных проектах, пропущенные при создании сборки. 
+Так как в этом случае запускается только сборка контейнеров докера, тесты автоматически не запускаются.
+"""
+
 if __name__ == '__main__':
     config = ConfigParser()
     config.read('config.ini')
