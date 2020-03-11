@@ -48,15 +48,15 @@ def get_merge_requests(config, issue_number):
     links_json = requests.get(url=REMOTE_LINK.format(issue_number),
                                  auth=(config['user_data']['login'], config['user_data']['jira_password'])).json()
     for link in links_json:
+        global confluence
+        if not confluence:
+            if 'confluence' in link['object']['url'] and link['relationship'] == "mentioned in":
+                confluence = link['object']['url']
         if 'commit' in link['object']['url'] or GIT_LAB not in link['object']['url']:
             continue
         if 'docker' in link['object']['url']:
             global docker
             docker = True
-        global confluence
-        if not confluence:
-            if 'confluence' in link['object']['url'] and link['relationship'] == "mentioned in":
-                confluence = link['object']['url']
         url_parts = link['object']['url'].split('/')
         if len(url_parts) < 6:
             continue
