@@ -43,7 +43,7 @@ def get_release_details(config, jira):
 
 
 def get_merge_requests(config, issue_number):
-    """ Ищет ссылки на МР в задаче и возвращает список МР """
+    """ Ищет ссылки на невлитые МР в задаче и возвращает их список """
     result = []
     links_json = requests.get(url=REMOTE_LINK.format(issue_number),
                                  auth=(config['user_data']['login'], config['user_data']['jira_password'])).json()
@@ -103,8 +103,9 @@ def get_links(config, merges):
     for line in range(len(statuses)):
         statuses[line].append(status)  # 3
         if not conflict:
-            logging.info(f'Мержим {issue_number} в {RC_name}')
-            merge_rc(config, statuses[line][1])
+            mr = statuses[line][1]
+            logging.info(f"Мержим {issue_number} в {RC_name} в {mr.attributes['references']['full']}")
+            merge_rc(config, mr)
 
     result = ''
     start = True  # флаг первого МР, если их в задаче несколько
@@ -118,9 +119,10 @@ def get_links(config, merges):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(
-        format = u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s', level = logging.INFO
-    )
+    level = logging.INFO
+    handlers = [logging.FileHandler('log.txt'), logging.StreamHandler()]
+    format = u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s'
+    logging.basicConfig(level = level, format = format, handlers = handlers)
     with open('message.txt', 'w') as file:
         config = ConfigParser()
         config.read('config.ini')
@@ -158,21 +160,27 @@ if __name__ == '__main__':
         #
         logging.info('Собираем мердж реквесты')
         merge_requests = defaultdict(list)  # словарь- задача: список кортежей ссылок и проектов
-        used_projects = set()
+        used_projects = set()  # сет проектов всего затронутых в релизе
         MRless_issues_number = 1
         MRless_issues = []
         if issues_list:
             for issue_number in issues_list:
-                MR_count = get_merge_requests(config, issue_number)
-                if not MR_count: # если в задаче нет МР
-                    message += f"|{MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]|{issues_list[issue_number]}| Нет изменений |(/)|\r\n"
+                MR_count = get_merge_requests(config, issue_number)  # возвращаются только невлитые МР
+                if not MR_count: # если в задаче нет МР вносим задачу в таблицу
+                    message += f"|{MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]|" \
+                               f"{issues_list[issue_number]}| Нет изменений |(/)|\r\n"
                     MRless_issues_number += 1
                     MRless_issues.append(issue_number)
                     continue
+
+                issue_projects = set()  # сет проектов всего затронутых в задаче
                 for merge in MR_count:
                     used_projects.add(merge.project)
-                    merge_requests[issue_number].append(merge)
-            if MRless_issues:
+                    if merge.project not in issue_projects:  # проверяем не было ли в этой задаче нескольких МР в одном
+                        issue_projects.add(merge.project)    # проекте, если несколько - берем один
+                        merge_requests[issue_number].append(merge)
+
+            if MRless_issues:  # убираем задачу без МР из списка задач для сборки RC
                 for item in MRless_issues:
                     issues_list.pop(item)
         with shelve.open('used_projects') as projects:  # сохраняем использованные проекты на диске
@@ -186,7 +194,7 @@ if __name__ == '__main__':
         #
         #           Заполняем таблицу
         #
-        logging.info('Заполняем таблицу')
+        logging.info('Заполняем таблицу')  # делаем МР в RC и заполняем таблицу ссылками и статусами МР
         for index, issue_number in enumerate(sorted(issues_list)):
             priority = issues_list[issue_number]
             result = get_links(config, merge_requests[issue_number])
