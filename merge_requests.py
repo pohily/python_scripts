@@ -22,7 +22,7 @@ MR_STATUS = {'can_be_merged': '(/) Нет конфликтов, ', 'cannot_be_me
 PRIORITY = {'Critical': '(!) - Critical', 'Highest': '(*r) - Highest', 'High': '(*) - High', 'Medium': '(*g) - Medium',
             'Low': '(*b) - Low', 'Lowest': '(*b) - Lowest', 'Критический': '(!) - Critical'}
 
-PROJECTS_WITH_TESTS = [11, 20, 79, 110, 166]
+PROJECTS_WITH_TESTS = [11, 20, 79, 93, 94, 97, 100, 110, 166]
 DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167]
 
 MR_BY_IID = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?iids[]={}&{}'

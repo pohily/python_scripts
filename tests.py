@@ -6,6 +6,10 @@ import gitlab
 
 from merge_requests import PROJECTS_WITH_TESTS, DOCKER_PROJECTS
 
+""" с помощью следующей команды можно запустить тесты в остальных проектах, пропущенные при создании сборки. 
+Так как в этом случае запускается только сборка контейнеров докера, тесты автоматически не запускаются.
+"""
+
 if __name__ == '__main__':
     config = ConfigParser()
     config.read('config.ini')
@@ -16,7 +20,7 @@ if __name__ == '__main__':
     RC_name = f'rc-{release_input.replace(".", "-")}'
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
 
-    with shelve.open('used_projects') as used_projects:
+    with shelve.open('logs/used_projects') as used_projects:
         if RC_name in used_projects:
             for pr in used_projects[RC_name]:
                 if pr in PROJECTS_WITH_TESTS and pr not in DOCKER_PROJECTS:
