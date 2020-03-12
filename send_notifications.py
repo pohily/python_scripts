@@ -2,6 +2,7 @@ from configparser import ConfigParser
 from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
+import logging
 from smtplib import SMTP
 from sys import argv
 
@@ -53,6 +54,7 @@ def send_mail(release_country, release_name, country_key, message, config):
     msg['from'] = config['user_data']['login'] + '@4slovo.ru'
     msg['to'] = config['recipients'][country_key]
     msg.add_header('Content-Type', 'text/html')
+    logging.info('Высылаем письмо')
     connection.sendmail(msg['from'], [msg['to']], msg.as_string())
     connection.quit()
 
@@ -60,6 +62,11 @@ def send_mail(release_country, release_name, country_key, message, config):
 if __name__ == '__main__':
     config = ConfigParser()
     config.read('config.ini')
+    level = logging.INFO
+    handlers = [logging.FileHandler('logs/log.txt'), logging.StreamHandler()]
+    format = u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s'
+    logging.basicConfig(level=level, format=format, handlers=handlers)
+    logging.info('--------------Формируем письмо----------------')
     jira_options = {'server': 'https://jira.4slovo.ru/'}
     jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
     release_date, release_name, release_country, release_issues = get_release_details(config, jira)
@@ -80,6 +87,7 @@ if __name__ == '__main__':
         elif release_country == 'Грузия':
             country_key = 'ge'
         else:
+            logging.exception('Страна для релиза не определена')
             raise Exception('Страна для релиза не определена')
         send_mail(release_country, release_name, country_key, message, config)
 
