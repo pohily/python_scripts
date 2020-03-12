@@ -24,7 +24,7 @@ def get_release_details(config, jira):
     fix_issues = jira.search_issues(f'fixVersion={release_input}')
     try:
         fix_date = fix_issues[0].fields.fixVersions[0].releaseDate
-    except AttributeError as e:
+    except (AttributeError, UnboundLocalError, TypeError) as e:
         logging.exception(f'Релиз {release_input} еще не выпущен!')
     if 'ru' in release_input.lower():
         release_country = 'Россия'
