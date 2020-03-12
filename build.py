@@ -99,9 +99,9 @@ def get_links(config, merges):
         statuses[index].append(mr)  # 1
         url_parts = url.split('/')
         # в связи с обновлением gitlab поменялись url 11/03/20:
-        if GIT_LAB in link['object']['url'] and url_parts[6].isdigit():
+        if GIT_LAB in url and url_parts[6].isdigit():
             iid = url_parts[6]
-        elif GIT_LAB in link['object']['url'] and url_parts[7].isdigit():
+        elif GIT_LAB in url and url_parts[7].isdigit():
             iid = url_parts[7]
         else:
             logging.exception(f'Проверьте задачу {issue_number} - некорректная ссылка {url}')
@@ -138,6 +138,7 @@ if __name__ == '__main__':
     handlers = [logging.FileHandler('logs/log.txt'), logging.StreamHandler()]
     format = u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s'
     logging.basicConfig(level=level, format=format, handlers=handlers)
+    logging.info('--------------Начало сборки----------------')
     with open('logs/message.txt', 'w') as file:
         config = ConfigParser()
         config.read('config.ini')
@@ -157,7 +158,7 @@ if __name__ == '__main__':
         #
         #           Выбираем задачи для релиза в нужных статусах
         #
-        logging.info('Выбираем задачи для релиза в нужных статусах')
+        logging.info(f'Выбираем задачи для релиза {release_name} в нужных статусах')
         issues_list = {}
         before_deploy = []
         post_deploy = []

@@ -5,6 +5,8 @@ from configparser import ConfigParser
 import gitlab
 import requests
 
+from build import PROJECTS_NUMBERS
+
 TEST = False
 
 PROJECTS_NAMES = {"4slovo.ru/chestnoe_slovo": 7, "4slovo.kz/crm4slovokz": 11, "4slovo.kz/4slovokz": 12,
@@ -95,7 +97,7 @@ def make_mr_to_rc(config, MR, RC_name):
         if pipelines:
             pipelines = pipelines[0]
             if pipelines.attributes['status'] != 'success':
-                logging.warning(f'В задаче {MR.issue} в мердж реквесте {MR.project} уже в не прошли тесты')
+                logging.warning(f'В задаче {MR.issue} в проекте {PROJECTS_NUMBERS[MR.project]} не прошли тесты')
                 status = '(x) Тесты не прошли!, '
 
     mr = project.mergerequests.list(state='opened', source_branch=source_branch, target_branch=target_branch)
@@ -104,7 +106,7 @@ def make_mr_to_rc(config, MR, RC_name):
     else:
         mr = project.mergerequests.create({'source_branch': source_branch,
                                            'target_branch': target_branch,
-                                           'title': f"[skip-ci] {(MR.issue).replace('-', '_')} -> {RC_name}",
+                                           'title': f"[skip ci] {(MR.issue).replace('-', '_')} -> {RC_name}",
                                            'target_project_id': MR.project,
                                            })
     status += MR_STATUS[mr.attributes['merge_status']]
