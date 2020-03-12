@@ -11,26 +11,11 @@ from constants import PROJECTS_NAMES, PROJECTS_NUMBERS, RELEASE_URL, REMOTE_LINK
     PRIORITY, ISSUE_URL, MR_STATUS
 from merge_requests import make_mr_to_rc, make_mr_to_staging, make_mr_to_master, delete_create_RC, merge_rc, \
     is_merged
+from send_notifications import get_release_details
 
 docker = False  # флаг наличия мерджей на докер
 confluence = ''  # ссылка на отчет о тестировании
 Merge_request = namedtuple('Merge_request', ['url', 'iid', 'project', 'issue'])  # iid - номер МР в url'е, project - int
-
-
-def get_release_details(config, jira):
-    try:
-        # откуда происходит ввод названия релиза
-        COMMAND_LINE_INPUT = eval(config['options']['COMMAND_LINE_INPUT'])
-        if COMMAND_LINE_INPUT:
-            release_input = argv[1]
-        else:
-            release_input = 'ru.5.7.10'
-    except IndexError as e:
-        logging.exception('Введите имя релиза!')
-        raise Exception('Введите имя релиза!')
-    fix_issues = jira.search_issues(f'fixVersion={release_input}')
-    fix_id = fix_issues[0].fields.fixVersions[0].id
-    return release_input, fix_id, fix_issues
 
 
 def get_merge_requests(config, issue_number):
@@ -139,7 +124,7 @@ if __name__ == '__main__':
         #           Определяем состав релиза
         #
         logging.info('Определяем состав релиза')
-        release_name, release_id, release_issues = get_release_details(config, jira)
+        _, release_name, _, release_issues, release_id = get_release_details(config, jira)
         RC_name = f'rc-{release_name.replace(".", "-")}'
         #
         #           До таблицы

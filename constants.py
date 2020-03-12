@@ -46,3 +46,5 @@ STATUS_FOR_RELEASE = ['Released to production', 'Passed QA', 'In regression test
 SMTP_PORT = 587
 SMTP_SERVER = 'smtp.4slovo.ru'
 MR_BY_IID = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?iids[]={}&{}'
+
+TEST = False

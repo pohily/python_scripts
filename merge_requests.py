@@ -5,9 +5,9 @@ from configparser import ConfigParser
 import gitlab
 import requests
 
-from constants import MR_STATUS, MR_BY_IID, PROJECTS_WITH_TESTS, DOCKER_PROJECTS, PROJECTS_NUMBERS, PROJECTS_COUNTRIES
+from constants import MR_STATUS, MR_BY_IID, PROJECTS_WITH_TESTS, DOCKER_PROJECTS, PROJECTS_NUMBERS, \
+    PROJECTS_COUNTRIES, TEST
 
-TEST = False
 Merge_request_details = namedtuple('Merge_request_details', ['merge_status', 'source_branch', 'target_branch', 'state'])
 
 

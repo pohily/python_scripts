@@ -6,8 +6,9 @@ from re import sub
 import gitlab
 from jira import JIRA
 
-from build import get_release_details, get_merge_requests, PROJECTS_NUMBERS
-from constants import STATUS_FOR_RELEASE, PROJECTS_COUNTRIES
+from build import get_merge_requests
+from constants import STATUS_FOR_RELEASE, PROJECTS_COUNTRIES, PROJECTS_NUMBERS
+from send_notifications import get_release_details
 
 """ Показывает статистику по запрошенному релизу: количество задач, проетов и названия проектов, 
 также показываются задачи, которые не подходят для данного релиза (неправильная страна) """
@@ -18,7 +19,7 @@ def main():
     config.read('config.ini')
     jira_options = {'server': 'https://jira.4slovo.ru/'}
     jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
-    release_input, _, fix_issues = get_release_details(config, jira)
+    _, release_input, _, fix_issues, _ = get_release_details(config, jira)
     used_projects = set()
     issue_count = 0
     wrong_release_issues = set()

@@ -11,28 +11,34 @@ from jira import JIRA
 from constants import SMTP_PORT, SMTP_SERVER, ISSUE_URL, RELEASE_ISSUES_URL
 
 
-def get_release_details(config, jira):
+def get_release_details(config, jira, date=False):
     try:
         COMMAND_LINE_INPUT = eval(config['options']['COMMAND_LINE_INPUT'])
         if COMMAND_LINE_INPUT:
             release_input = argv[1]
         else:
-            release_input = 'kz.3.14.35'
-    except IndexError:
+            release_input = 'ru.5.7.10'
+    except IndexError as e:
         logging.exception('Введите имя релиза!')
-        raise Exception('Введите имя релиза')
+        raise Exception('Введите имя релиза!')
     fix_issues = jira.search_issues(f'fixVersion={release_input}')
-    try:
-        fix_date = fix_issues[0].fields.fixVersions[0].releaseDate
-    except (AttributeError, UnboundLocalError, TypeError) as e:
-        logging.exception(f'Релиз {release_input} еще не выпущен!')
+    if date:
+        try:
+            fix_date = fix_issues[0].fields.fixVersions[0].releaseDate
+            fix_date = datetime.strptime(fix_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+        except (AttributeError, UnboundLocalError, TypeError) as e:
+            fix_date = None
+            logging.exception(f'Релиз {release_input} еще не выпущен!')
+    else:
+        fix_date = None
     if 'ru' in release_input.lower():
         release_country = 'Россия'
     elif 'kz' in release_input.lower():
         release_country = 'Казахстан'
     else:
         release_country = 'Грузия'
-    return datetime.strptime(fix_date, '%Y-%m-%d').strftime('%d.%m.%Y'), release_input, release_country, fix_issues
+    fix_id = fix_issues[0].fields.fixVersions[0].id
+    return fix_date, release_input, release_country, fix_issues, fix_id
 
 
 def get_release_message(release_date, release_country, release_name):
@@ -66,7 +72,7 @@ if __name__ == '__main__':
     logging.info('--------------Формируем письмо----------------')
     jira_options = {'server': 'https://jira.4slovo.ru/'}
     jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
-    release_date, release_name, release_country, release_issues = get_release_details(config, jira)
+    release_date, release_name, release_country, release_issues, _ = get_release_details(config, jira, date=True)
     issues_of_release_link = RELEASE_ISSUES_URL.format(release_name)
     issues_list = {}
     message = get_release_message(release_date, release_country, release_name)
@@ -74,7 +80,7 @@ if __name__ == '__main__':
         if 'сборка' not in issue.fields.summary.lower():
             issues_list[issue.key] = issue.fields.summary
 
-    if issues_list:
+    if issues_list and release_date:
         for issue_number in sorted(issues_list):
             message += f"<a href='{ISSUE_URL}{issue_number}'>{issue_number}</a> - {issues_list[issue_number]}<br>"
         if release_country == 'Россия':
