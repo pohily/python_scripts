@@ -216,12 +216,8 @@ if __name__ == '__main__':
     config = ConfigParser()
     config.read('config.ini')
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
-    for rep in range(170):
-        try:
-            project = gl.projects.get(rep)
-            mr = project.mergerequests.list()
-            mr = mr[0]
-            mr = mr.attributes['web_url'].split('/')
-            print(f'{rep}: "{mr[3]}/{mr[4]}", ')
-        except:
-            pass
+    project = gl.projects.get(20)
+    mr = project.mergerequests.list(web_url="https://gitlab.4slovo.ru/4slovo.ru/chestnoe_slovo_backend/-/merge_requests/2881")
+    if mr:
+        mr = mr[0]
+

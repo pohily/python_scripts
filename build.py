@@ -34,7 +34,7 @@ def get_release_details(config, jira):
         if COMMAND_LINE_INPUT:
             release_input = argv[1]
         else:
-            release_input = 'kz.3.14.35'
+            release_input = 'ru.5.7.10'
     except IndexError:
         raise Exception('Enter release name')
     fix_issues = jira.search_issues(f'fixVersion={release_input}')
@@ -65,7 +65,14 @@ def get_merge_requests(config, issue_number):
         except KeyError as e:
             logging.exception(f'Проверьте задачу {issue_number} - не найден проект {url_parts[3]}/{url_parts[4]}')
             continue
-        iid = url_parts[6]
+        # в связи с обновлением gitlab поменялись url 11/03/20:
+        if GIT_LAB in link['object']['url'] and url_parts[6].isdigit():
+            iid = url_parts[6]
+        elif GIT_LAB in link['object']['url'] and url_parts[7].isdigit():
+            iid = url_parts[7]
+        else:
+            logging.warning(f"Проверьте ссылку {link['object']['url']} в задаче {issue_number}")
+            continue
         merge = Merge_request(link['object']['url'], iid, project, issue_number)
         if not is_merged(config, merge):
             result.append(merge)
@@ -91,7 +98,15 @@ def get_links(config, merges):
         statuses[index] = [status]  # 0
         statuses[index].append(mr)  # 1
         url_parts = url.split('/')
-        statuses[index].append(f'[{url_parts[3]}/{url_parts[4]}/{url_parts[6]}|{url}]')  # 2
+        # в связи с обновлением gitlab поменялись url 11/03/20:
+        if GIT_LAB in link['object']['url'] and url_parts[6].isdigit():
+            iid = url_parts[6]
+        elif GIT_LAB in link['object']['url'] and url_parts[7].isdigit():
+            iid = url_parts[7]
+        else:
+            logging.exception(f'Проверьте задачу {issue_number} - некорректная ссылка {url}')
+            continue
+        statuses[index].append(f'[{url_parts[3]}/{url_parts[4]}/{iid}|{url}]')  # 2
         logging.info(status)
     #
     #           Мержим MR из текущей задачи в RC
