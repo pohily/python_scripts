@@ -1,21 +1,14 @@
+import logging
 from configparser import ConfigParser
 from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
-import logging
 from smtplib import SMTP
 from sys import argv
 
 from jira import JIRA
 
-ISSUE_URL = 'https://jira.4slovo.ru/browse/'
-GIT_LAB = 'https://gitlab'
-RELEASE_ISSUES_URL = 'https://jira.4slovo.ru/rest/api/latest/search?jql=fixVersion={}'
-RELEASE_URL = 'https://jira.4slovo.ru/projects/SLOV/versions/{}'
-REMOTE_LINK = 'https://jira.4slovo.ru/rest/api/latest/issue/{}/remotelink'
-STATUS_FOR_RELEASE = ['Released to production', 'Passed QA', 'In regression test', 'Ready for release', 'Закрыт', 'Fixed']#, 'In development']
-SMTP_PORT = 587
-SMTP_SERVER = 'smtp.4slovo.ru'
+from constants import SMTP_PORT, SMTP_SERVER, ISSUE_URL, RELEASE_ISSUES_URL
 
 
 def get_release_details(config, jira):
@@ -26,9 +19,13 @@ def get_release_details(config, jira):
         else:
             release_input = 'kz.3.14.35'
     except IndexError:
-        raise Exception('Enter release name')
+        logging.exception('Введите имя релиза!')
+        raise Exception('Введите имя релиза')
     fix_issues = jira.search_issues(f'fixVersion={release_input}')
-    fix_date = fix_issues[0].fields.fixVersions[0].releaseDate
+    try:
+        fix_date = fix_issues[0].fields.fixVersions[0].releaseDate
+    except AttributeError as e:
+        logging.exception(f'Релиз {release_input} еще не выпущен!')
     if 'ru' in release_input.lower():
         release_country = 'Россия'
     elif 'kz' in release_input.lower():

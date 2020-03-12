@@ -1,10 +1,11 @@
+import logging
 import shelve
 from configparser import ConfigParser
 from sys import argv
 
 import gitlab
 
-from merge_requests import PROJECTS_WITH_TESTS, DOCKER_PROJECTS
+from constants import PROJECTS_WITH_TESTS, DOCKER_PROJECTS, PROJECTS_COUNTRIES
 
 """ с помощью следующей команды можно запустить тесты в остальных проектах, пропущенные при создании сборки. 
 Так как в этом случае запускается только сборка контейнеров докера, тесты автоматически не запускаются.
@@ -16,7 +17,8 @@ if __name__ == '__main__':
     try:
         release_input = argv[1]
     except IndexError:
-        raise Exception('Enter release name')
+        logging.exception('Введите имя релиза!')
+        raise Exception('Введите имя релиза')
     RC_name = f'rc-{release_input.replace(".", "-")}'
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
 
@@ -27,6 +29,7 @@ if __name__ == '__main__':
                     project = gl.projects.get(pr)
                     try:
                         branch = project.branches.get(RC_name)
+                        logging.info(f'Запускаем тесты в проекте {PROJECTS_COUNTRIES[pr]}')
                         try:
                             commit_json = {
                                 "branch": f"{RC_name}",
@@ -54,7 +57,7 @@ if __name__ == '__main__':
                             }
                             commit = project.commits.create(commit_json)
                     except gitlab.exceptions.GitlabGetError:
-                        pass
+                        logging.exception(f'Не найдена ветка {RC_name} в {PROJECTS_COUNTRIES[pr]}')
         else:
             print(f'Сначала надо создать сборку для {RC_name}')
 
