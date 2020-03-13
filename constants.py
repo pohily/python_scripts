@@ -43,7 +43,8 @@ JIRA_SERVER = 'https://jira.4slovo.ru/'
 RELEASE_ISSUES_URL = 'https://jira.4slovo.ru/rest/api/latest/search?jql=fixVersion={}'
 RELEASE_URL = 'https://jira.4slovo.ru/projects/SLOV/versions/{}'
 REMOTE_LINK = 'https://jira.4slovo.ru/rest/api/latest/issue/{}/remotelink'
-STATUS_FOR_RELEASE = ['Released to production', 'Passed QA', 'In regression test', 'Ready for release', 'Закрыт', 'Fixed']#, 'In development']
+STATUS_FOR_RELEASE = ['Released to production', 'Passed QA', 'In regression test', 'Ready for release', 'Закрыт',
+                      'Fixed', 'Closed']#, 'In development']
 SMTP_PORT = 587
 SMTP_SERVER = 'smtp.4slovo.ru'
 MR_BY_IID = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?iids[]={}&{}'
