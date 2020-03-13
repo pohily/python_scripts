@@ -8,7 +8,7 @@ from sys import argv
 
 from jira import JIRA
 
-from constants import SMTP_PORT, SMTP_SERVER, ISSUE_URL, RELEASE_ISSUES_URL
+from constants import SMTP_PORT, SMTP_SERVER, ISSUE_URL, RELEASE_ISSUES_URL, JIRA_SERVER
 
 
 def get_release_details(config, jira, date=False):
@@ -18,7 +18,7 @@ def get_release_details(config, jira, date=False):
             release_input = argv[1]
         else:
             release_input = 'ru.5.7.10'
-    except IndexError as e:
+    except IndexError:
         logging.exception('Введите имя релиза!')
         raise Exception('Введите имя релиза!')
     fix_issues = jira.search_issues(f'fixVersion={release_input}')
@@ -26,7 +26,7 @@ def get_release_details(config, jira, date=False):
         try:
             fix_date = fix_issues[0].fields.fixVersions[0].releaseDate
             fix_date = datetime.strptime(fix_date, '%Y-%m-%d').strftime('%d.%m.%Y')
-        except (AttributeError, UnboundLocalError, TypeError) as e:
+        except (AttributeError, UnboundLocalError, TypeError):
             fix_date = None
             logging.exception(f'Релиз {release_input} еще не выпущен!')
     else:
@@ -70,7 +70,7 @@ if __name__ == '__main__':
     format = u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s'
     logging.basicConfig(level=level, format=format, handlers=handlers)
     logging.info('--------------Формируем письмо----------------')
-    jira_options = {'server': 'https://jira.4slovo.ru/'}
+    jira_options = {'server': JIRA_SERVER}
     jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
     release_date, release_name, release_country, release_issues, _ = get_release_details(config, jira, date=True)
     issues_of_release_link = RELEASE_ISSUES_URL.format(release_name)

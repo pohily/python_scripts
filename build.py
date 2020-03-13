@@ -8,7 +8,7 @@ import requests
 from jira import JIRA
 
 from constants import PROJECTS_NAMES, PROJECTS_NUMBERS, RELEASE_URL, REMOTE_LINK, GIT_LAB, STATUS_FOR_RELEASE, \
-    PRIORITY, ISSUE_URL, MR_STATUS
+    PRIORITY, ISSUE_URL, MR_STATUS, JIRA_SERVER
 from merge_requests import make_mr_to_rc, make_mr_to_staging, make_mr_to_master, delete_create_RC, merge_rc, \
     is_merged
 from send_notifications import get_release_details
@@ -118,7 +118,7 @@ if __name__ == '__main__':
     with open('logs/message.txt', 'w') as file:
         config = ConfigParser()
         config.read('config.ini')
-        jira_options = {'server': 'https://jira.4slovo.ru/'}
+        jira_options = {'server': JIRA_SERVER}
         jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
         #
         #           Определяем состав релиза

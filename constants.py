@@ -39,6 +39,7 @@ DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167]
 
 ISSUE_URL = 'https://jira.4slovo.ru/browse/'
 GIT_LAB = 'https://gitlab'
+JIRA_SERVER = 'https://jira.4slovo.ru/'
 RELEASE_ISSUES_URL = 'https://jira.4slovo.ru/rest/api/latest/search?jql=fixVersion={}'
 RELEASE_URL = 'https://jira.4slovo.ru/projects/SLOV/versions/{}'
 REMOTE_LINK = 'https://jira.4slovo.ru/rest/api/latest/issue/{}/remotelink'
