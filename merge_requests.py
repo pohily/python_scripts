@@ -5,29 +5,8 @@ from configparser import ConfigParser
 import gitlab
 import requests
 
-from build import PROJECTS_NUMBERS
-
-TEST = False
-
-PROJECTS_NAMES = {"4slovo.ru/chestnoe_slovo": 7, "4slovo.kz/crm4slovokz": 11, "4slovo.kz/4slovokz": 12,
-                  "4slovo.ru/chestnoe_slovo_backend": 20, "4slovo.ru/common": 22, "mrloan.ge/mrloange": 23,
-                  "mrloan.ge/crmmrloange": 24, "4slovo.ru/fias": 61, "4slovo.ru/chestnoe_slovo_landing": 62,
-                  "4slovo.ru/api": 79, "4slovo/cache": 86, "4slovo/sawmill": 90, "4slovo/common": 91, "4slovo/inn": 92,
-                  "4slovo/finance": 93, "docker/finance": 94, "docker/api": 97, "docker/ge": 100,
-                  "4slovo/finance_client": 103, "docker/kz": 110, "4slovo/rabbitclient": 113, "4slovo/fs-client": 116,
-                  "4slovo/fs": 117, "4slovo/enum-generator": 121, "4slovo/expression": 125, "almal.ge/almalge": 128,
-                  "almal.ge/crmalmalge": 129, "4slovo.ru/python-tests": 130, "4slovo/logging": 135,
-                  "4slovo/timeservice": 138, "4slovo/timeservice_client": 139, "docker/replicator": 144,
-                  "4slovo.ru/python-scripts": 154, "4slovo.kz/landing": 159, "docker/ru": 166, "docker/ru-db": 167,
-                  }
-MR_STATUS = {'can_be_merged': '(/) Нет конфликтов, ', 'cannot_be_merged': '(x) Конфликт!, '}
-PRIORITY = {'Critical': '(!) - Critical', 'Highest': '(*r) - Highest', 'High': '(*) - High', 'Medium': '(*g) - Medium',
-            'Low': '(*b) - Low', 'Lowest': '(*b) - Lowest', 'Критический': '(!) - Critical'}
-
-PROJECTS_WITH_TESTS = [11, 20, 79, 93, 94, 97, 100, 110, 166]
-DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167]
-
-MR_BY_IID = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?iids[]={}&{}'
+from constants import MR_STATUS, MR_BY_IID, PROJECTS_WITH_TESTS, DOCKER_PROJECTS, PROJECTS_NUMBERS, \
+    PROJECTS_COUNTRIES, TEST
 
 Merge_request_details = namedtuple('Merge_request_details', ['merge_status', 'source_branch', 'target_branch', 'state'])
 
@@ -186,7 +165,7 @@ def make_mr_to_staging(config, projects, RC_name, docker):
                     }
                     project.commits.create(commit_json)
             except gitlab.exceptions.GitlabGetError:
-                pass
+                logging.exception(f'Не найдена ветка {RC_name} в {PROJECTS_COUNTRIES[pr]}')
     return mr_links
 
 
