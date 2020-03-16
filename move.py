@@ -18,6 +18,14 @@ def main():
     jira_options = {'server': JIRA_SERVER}
     jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
 
+    # -h, --help - показывается помощь:         python move.py -h
+    # без флага - переносятся все задачи в статусах неподходящих для релиза:    python move.py ru.1.2.3 ru.1.3.0
+    # -a - переносятся все задачи:              python move.py -a ru.1.2.3 ru.1.3.0
+    # -s - переносятся только выбранные задачи: python move.py -s ru.1.2.3 ru.1.3.0 1236, 2356, 1212
+    # -e - переносятся все кроме выбранных:     python move.py -e ru.1.2.3 ru.1.3.0 1236, 2356, 1212
+    # -r - все задачи переводятся в статус Released to production:              python move.py -r ru.1.2.3
+    # (todo и релиз в статус Выпущен)
+
     try:
         if not argv[1].startswith('-'):
             source = argv[1]
@@ -30,6 +38,10 @@ def main():
         logging.exception('Введите релиз-источник и релиз-назначение!')
         raise Exception('Введите релиз-источник и релиз-назначение!!')
 
+    # проверка на совпадение страны
+    if source.split('.')[0] != target.split('.')[0]:
+        logging.exception('Ошибка при вводе релиза-источника и релиза-назначения!')
+        raise Exception('Ошибка при вводе релиза-источника и релиза-назначения!')
     #
     #           Выбираем задачи для релиза в нужных статусах
     #

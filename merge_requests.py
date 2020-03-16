@@ -6,7 +6,7 @@ import gitlab
 import requests
 
 from constants import MR_STATUS, MR_BY_IID, PROJECTS_WITH_TESTS, DOCKER_PROJECTS, PROJECTS_NUMBERS, \
-    PROJECTS_COUNTRIES, TEST
+    PROJECTS_COUNTRIES, TEST, PROJECTS_WITHOUT_STAGING
 
 Merge_request_details = namedtuple('Merge_request_details', ['merge_status', 'source_branch', 'target_branch', 'state'])
 
@@ -107,12 +107,13 @@ def make_mr_to_staging(config, projects, RC_name, docker):
     if TEST:
         return [projects]
 
-    mr_links = [] # ссылки для вывода под таблицей
+    staging_links = []  # ссылки для вывода под таблицей
+    master_links = []
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
     for pr in projects:
         project = gl.projects.get(pr)
         source_branch = RC_name
-        if pr in DOCKER_PROJECTS:
+        if pr in DOCKER_PROJECTS or pr in PROJECTS_WITHOUT_STAGING:
             target_branch = 'master'
         else:
             target_branch = 'staging'
@@ -126,7 +127,11 @@ def make_mr_to_staging(config, projects, RC_name, docker):
                                                'title': title,
                                                'target_project_id': pr,
                                                })
-        mr_links.append(mr.attributes['web_url'])
+
+        if pr in DOCKER_PROJECTS or pr in PROJECTS_WITHOUT_STAGING:
+            master_links.append(mr.attributes['web_url'])
+        else:
+            staging_links.append(mr.attributes['web_url'])
         #
         #           Делаем коммит запускающий тесты и билд контейнеров докера, после пропуска этого шага при создании RC
         #
@@ -166,7 +171,7 @@ def make_mr_to_staging(config, projects, RC_name, docker):
                     project.commits.create(commit_json)
             except gitlab.exceptions.GitlabGetError:
                 logging.exception(f'Не найдена ветка {RC_name} в {PROJECTS_COUNTRIES[pr]}')
-    return mr_links
+    return master_links, staging_links
 
 
 def make_mr_to_master(config, projects):
@@ -177,7 +182,7 @@ def make_mr_to_master(config, projects):
     mr_links = [] # ссылки для вывода под таблицей
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
     for pr in projects:
-        if pr in DOCKER_PROJECTS:
+        if pr in DOCKER_PROJECTS or pr in PROJECTS_WITHOUT_STAGING:
             continue
         project = gl.projects.get(pr)
         mr = project.mergerequests.list(state='opened', source_branch='staging', target_branch='master')

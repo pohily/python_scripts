@@ -2,7 +2,6 @@ import logging
 import shelve
 from collections import defaultdict, namedtuple
 from configparser import ConfigParser
-from sys import argv
 
 import requests
 from jira import JIRA
@@ -198,23 +197,21 @@ if __name__ == '__main__':
         #           Создаем MR RC -> Staging для всех проектов (передумали вычитать проекты с конфликтами)
         #
         logging.info('Делаем МР RC -> Staging')
-        staging_links = make_mr_to_staging(config, used_projects, RC_name, docker)
+        master_links, staging_links = make_mr_to_staging(config, used_projects, RC_name, docker)
         #
         #           Docker -> Master
         #
         logging.info('Заполняем ссылки на МР RC -> Staging, Staging -> Master')
-        if docker:
-            message += '\r\n*Docker -> Master*\r\n'
-            for link in staging_links:
-                if 'docker' in link:
-                    message += f'\n[{link}]\r'
+        if master_links:
+            message += '\r\n*RC -> Master*\r\n'
+            for link in master_links:
+                message += f'\n[{link}]\r'
         #
         #           RC -> Staging
         #
         message += '\n\r*RC -> Staging*\r\n'
         for link in staging_links:
-            if 'docker' not in link:
-                message += f'\n[{link}]\r'
+            message += f'\n[{link}]\r'
         #
         #           Создаем MR Staging -> Master
         #

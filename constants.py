@@ -35,6 +35,7 @@ PRIORITY = {'Critical': '(!) - Critical', 'Highest': '(*r) - Highest', 'High': '
             'Low': '(*b) - Low', 'Lowest': '(*b) - Lowest', 'Критический': '(!) - Critical'}
 
 PROJECTS_WITH_TESTS = [11, 20, 79, 93, 94, 97, 100, 110, 166]
+PROJECTS_WITHOUT_STAGING = [22, 61, 86, 90, 91, 92, 103, 113, 116, 121, 125, 135, 138, 139]
 DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167]
 
 ISSUE_URL = 'https://jira.4slovo.ru/browse/'
