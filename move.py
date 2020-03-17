@@ -41,7 +41,14 @@ def main():
             for issue in release_issues:
                 if 'сборка' not in issue.fields.summary.lower() and issue.fields.status.name not in STATUS_FOR_RELEASE:
                     for_move.append(issue)
-                    print(issue)
+            logging.info(f'Найдено {len(for_move)} неготовых задач')
+            logging.info(f'Переносим неготовые задачи в релиз {target}')
+            for issue in for_move:
+                logging.info(f'Переносим задачу {issue}')
+                issue.update(fields={
+                    "fixVersions": [{"name": target, }]
+                })
+            logging.info(f'Перенос выполнен')
         else:
             logging.exception('Ошибка при вводе релиза-источника и релиза-назначения!')
             raise Exception('Ошибка при вводе релиза-источника и релиза-назначения!')
@@ -59,33 +66,39 @@ def main():
         pass
 
     try:
-        if not argv[1].startswith('-'):
-            source = argv[1]
-            target = argv[2]
-            move_bad(source, target)
-        else:
-            if argv[1] == '-h' or argv[1] == '--help':
-                pass
-            elif argv[1] == '-a':
-                source = argv[2]
-                target = argv[3]
-                move_all(source, target)
-            elif argv[1] == '-s':
-                source = argv[2]
-                target = argv[3]
-                issues = argv[4:]
-                move_selected(source, target, issues)
-            elif argv[1] == '-e':
-                source = argv[2]
-                target = argv[3]
-                issues = argv[4:]
-                move_except(source, target, issues)
-            elif argv[1] == '-r':
-                source = argv[2]
-                release(source)
+        COMMAND_LINE_INPUT = eval(config['options']['COMMAND_LINE_INPUT'])
+        if COMMAND_LINE_INPUT:
+            if not argv[1].startswith('-'):
+                source = argv[1]
+                target = argv[2]
+                move_bad(source, target)
             else:
-                logging.exception('Неизвестная команда!')
-                raise Exception('Неизвестная команда!')
+                if argv[1] == '-h' or argv[1] == '--help':
+                    pass
+                elif argv[1] == '-a':
+                    source = argv[2]
+                    target = argv[3]
+                    move_all(source, target)
+                elif argv[1] == '-s':
+                    source = argv[2]
+                    target = argv[3]
+                    issues = argv[4:]
+                    move_selected(source, target, issues)
+                elif argv[1] == '-e':
+                    source = argv[2]
+                    target = argv[3]
+                    issues = argv[4:]
+                    move_except(source, target, issues)
+                elif argv[1] == '-r':
+                    source = argv[2]
+                    release(source)
+                else:
+                    logging.exception('Неизвестная команда!')
+                    raise Exception('Неизвестная команда!')
+        else:
+            source = 'ru.5.7.20'
+            target = 'ru.5.7.30'
+            move_bad(source, target)
     except IndexError:
         logging.exception('Введите релиз-источник и релиз-назначение!')
         raise Exception('Введите релиз-источник и релиз-назначение!!')
