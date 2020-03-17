@@ -34,9 +34,7 @@ def main():
 
     def move_bad(source, target):
         if is_country_ok(source, target):
-            #
-            #           Выбираем задачи для релиза в нужных статусах
-            #
+            #  Выбираем задачи для релиза в нужных статусах
             _, _, _, release_issues, _ = get_release_details(config, jira)
             logging.info(f'Выбираем неготовые задачи из релиза {source}')
             for_move = []
