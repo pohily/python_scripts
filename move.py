@@ -54,16 +54,16 @@ def main():
             raise Exception('Ошибка при вводе релиза-источника и релиза-назначения!')
 
     def move_all(source, target):
-        pass
+        logging.exception('Пока не реализовано!')
 
     def move_selected(source, target, issues):
-        pass
+        logging.exception('Пока не реализовано!')
 
     def move_except(source, target, issues):
-        pass
+        logging.exception('Пока не реализовано!')
 
     def release(source):
-        pass
+        logging.exception('Пока не реализовано!')
 
     try:
         COMMAND_LINE_INPUT = eval(config['options']['COMMAND_LINE_INPUT'])
