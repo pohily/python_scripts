@@ -194,21 +194,14 @@ if __name__ == '__main__':
         if confluence:
             message += f'\n\r[*Отчет о тестировании*.|{confluence}]\n\r'
         #
-        #           Создаем MR RC -> Staging для всех проектов (передумали вычитать проекты с конфликтами)
+        #           Создаем MR RC -> Staging, RC -> Master для Docker и проектов без стейджинга
         #
-        logging.info('Делаем МР RC -> Staging')
-        master_links, staging_links = make_mr_to_staging(config, used_projects, RC_name, docker)
-        #
-        #           Docker -> Master
-        #
-        logging.info('Заполняем ссылки на МР RC -> Staging, Staging -> Master')
-        if master_links:
-            message += '\r\n*RC -> Master*\r\n'
-            for link in master_links:
-                message += f'\n[{link}]\r'
+        logging.info('Делаем МР RC -> Staging, RC -> Master')
+        rc_master_links, staging_links = make_mr_to_staging(config, used_projects, RC_name, docker)
         #
         #           RC -> Staging
         #
+        logging.info('Заполняем ссылки на МР RC -> Staging')
         message += '\n\r*RC -> Staging*\r\n'
         for link in staging_links:
             message += f'\n[{link}]\r'
@@ -220,9 +213,18 @@ if __name__ == '__main__':
         #
         #           Staging -> Master
         #
+        logging.info('Заполняем ссылки на МР Staging -> Master')
         message += '\n\r*Staging -> Master*\r\n'
         for link in master_links:
             message += f'\n[{link}]\r'
+        #
+        #           Docker и проекты без стейджинга -> Master
+        #
+        if rc_master_links:
+            logging.info('Заполняем ссылки на МР RC -> Master')
+            message += '\r\n*RC -> Master*\r\n'
+            for link in rc_master_links:
+                message += f'\n[{link}]\r'
         #
         #           Преддеплойные действия
         #
