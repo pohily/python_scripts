@@ -70,7 +70,7 @@ def make_mr_to_rc(config, MR, RC_name):
     #           проверка статусов pipeline
     #
     status = ''
-    if MR.project in PROJECTS_WITH_TESTS and MR.project != 11:  # пока не проверяем 11 - там они всегда падают
+    if MR.project in PROJECTS_WITH_TESTS and MR.project != 11:  #todo пока не проверяем 11 - там они всегда падают
         issue = MR.issue.lower()
         pipelines = project.pipelines.list(ref=f'{issue}')
         if pipelines:

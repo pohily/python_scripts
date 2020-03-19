@@ -19,6 +19,7 @@ def main():
     jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
 
     # без флага - переносятся все задачи в статусах неподходящих для релиза:    python move.py ru.1.2.3 ru.1.3.0
+    # -g - переносятся задачи в подходящих для релиза статусах                  python move.py -g ru.1.2.3 ru.1.3.0
     # -h, --help - показывается помощь:                                         python move.py -h
     # -a - переносятся все задачи:                                              python move.py -a ru.1.2.3 ru.1.3.0
     # -s - переносятся только выбранные задачи:                     python move.py -s ru.1.2.3 ru.1.3.0 1236, 2356, 1212
@@ -41,8 +42,28 @@ def main():
             for issue in release_issues:
                 if 'сборка' not in issue.fields.summary.lower() and issue.fields.status.name not in STATUS_FOR_RELEASE:
                     for_move.append(issue)
-            logging.info(f'Найдено {len(for_move)} неготовых задач')
+            logging.info(f'Найдено {len(for_move)} неготовых задач(-и, -а)')
             logging.info(f'Переносим неготовые задачи в релиз {target}')
+            for issue in for_move:
+                logging.info(f'Переносим задачу {issue}')
+                issue.update(fields={
+                    "fixVersions": [{"name": target, }]
+                })
+            logging.info(f'Перенос выполнен')
+        else:
+            logging.exception('Ошибка при вводе релиза-источника и релиза-назначения!')
+            raise Exception('Ошибка при вводе релиза-источника и релиза-назначения!')
+
+    def move_good(source, target):
+        if is_country_ok(source, target):
+            _, _, _, release_issues, _ = get_release_details(config, jira, release=source)
+            logging.info(f'Выбираем готовые задачи из релиза {source}')
+            for_move = []
+            for issue in release_issues:
+                if 'сборка' not in issue.fields.summary.lower() and issue.fields.status.name in STATUS_FOR_RELEASE:
+                    for_move.append(issue)
+            logging.info(f'Найдено {len(for_move)} готовых задач(-и, -а)')
+            logging.info(f'Переносим готовые задачи в релиз {target}')
             for issue in for_move:
                 logging.info(f'Переносим задачу {issue}')
                 issue.update(fields={
@@ -57,7 +78,27 @@ def main():
         logging.exception('Пока не реализовано!')
 
     def move_selected(source, target, issues):
-        logging.exception('Пока не реализовано!')
+        if not issues:
+            logging.exception('Введите номера задач для переноса!')
+        else:
+            if is_country_ok(source, target):
+                _, _, _, release_issues, _ = get_release_details(config, jira, release=source)
+                for issue in issues:
+                    if issue.isdigit():
+                        issue = f'SLOV-{issue}'
+                    else:
+                        issue = issue.upper()
+                    if issue in release_issues:
+                        logging.info(f'Переносим задачу {issue}')
+                        issue.update(fields={
+                            "fixVersions": [{"name": target, }]
+                        })
+                    else:
+                        logging.exception(f'Задача {issue} в релизе {source} не найдена')
+                logging.info(f'Перенос выполнен')
+            else:
+                logging.exception('Ошибка при вводе релиза-источника и релиза-назначения!')
+                raise Exception('Ошибка при вводе релиза-источника и релиза-назначения!')
 
     def move_except(source, target, issues):
         logging.exception('Пока не реализовано!')
@@ -79,6 +120,10 @@ def main():
                     source = argv[2]
                     target = argv[3]
                     move_all(source, target)
+                elif argv[1] == '-g':
+                    source = argv[2]
+                    target = argv[3]
+                    move_good(source, target)
                 elif argv[1] == '-s':
                     source = argv[2]
                     target = argv[3]
