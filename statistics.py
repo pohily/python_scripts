@@ -1,3 +1,4 @@
+import logging
 from configparser import ConfigParser
 from itertools import chain
 from re import sub
@@ -5,27 +6,20 @@ from re import sub
 import gitlab
 from jira import JIRA
 
-from build import get_release_details, get_merge_requests, PROJECTS_NUMBERS
-from send_notifications import STATUS_FOR_RELEASE
+from build import get_merge_requests
+from constants import STATUS_FOR_RELEASE, PROJECTS_COUNTRIES, PROJECTS_NUMBERS, JIRA_SERVER
+from send_notifications import get_release_details
 
 """ Показывает статистику по запрошенному релизу: количество задач, проетов и названия проектов, 
 также показываются задачи, которые не подходят для данного релиза (неправильная страна) """
-
-PROJECTS_COUNTRIES = {7: "ru", 11: "kz", 12: "kz", 20: "ru", 22: "ru", 23: "ge", 24: "ge", 61: "ru",
-                      62: "ru", 79: "ru", 86: "ru, kz, ge", 90: "ru, kz, ge", 91: "ru, kz, ge", 92: "ru, kz, ge",
-                      93: "ru, kz, ge", 94: "ru, kz, ge", 97: "ru, kz, ge", 100: "ge", 103: "ru, kz, ge", 110: "kz",
-                      113: "ru, kz, ge", 116: "ru, kz, ge", 117: "ru, kz, ge", 121: "ge", 125: "ru, kz, ge",
-                      128: "ge", 129: "ge", 130: "ru", 135: "ru, kz, ge", 138: "ru, kz, ge", 139: "ru, kz, ge",
-                      144: "ru, kz, ge", 154: "ru", 159: "kz", 166: "ru", 167: "ru",
-                      }
 
 
 def main():
     config = ConfigParser()
     config.read('config.ini')
-    jira_options = {'server': 'https://jira.4slovo.ru/'}
+    jira_options = {'server': JIRA_SERVER}
     jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
-    release_input, _, fix_issues = get_release_details(config, jira)
+    _, release_input, _, fix_issues, _ = get_release_details(config, jira)
     used_projects = set()
     issue_count = 0
     wrong_release_issues = set()
@@ -51,7 +45,7 @@ def main():
                     issue = merge.issue.key
                     wrong_release_issues.add(issue)
             except:
-                pass
+                logging.exception(f'У вас нет доступа к проекту {PROJECTS_COUNTRIES[merge.project]}')
     projects = [PROJECTS_NUMBERS[pr] for pr in used_projects]
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
     user_id = 0
@@ -66,7 +60,8 @@ def main():
         access_level = member.attributes['access_level']
         if access_level < 30:
             reporter.append(project)
-    print(f'\033[34m В релизе {release_input} \033[31m{issue_count}\033[34m задач(-a, -и) с изменениями в статусах выше "Passed QA".')
+    print(f'\033[34m В релизе {release_input} \033[31m{len(fix_issues)}\033[34m задач(-a, -и)')
+    print(f'\033[34m Из них \033[31m{issue_count}\033[34m задач(-a, -и) с изменениями в статусах выше "Passed QA".')
     print(f'\033[34m Изменения в них затронули \033[31m {len(used_projects)} \033[34m проект(-а, '
           f'-ов): \033[31m {", ".join(sorted(projects))}. \033[0m')
     if reporter:

@@ -5,29 +5,8 @@ from configparser import ConfigParser
 import gitlab
 import requests
 
-from build import PROJECTS_NUMBERS
-
-TEST = False
-
-PROJECTS_NAMES = {"4slovo.ru/chestnoe_slovo": 7, "4slovo.kz/crm4slovokz": 11, "4slovo.kz/4slovokz": 12,
-                  "4slovo.ru/chestnoe_slovo_backend": 20, "4slovo.ru/common": 22, "mrloan.ge/mrloange": 23,
-                  "mrloan.ge/crmmrloange": 24, "4slovo.ru/fias": 61, "4slovo.ru/chestnoe_slovo_landing": 62,
-                  "4slovo.ru/api": 79, "4slovo/cache": 86, "4slovo/sawmill": 90, "4slovo/common": 91, "4slovo/inn": 92,
-                  "4slovo/finance": 93, "docker/finance": 94, "docker/api": 97, "docker/ge": 100,
-                  "4slovo/finance_client": 103, "docker/kz": 110, "4slovo/rabbitclient": 113, "4slovo/fs-client": 116,
-                  "4slovo/fs": 117, "4slovo/enum-generator": 121, "4slovo/expression": 125, "almal.ge/almalge": 128,
-                  "almal.ge/crmalmalge": 129, "4slovo.ru/python-tests": 130, "4slovo/logging": 135,
-                  "4slovo/timeservice": 138, "4slovo/timeservice_client": 139, "docker/replicator": 144,
-                  "4slovo.ru/python-scripts": 154, "4slovo.kz/landing": 159, "docker/ru": 166, "docker/ru-db": 167,
-                  }
-MR_STATUS = {'can_be_merged': '(/) Нет конфликтов, ', 'cannot_be_merged': '(x) Конфликт!, '}
-PRIORITY = {'Critical': '(!) - Critical', 'Highest': '(*r) - Highest', 'High': '(*) - High', 'Medium': '(*g) - Medium',
-            'Low': '(*b) - Low', 'Lowest': '(*b) - Lowest', 'Критический': '(!) - Critical'}
-
-PROJECTS_WITH_TESTS = [11, 20, 79, 93, 94, 97, 100, 110, 166]
-DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167]
-
-MR_BY_IID = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?iids[]={}&{}'
+from constants import MR_STATUS, MR_BY_IID, PROJECTS_WITH_TESTS, DOCKER_PROJECTS, PROJECTS_NUMBERS, \
+    PROJECTS_COUNTRIES, TEST, PROJECTS_WITHOUT_STAGING
 
 Merge_request_details = namedtuple('Merge_request_details', ['merge_status', 'source_branch', 'target_branch', 'state'])
 
@@ -91,7 +70,7 @@ def make_mr_to_rc(config, MR, RC_name):
     #           проверка статусов pipeline
     #
     status = ''
-    if MR.project in PROJECTS_WITH_TESTS and MR.project != 11:  # пока не проверяем 11 - там они всегда падают
+    if MR.project in PROJECTS_WITH_TESTS and MR.project != 11:  #todo пока не проверяем 11 - там они всегда падают
         issue = MR.issue.lower()
         pipelines = project.pipelines.list(ref=f'{issue}')
         if pipelines:
@@ -128,12 +107,13 @@ def make_mr_to_staging(config, projects, RC_name, docker):
     if TEST:
         return [projects]
 
-    mr_links = [] # ссылки для вывода под таблицей
+    staging_links = []  # ссылки для вывода под таблицей
+    master_links = []
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
     for pr in projects:
         project = gl.projects.get(pr)
         source_branch = RC_name
-        if pr in DOCKER_PROJECTS:
+        if pr in DOCKER_PROJECTS or pr in PROJECTS_WITHOUT_STAGING:
             target_branch = 'master'
         else:
             target_branch = 'staging'
@@ -147,7 +127,11 @@ def make_mr_to_staging(config, projects, RC_name, docker):
                                                'title': title,
                                                'target_project_id': pr,
                                                })
-        mr_links.append(mr.attributes['web_url'])
+
+        if pr in DOCKER_PROJECTS or pr in PROJECTS_WITHOUT_STAGING:
+            master_links.append(mr.attributes['web_url'])
+        else:
+            staging_links.append(mr.attributes['web_url'])
         #
         #           Делаем коммит запускающий тесты и билд контейнеров докера, после пропуска этого шага при создании RC
         #
@@ -186,8 +170,8 @@ def make_mr_to_staging(config, projects, RC_name, docker):
                     }
                     project.commits.create(commit_json)
             except gitlab.exceptions.GitlabGetError:
-                pass
-    return mr_links
+                logging.exception(f'Не найдена ветка {RC_name} в {PROJECTS_COUNTRIES[pr]}')
+    return master_links, staging_links
 
 
 def make_mr_to_master(config, projects):
@@ -198,7 +182,7 @@ def make_mr_to_master(config, projects):
     mr_links = [] # ссылки для вывода под таблицей
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
     for pr in projects:
-        if pr in DOCKER_PROJECTS:
+        if pr in DOCKER_PROJECTS or pr in PROJECTS_WITHOUT_STAGING:
             continue
         project = gl.projects.get(pr)
         mr = project.mergerequests.list(state='opened', source_branch='staging', target_branch='master')
