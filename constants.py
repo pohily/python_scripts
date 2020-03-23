@@ -22,7 +22,7 @@ PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo", 11: "4slovo.kz/crm4slovokz", 
                     154: "4slovo.ru/python-scripts", 159: "4slovo.kz/landing", 166: "docker/ru",167: "docker/ru-db",
                     }
 
-PROJECTS_COUNTRIES = {7: "ru", 11: "kz", 12: "kz", 20: "ru", 22: "ru", 23: "ge", 24: "ge", 61: "ru",
+PROJECTS_COUNTRIES = {7: "ru", 11: "kz", 12: "kz", 20: "ru", 22: "kz", 23: "ge", 24: "ge", 61: "ru",
                       62: "ru", 79: "ru", 86: "ru, kz, ge", 90: "ru, kz, ge", 91: "ru, kz, ge", 92: "ru, kz, ge",
                       93: "ru, kz, ge", 94: "ru, kz, ge", 97: "ru, kz, ge", 100: "ge", 103: "ru, kz, ge", 110: "kz",
                       113: "ru, kz, ge", 116: "ru, kz, ge", 117: "ru, kz, ge", 121: "ge", 125: "ru, kz, ge",
@@ -35,6 +35,7 @@ PRIORITY = {'Critical': '(*r) - Critical', 'Highest': '(!) - Highest', 'High': '
             'Low': '(*b) - Low', 'Lowest': '(*b) - Lowest', 'Критический': '(*r) - Critical'}
 STATUS_FOR_RELEASE = ['Released to production', 'Passed QA', 'In regression test', 'Ready for release', 'Закрыт',
                       'Fixed', 'Closed']#, 'In QA', 'Ready for QA', 'In development']
+STATUS_READY = ['Released to production', 'Ready for release', 'Закрыт', 'Fixed', 'Closed']
 
 PROJECTS_WITH_TESTS = [11, 20, 79, 93, 94, 97, 100, 110, 166]
 PROJECTS_WITHOUT_STAGING = [22, 61, 86, 90, 91, 92, 103, 113, 116, 121, 125, 135, 138, 139]

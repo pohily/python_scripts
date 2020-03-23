@@ -4,9 +4,11 @@ from configparser import ConfigParser
 
 import gitlab
 import requests
+from jira import JIRA
 
 from constants import MR_STATUS, MR_BY_IID, PROJECTS_WITH_TESTS, DOCKER_PROJECTS, PROJECTS_NUMBERS, \
-    PROJECTS_COUNTRIES, TEST, PROJECTS_WITHOUT_STAGING
+    PROJECTS_COUNTRIES, TEST, PROJECTS_WITHOUT_STAGING, JIRA_SERVER
+from send_notifications import get_release_details
 
 Merge_request_details = namedtuple('Merge_request_details', ['merge_status', 'source_branch', 'target_branch', 'state'])
 
@@ -70,7 +72,7 @@ def make_mr_to_rc(config, MR, RC_name):
     #           проверка статусов pipeline
     #
     status = ''
-    if MR.project in PROJECTS_WITH_TESTS and MR.project != 11:  #todo пока не проверяем 11 - там они всегда падают
+    if MR.project in PROJECTS_WITH_TESTS:
         issue = MR.issue.lower()
         pipelines = project.pipelines.list(ref=f'{issue}')
         if pipelines:
@@ -201,6 +203,14 @@ def make_mr_to_master(config, projects):
 if __name__ == '__main__':
     config = ConfigParser()
     config.read('config.ini')
+    jira_options = {'server': JIRA_SERVER}
+    jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
+    pr = jira.project('10000')
+    _, _, _, release_issues, _ = get_release_details(config, jira, release='kz.3.14.40')
+    for issue in release_issues:
+        transitions = jira.transitions(issue)
+        id = [(t['id']) for t in transitions]
+        pass
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
     project = gl.projects.get(20)
     mr = project.mergerequests.list(web_url="https://gitlab.4slovo.ru/4slovo.ru/chestnoe_slovo_backend/-/merge_requests/2881")

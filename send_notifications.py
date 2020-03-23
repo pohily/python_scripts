@@ -5,6 +5,7 @@ from email.header import Header
 from email.mime.text import MIMEText
 from smtplib import SMTP
 from sys import argv
+import os
 
 from jira import JIRA
 
@@ -69,6 +70,8 @@ def send_mail(release_country, release_name, country_key, message, config):
 
 
 if __name__ == '__main__':
+    if not os.path.exists('logs'):
+        os.mkdir(os.getcwd() + '/log')
     config = ConfigParser()
     config.read('config.ini')
     level = logging.INFO

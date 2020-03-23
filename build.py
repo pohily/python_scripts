@@ -2,6 +2,7 @@ import logging
 import shelve
 from collections import defaultdict, namedtuple
 from configparser import ConfigParser
+import os
 
 import requests
 from jira import JIRA
@@ -109,6 +110,8 @@ def get_links(config, merges):
 
 
 if __name__ == '__main__':
+    if not os.path.exists('logs'):
+        os.mkdir(os.getcwd() + '/log')
     level = logging.INFO
     handlers = [logging.FileHandler('logs/log.txt'), logging.StreamHandler()]
     format = u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s'

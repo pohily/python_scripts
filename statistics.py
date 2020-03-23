@@ -2,6 +2,7 @@ import logging
 from configparser import ConfigParser
 from itertools import chain
 from re import sub
+import os
 
 import gitlab
 from jira import JIRA
@@ -15,6 +16,8 @@ from send_notifications import get_release_details
 
 
 def main():
+    if not os.path.exists('logs'):
+        os.mkdir(os.getcwd() + '/log')
     config = ConfigParser()
     config.read('config.ini')
     jira_options = {'server': JIRA_SERVER}
@@ -76,6 +79,7 @@ def main():
         summary = sub('h\d\.', '', summary)
         print(f'\033[31m{action[0]} - \033[0m{summary}')
     if wrong_release_issues:
+        print('\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n')
         print(f'\033[34m Следующие задачи не подходят для данного релиза (неправильная страна):\033[0m')
         for issue in sorted(wrong_release_issues):
             print(f'\033[31m {issue}\033[0m', sep=', ')
