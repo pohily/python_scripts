@@ -1,10 +1,12 @@
 import logging
 from configparser import ConfigParser
+from datetime import datetime
 from sys import argv
+import os
 
 from jira import JIRA
 
-from constants import JIRA_SERVER, STATUS_FOR_RELEASE
+from constants import JIRA_SERVER, STATUS_FOR_RELEASE, STATUS_READY
 from send_notifications import get_release_details
 
 
@@ -104,8 +106,32 @@ def main():
         logging.exception('Пока не реализовано!')
 
     def release(source):
-        logging.exception('Пока не реализовано!')
+        _, _, _, release_issues, _ = get_release_details(config, jira, release=source)
+        for issue in release_issues:
+            today = datetime.today().strftime('%Y-%m-%d')
+            if issue.fields.status.name in STATUS_READY:
+                logging.info(f'Релизим задачу {issue}')
+                transitions = jira.transitions(issue)
+                transitions_ids = [(t['id'], t['name']) for t in transitions]
+                id = ''
+                for transition in transitions_ids:
+                    if transition[1] == 'Release to Production':
+                        id = transition[0]
+                        break
+                if id:
+                    jira.transition_issue(issue, id)
+                    issue.update(fields={"fixVersions": {"released": True, "releaseDate": today}})
+                else:
+                    logging.exception(f'Задача {issue} еще не переведена в статус подходящий для релиза!')
+            else:
+                logging.exception(f'Задача {issue} еще не переведена в статус подходящий для релиза!')
+        logging.info(f'Релиз и все входящие в него задачи переведены в статус Released to production')
 
+    #
+    # Получаем данные из коммандной строки
+    #
+    if not os.path.exists('logs'):
+        os.mkdir(os.getcwd() + '/log')
     try:
         COMMAND_LINE_INPUT = eval(config['options']['COMMAND_LINE_INPUT'])
         if COMMAND_LINE_INPUT:
