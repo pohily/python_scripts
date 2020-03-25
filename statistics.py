@@ -16,8 +16,7 @@ from send_notifications import get_release_details
 
 
 def main():
-    if not os.path.exists('logs'):
-        os.mkdir(os.getcwd() + '/log')
+    os.makedirs('logs', exist_ok=True)
     config = ConfigParser()
     config.read('config.ini')
     jira_options = {'server': JIRA_SERVER}
