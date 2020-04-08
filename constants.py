@@ -34,7 +34,7 @@ MR_STATUS = {'can_be_merged': '(/) Нет конфликтов, ', 'cannot_be_me
 PRIORITY = {'Critical': '(*r) - Critical', 'Highest': '(!) - Highest', 'High': '(*) - High', 'Medium': '(*g) - Medium',
             'Low': '(*b) - Low', 'Lowest': '(*b) - Lowest', 'Критический': '(*r) - Critical'}
 STATUS_FOR_RELEASE = ['Released to production', 'Passed QA', 'In regression test', 'Ready for release', 'Закрыт',
-                      'Fixed', 'Closed']#, 'In QA', 'Ready for QA', 'In development']
+                      'Fixed', 'Closed']#, 'In QA', 'Open', 'Ready for QA', 'In development']
 STATUS_READY = ['Released to production', 'Ready for release', 'Закрыт', 'Fixed', 'Closed']
 
 PROJECTS_WITH_TESTS = [11, 20, 79, 93, 94, 97, 100, 110, 166]

@@ -10,9 +10,11 @@ from jira import JIRA
 from build import get_merge_requests
 from constants import STATUS_FOR_RELEASE, PROJECTS_COUNTRIES, PROJECTS_NUMBERS, JIRA_SERVER
 from send_notifications import get_release_details
+from merge_requests import get_merge_request_details
 
 """ Показывает статистику по запрошенному релизу: количество задач, проетов и названия проектов, 
-также показываются задачи, которые не подходят для данного релиза (неправильная страна) """
+также показываются задачи, которые не подходят для данного релиза (неправильная страна).
+ Показывает мердж конфликты, если такие есть"""
 
 
 def main():
@@ -42,6 +44,9 @@ def main():
             continue
         MR_count = get_merge_requests(config, issue_number)
         for merge in MR_count:
+            status, _, _, _ = get_merge_request_details(config, merge)
+            if status != '(/) Нет конфликтов, ':
+                logging.exception(f'\033[31m Конфликт в задаче {merge.issue} в мердж реквесте {merge.url}\033[0m')
             used_projects.add(merge.project)
             try:
                 if country not in PROJECTS_COUNTRIES[merge.project].lower():
