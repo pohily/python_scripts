@@ -70,8 +70,7 @@ def send_mail(release_country, release_name, country_key, message, config):
 
 
 if __name__ == '__main__':
-    if not os.path.exists('logs'):
-        os.mkdir(os.getcwd() + '/log')
+    os.makedirs('logs', exist_ok=True)
     config = ConfigParser()
     config.read('config.ini')
     level = logging.INFO
