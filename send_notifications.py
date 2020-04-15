@@ -89,8 +89,8 @@ if __name__ == '__main__':
             issues_list[issue.key] = issue.fields.summary
 
     if issues_list and release_date:
-        for issue_number in sorted(issues_list):
-            message += f"<a href='{ISSUE_URL}{issue_number}'>{issue_number}</a> - {issues_list[issue_number]}<br>"
+        for index, issue_number in enumerate(sorted(issues_list)):
+            message += f"{index + 1}. <a href='{ISSUE_URL}{issue_number}'>{issue_number}</a> - {issues_list[issue_number]}<br>"
         if release_country == 'Россия':
             country_key = 'ru'
         elif release_country == 'Казахстан':
