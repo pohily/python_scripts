@@ -13,7 +13,7 @@ from send_notifications import get_release_details
 def main():
     config = ConfigParser()
     config.read('config.ini')
-    level = logging.INFO
+    level = logging.DEBUG
     handlers = [logging.FileHandler('logs/log.txt'), logging.StreamHandler()]
     format = u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s'
     logging.basicConfig(level=level, format=format, handlers=handlers)
@@ -90,7 +90,8 @@ def main():
                         issue = f'SLOV-{issue}'
                     else:
                         issue = issue.upper()
-                    if issue in release_issues:
+                for issue in release_issues:
+                    if issue.key in issues:
                         logging.info(f'Переносим задачу {issue}')
                         issue.update(fields={
                             "fixVersions": [{"name": target, }]

@@ -205,17 +205,10 @@ if __name__ == '__main__':
     config.read('config.ini')
     jira_options = {'server': JIRA_SERVER}
     jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
-    issue = jira.issue('SLOV-4929')
-    transitions = jira.transitions(issue)
-    transitions_ids = [(t['id'], t['name']) for t in transitions]
-    id = ''
-    for transition in transitions_ids:
-        if transition[1] == 'Release to Production':
-            id = transition[0]
-            break
+    issue = jira.issue('SLOV-5358')
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
-    project = gl.projects.get(20)
-    mr = project.mergerequests.list(web_url="https://gitlab.4slovo.ru/4slovo.ru/chestnoe_slovo_backend/-/merge_requests/2881")
+    project = gl.projects.get(11)
+    mr = project.mergerequests.list(source_branch='slov-5358', target_branch='master')
     if mr:
         mr = mr[0]
 
