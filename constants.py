@@ -30,8 +30,10 @@ PROJECTS_COUNTRIES = {7: "ru", 11: "kz", 12: "kz", 20: "ru", 22: "kz", 23: "ge",
                       144: "ru, kz, ge", 154: "ru", 159: "kz", 166: "ru", 167: "ru",
                       }
 
-MR_STATUS = {'can_be_merged': '(/) Нет конфликтов, ', 'cannot_be_merged': '(x) Конфликт!, ',
-             'unchecked': '(/) Нет конфликтов, ', 'cannot_be_merged_recheck': '(x) Конфликт!, ',}
+MR_STATUS = { True: '(x) Конфликт!, ', False: '(/) Нет конфликтов, ',
+    'can_be_merged': '(/) Нет конфликтов, ', 'cannot_be_merged': '(x) Конфликт!, ', 'unchecked': '(/) Нет конфликтов,',
+    'cannot_be_merged_recheck': '(x) Конфликт!, ','checking': '(x) Конфликт!, ',
+}
 PRIORITY = {'Critical': '(*r) - Critical', 'Highest': '(!) - Highest', 'High': '(*) - High', 'Medium': '(*g) - Medium',
             'Low': '(*b) - Low', 'Lowest': '(*b) - Lowest', 'Критический': '(*r) - Critical'}
 STATUS_FOR_RELEASE = ['Released to production', 'Passed QA', 'In regression test', 'Ready for release', 'Закрыт',

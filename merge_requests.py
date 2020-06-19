@@ -36,7 +36,7 @@ def get_merge_request_details(config, MR):
     if details:
         details = details[0]
         return Merge_request_details(
-            MR_STATUS[details['merge_status']], details['source_branch'], details['target_branch'], details['state']
+            MR_STATUS[details['has_conflicts']], details['source_branch'], details['target_branch'], details['state']
         )
     else:
         logging.error('MR не найден')
