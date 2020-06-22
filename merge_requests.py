@@ -90,7 +90,7 @@ def make_mr_to_rc(config, MR, RC_name):
                                            'title': f"[skip ci] {(MR.issue).replace('-', '_')} -> {RC_name}",
                                            'target_project_id': MR.project,
                                            })
-    status += MR_STATUS[mr.attributes['merge_status']]
+    status += MR_STATUS[mr.attributes['has_conflicts']]
     url = mr.attributes['web_url']
     return status, url, mr
 
