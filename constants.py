@@ -30,14 +30,15 @@ PROJECTS_COUNTRIES = {7: "ru", 11: "kz", 12: "kz", 20: "ru", 22: "kz", 23: "ge",
                       144: "ru, kz, ge", 154: "ru", 159: "kz", 166: "ru", 167: "ru",
                       }
 
-MR_STATUS = { True: '(x) Конфликт!, ', False: '(/) Нет конфликтов, ',
+MR_STATUS = {
+    True: '(x) Конфликт!, ', False: '(/) Нет конфликтов, ',
     'can_be_merged': '(/) Нет конфликтов, ', 'cannot_be_merged': '(x) Конфликт!, ', 'unchecked': '(/) Нет конфликтов,',
     'cannot_be_merged_recheck': '(x) Конфликт!, ','checking': '(x) Конфликт!, ',
 }
 PRIORITY = {'Critical': '(*r) - Critical', 'Highest': '(!) - Highest', 'High': '(*) - High', 'Medium': '(*g) - Medium',
             'Low': '(*b) - Low', 'Lowest': '(*b) - Lowest', 'Критический': '(*r) - Critical'}
 STATUS_FOR_RELEASE = ['Released to production', 'Passed QA', 'In regression test', 'Ready for release', 'Закрыт',
-                      'Fixed', 'Closed']#, 'In QA', 'Open', 'Ready for QA', 'In development']
+                      'Fixed', 'Closed']#, 'In QA', 'Готово','Open', 'Ready for QA', 'In development']
 STATUS_READY = ['Released to production', 'Ready for release', 'Закрыт', 'Fixed', 'Closed']
 
 PROJECTS_WITH_TESTS = [11, 20, 79, 93, 94, 97, 100, 110, 166]
@@ -47,7 +48,7 @@ DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167]
 GIT_LAB = 'https://gitlab'
 ISSUE_URL = 'https://jira.4slovo.ru/browse/'
 JIRA_SERVER = 'https://jira.4slovo.ru/'
-MR_BY_IID = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?iids[]={}&{}'
+MR_BY_IID = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?iids[]={}&{}&"with_merge_status_recheck"=True'
 RELEASE_ISSUES_URL = 'https://jira.4slovo.ru/rest/api/latest/search?jql=fixVersion={}'
 RELEASE_URL = 'https://jira.4slovo.ru/projects/SLOV/versions/{}'
 REMOTE_LINK = 'https://jira.4slovo.ru/rest/api/latest/issue/{}/remotelink'

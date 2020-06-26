@@ -68,7 +68,7 @@ def get_links(config, merges):
         logging.info(f'Пытаемся сделать MR из {merge.issue} в {RC_name} в {PROJECTS_NUMBERS[merge.project]}')
 
         status, url, mr = make_mr_to_rc(config, merge, RC_name)
-        if status == MR_STATUS['cannot_be_merged']:
+        if MR_STATUS['can_be_merged'] not in status:
             logging.warning(f"Конфликт в задаче {merge.issue} в {merge.project}")
             conflict = True
 

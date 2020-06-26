@@ -90,7 +90,8 @@ def make_mr_to_rc(config, MR, RC_name):
                                            'title': f"[skip ci] {(MR.issue).replace('-', '_')} -> {RC_name}",
                                            'target_project_id': MR.project,
                                            })
-    status += MR_STATUS[mr.attributes['merge_status']]
+    merge_status, _, _, _ = get_merge_request_details(config, (1, mr.attributes['iid'], mr.attributes['project_id'], 1))
+    status += merge_status
     url = mr.attributes['web_url']
     return status, url, mr
 
@@ -205,10 +206,19 @@ if __name__ == '__main__':
     config.read('config.ini')
     jira_options = {'server': JIRA_SERVER}
     jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
-    issue = jira.issue('SLOV-5358')
+    issue = jira.issue('SLOV-5444')
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
     project = gl.projects.get(11)
-    mr = project.mergerequests.list(source_branch='slov-5358', target_branch='master')
+    #mr = project.mergerequests.list(state='opened', source_branch='slov-5444', target_branch='staging')
+    mr = project.mergerequests.create({'source_branch': 'slov-5444',
+                                       'target_branch': 'staging',
+                                       'title': "test",
+                                       'target_project_id': 11,
+                                       })
+    status, _, _, _ = get_merge_request_details(config, (1, mr.attributes['iid'], mr.attributes['project_id'], 1))
+    print(status)
+
     if mr:
-        mr = mr[0]
+         mr = mr[0]
+
 
