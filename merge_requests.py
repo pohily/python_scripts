@@ -35,6 +35,10 @@ def get_merge_request_details(config, MR):
     details = requests.get(url=MR_BY_IID.format(project, iid, token)).json()
     if details:
         details = details[0]
+        logging.info(
+            f"Details for {iid}: {details['has_conflicts']}, {details['source_branch']}, "
+            f"{details['target_branch']}, {details['state']}"
+        )
         return Merge_request_details(
             MR_STATUS[details['has_conflicts']], details['source_branch'], details['target_branch'], details['state']
         )
@@ -102,6 +106,8 @@ def merge_rc (config, MR):
 
     gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
     if not isinstance(MR, bool) and MR.attributes['state'] != 'merged':
+        logging.info(f"Try to merge MR {MR.attributes['iid']} with merge_status {MR.attributes['merge_status']}, "
+                     f"has_conflicts - {MR.attributes['has_conflicts']} from {MR.attributes['source_branch']}")
         MR.merge()
 
 
@@ -209,16 +215,18 @@ if __name__ == '__main__':
     issue = jira.issue('SLOV-5444')
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
     project = gl.projects.get(11)
-    #mr = project.mergerequests.list(state='opened', source_branch='slov-5444', target_branch='staging')
-    mr = project.mergerequests.create({'source_branch': 'slov-5444',
-                                       'target_branch': 'staging',
-                                       'title': "test",
-                                       'target_project_id': 11,
-                                       })
-    status, _, _, _ = get_merge_request_details(config, (1, mr.attributes['iid'], mr.attributes['project_id'], 1))
-    print(status)
-
+    mr = project.mergerequests.list(state='opened', source_branch='slov-5444', target_branch='master')
     if mr:
          mr = mr[0]
+    merge_status, _, _, _ = get_merge_request_details(config, (1, mr.attributes['iid'], mr.attributes['project_id'], 1))
+    # mr = project.mergerequests.create({'source_branch': 'slov-5444',
+    #                                    'target_branch': 'staging',
+    #                                    'title': "test",
+    #                                    'target_project_id': 11,
+    #                                    })
+    # status, _, _, _ = get_merge_request_details(config, (1, mr.attributes['iid'], mr.attributes['project_id'], 1))
+    # print(status)
+    pass
+
 
 
