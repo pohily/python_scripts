@@ -108,7 +108,11 @@ def merge_rc (config, MR):
     if not isinstance(MR, bool) and MR.attributes['state'] != 'merged':
         logging.info(f"Try to merge MR {MR.attributes['iid']} with merge_status {MR.attributes['merge_status']}, "
                      f"has_conflicts - {MR.attributes['has_conflicts']} from {MR.attributes['source_branch']}")
-        MR.merge()
+        try:
+            MR.merge()
+            logging.info('Ok')
+        except gitlab.exceptions.GitlabHttpError:
+            logging.error(f"{MR.attributes['iid']} НЕ ВЛИТ!")
 
 
 def make_mr_to_staging(config, projects, RC_name, docker):
