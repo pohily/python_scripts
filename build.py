@@ -93,11 +93,11 @@ def get_links(config, merges):
     else:
         status = '(/) Влит'
     for line in range(len(statuses)):
-        statuses[line].append(status)  # 3
         if not conflict:
             mr = statuses[line][1]
             logging.info(f"Мержим {issue_number} в {RC_name} в {mr.attributes['references']['full']}")
-            merge_rc(config, mr)
+            status = merge_rc(config, mr)
+        statuses[line].append(status)  # 3
 
     result = ''
     start = True  # флаг первого МР, если их в задаче несколько

@@ -36,7 +36,7 @@ def get_merge_request_details(config, MR):
     if details:
         details = details[0]
         logging.info(
-            f"Details for {iid}: {details['has_conflicts']}, {details['source_branch']}, "
+            f"Details for {iid}: has_conflicts: {details['has_conflicts']}, {details['source_branch']} -> "
             f"{details['target_branch']}, {details['state']}"
         )
         return Merge_request_details(
@@ -107,12 +107,14 @@ def merge_rc (config, MR):
     gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
     if not isinstance(MR, bool) and MR.attributes['state'] != 'merged':
         logging.info(f"Try to merge MR {MR.attributes['iid']} with merge_status {MR.attributes['merge_status']}, "
-                     f"has_conflicts - {MR.attributes['has_conflicts']} from {MR.attributes['source_branch']}")
+                     f"has_conflicts - {MR.attributes['has_conflicts']} from {MR.attributes['source_branch']} to RC")
         try:
             MR.merge()
-            logging.info('Ok')
-        except gitlab.exceptions.GitlabHttpError:
+            logging.info('OK')
+            return '(/) Влит'
+        except:
             logging.error(f"{MR.attributes['iid']} НЕ ВЛИТ!")
+            return '(x) Не влит'
 
 
 def make_mr_to_staging(config, projects, RC_name, docker):
