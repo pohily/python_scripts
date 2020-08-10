@@ -80,6 +80,7 @@ def main():
         logging.exception('Пока не реализовано!')
 
     def move_selected(source, target, issues):
+        # not implemented
         if not issues:
             logging.exception('Введите номера задач для переноса!')
         else:
