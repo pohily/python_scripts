@@ -2,3 +2,4 @@
 config.ini
 venv
 logs
+__pycache__
