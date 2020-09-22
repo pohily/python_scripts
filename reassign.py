@@ -4,7 +4,7 @@ from random import shuffle
 
 from jira import JIRA
 
-from constants import JIRA_SERVER, TESTERS, STATUS_READY
+from constants import JIRA_SERVER, TESTERS, STATUS_READY, STATUS_FOR_RELEASE
 from send_notifications import get_release_details
 
 """ Переназначает задачи текущего релиза между тестировщиками """
@@ -23,7 +23,7 @@ def main():
         if 'сборка' in issue.fields.summary.lower():
             delta += 1
             continue
-        if issue.fields.priority.name in STATUS_READY:
+        if issue.fields.status.name in STATUS_READY or issue.fields.status.name not in STATUS_FOR_RELEASE:
             delta += 1
             continue
         new_assignee = TESTERS[(index - delta) % len(TESTERS)]
