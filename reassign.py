@@ -18,7 +18,7 @@ def main():
     jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
     _, release_input, _, fix_issues, _ = get_release_details(config, jira)
     shuffle(TESTERS)
-    delta = 0 # treshold for TESTERS in case of issue assign skip
+    delta = 0 # offset for TESTERS in case of issue assign skip
     for index, issue in enumerate(fix_issues):
         if 'сборка' in issue.fields.summary.lower():
             delta += 1
