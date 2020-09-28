@@ -91,7 +91,7 @@ def make_mr_to_rc(config, MR, RC_name):
     else:
         mr = project.mergerequests.create({'source_branch': source_branch,
                                            'target_branch': target_branch,
-                                           'title': f"[skip ci] {(MR.issue).replace('-', '_')} -> {RC_name}",
+                                           'title': f"{(MR.issue).replace('-', '_')} -> {RC_name}",
                                            'target_project_id': MR.project,
                                            })
     merge_status, _, _, _ = get_merge_request_details(config, (1, mr.attributes['iid'], mr.attributes['project_id'], 1))
