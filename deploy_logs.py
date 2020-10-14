@@ -1,8 +1,8 @@
 from configparser import ConfigParser
 from datetime import datetime
 
-from jira import JIRA
 import paramiko
+from jira import JIRA
 
 from build import get_merge_requests
 from constants import PROJECTS_NUMBERS, JIRA_SERVER, SYSTEM_USERS, COUNTRIES_ABBR
@@ -29,6 +29,7 @@ def main():
 
     projects = [PROJECTS_NUMBERS[pr] for pr in used_projects]
     system_users = [SYSTEM_USERS[release_country][pr] for pr in projects]
+    system_users = [user for user in system_users if user]
 
     username = config['staging'][f"user_{release_country}"]
     password = config['staging'][f"staging_password_{release_country}"]
@@ -43,14 +44,14 @@ def main():
     client.connect(server, port=22, username=username, password=password, )
 
     for user in system_users:
-        cmd = f'sudo -Siu {user} tail logs/deploy.log'
+        cmd = f'sudo -Siu {user} tail -50 logs/deploy.log'
         _, ssh_stdout, stderr = client.exec_command(cmd)
-        err = stderr.read().decode('ascii').strip("\n")
+        err = stderr.read().decode('utf-8').strip("\n")
         if err:
-            print(f'{datetime.now().strftime("%H:%M:%S")} Error. {err}')
+            print(f'!!!!!!! Error in {user}: {err}')
         else:
-            result = ssh_stdout.read().decode('ascii').strip("\n")
-            print(f'{datetime.now().strftime("%H:%M:%S")} Ok. {result}')
+            result = ssh_stdout.read().decode('utf-8').strip("\n")
+            print(f'{user} ================ Ok. {result}')
     client.close()
 
 
