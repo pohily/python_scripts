@@ -22,7 +22,7 @@ def get_release_details(config, jira, date=False, release=False):
             if COMMAND_LINE_INPUT:
                 release_input = argv[1]
             else:
-                release_input = 'kz.3.18.30'
+                release_input = config['options']['hardcode_release']
         except IndexError:
             logging.exception('Введите имя релиза!')
             raise Exception('Введите имя релиза!')
