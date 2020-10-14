@@ -32,6 +32,25 @@ PROJECTS_COUNTRIES = {7: "ru", 10: "ru", 11: "kz", 12: "kz", 20: "ru", 22: "kz",
                       144: "ru, kz, ge", 154: "ru", 159: "kz", 166: "ru", 167: "ru", 187: "ru"
                       }
 
+COUNTRIES = {
+    'ru': 'Россия', 'kz': 'Казахстан', 'ge': 'Грузия'
+}
+COUNTRIES_ABBR = {
+    'Россия': 'ru', 'Казахстан': 'kz', 'Грузия':'ge'
+}
+
+SYSTEM_USERS = {
+    'ru': {
+        '4slovo/finance': 'ru_finance', '4slovo/fs': 'fs4slovo', '4slovo.ru/chestnoe_slovo': 'f4slovo',
+        '4slovo.ru/chestnoe_slovo_backend': 'crm4slovo', '4slovo.ru/chestnoe_slovo_landing': 'n4slovo',
+        '4slovo.ru/api': 'api4slovo'
+    },
+    'kz': {
+        '4slovo/finance': 'kz_finance', '4slovo/fs': 'kz_fs', '4slovo.kz/4slovokz': 'kz_f',
+        '4slovo.kz/crm4slovokz': 'kz_backend_mfo'
+    }
+}
+
 MR_STATUS = {
     True: '(x) Конфликт!, ', False: '(/) Нет конфликтов, ',
     'can_be_merged': '(/) Нет конфликтов, ', 'cannot_be_merged': '(x) Конфликт!, ', 'unchecked': '(/) Нет конфликтов,',
