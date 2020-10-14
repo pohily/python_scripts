@@ -9,7 +9,7 @@ import os
 
 from jira import JIRA
 
-from constants import SMTP_PORT, SMTP_SERVER, ISSUE_URL, RELEASE_ISSUES_URL, JIRA_SERVER
+from constants import SMTP_PORT, SMTP_SERVER, ISSUE_URL, RELEASE_ISSUES_URL, JIRA_SERVER, COUNTRIES
 
 
 def get_release_details(config, jira, date=False, release=False):
@@ -38,12 +38,8 @@ def get_release_details(config, jira, date=False, release=False):
             logging.exception(f'Релиз {release_input} еще не выпущен!')
     else:
         fix_date = None
-    if 'ru' in release_input.lower():
-        release_country = 'Россия'
-    elif 'kz' in release_input.lower():
-        release_country = 'Казахстан'
-    else:
-        release_country = 'Грузия'
+    country = release_input.split('.')[0].lower()
+    release_country = COUNTRIES[country]
     fix_id = fix_issues[0].fields.fixVersions[0].id
     logging.info(f'Для релиза {release_input}')
     return fix_date, release_input, release_country, fix_issues, fix_id
