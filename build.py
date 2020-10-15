@@ -18,8 +18,10 @@ confluence = ''  # ссылка на отчет о тестировании
 Merge_request = namedtuple('Merge_request', ['url', 'iid', 'project', 'issue'])  # iid - номер МР в url'е, project - int
 
 
-def get_merge_requests(config, issue_number):
-    """ Ищет ссылки на невлитые МР в задаче и возвращает их список """
+def get_merge_requests(config, issue_number, return_merged=None):
+    """ Ищет ссылки на невлитые МР в задаче и возвращает их список
+    :return_merged: передается True если надо вернуть влитые МР, обычно возвращаются только невлитые"""
+
     result = []
     links_json = requests.get(url=REMOTE_LINK.format(issue_number),
                                  auth=(config['user_data']['login'], config['user_data']['jira_password'])).json()
@@ -50,8 +52,11 @@ def get_merge_requests(config, issue_number):
             logging.warning(f"Проверьте ссылку {link['object']['url']} в задаче {issue_number}")
             continue
         merge = Merge_request(link['object']['url'], iid, project, issue_number)
-        if not is_merged(config, merge):
+        if return_merged:
             result.append(merge)
+        else:
+            if not is_merged(config, merge):
+                result.append(merge)
     return result
 
 
