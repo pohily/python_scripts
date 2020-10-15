@@ -125,6 +125,11 @@ def make_mr_to_staging(config, projects, RC_name, docker):
     staging_links = []  # ссылки для вывода под таблицей
     master_links = []
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
+    if docker:
+        tests = DOCKER_PROJECTS
+        logging.warning('\033[31m Запустите тесты в Gitlab после сборки контейнеров докера в RC вручную! \033[0m')
+    else:
+        tests = PROJECTS_WITH_TESTS
     for pr in projects:
         project = gl.projects.get(pr)
         source_branch = RC_name
@@ -142,22 +147,16 @@ def make_mr_to_staging(config, projects, RC_name, docker):
                                                'title': title,
                                                'target_project_id': pr,
                                                })
-
         if pr in DOCKER_PROJECTS or pr in PROJECTS_WITHOUT_STAGING:
             master_links.append(mr.attributes['web_url'])
         else:
             staging_links.append(mr.attributes['web_url'])
-        #
-        #           Делаем коммит запускающий тесты и билд контейнеров докера, после пропуска этого шага при создании RC
-        #
-        if docker:
-            tests = DOCKER_PROJECTS
-            logging.warning('\033[31m Запустите тесты в Gitlab после сборки контейнеров докера в RC вручную! \033[0m')
-        else:
-            tests = PROJECTS_WITH_TESTS
+
+        # Делаем коммит с названием последнего билда - раньше запускал тесты и билд контейнеров докера, сейчас отключили
+        # автоматический запуск тестов - запускаю дальше вручную
         if pr in tests:
             try:
-                project.branches.get(RC_name)   # если в проетке нет RC,то и коммит не нужен
+                project.branches.get(RC_name)   # если в проекте нет RC,то и коммит не нужен
                 try:
                     commit_json = {
                         "branch": f"{RC_name}",
@@ -186,6 +185,14 @@ def make_mr_to_staging(config, projects, RC_name, docker):
                     project.commits.create(commit_json)
             except gitlab.exceptions.GitlabGetError:
                 logging.exception(f'Не найдена ветка {RC_name} в {PROJECTS_COUNTRIES[pr]}')
+        pipelines = project.pipelines.list()
+        # Запуск тестов в проекте
+        for pipeline in pipelines:
+            if pipeline.attributes['ref'] == RC_name and pipeline.attributes['status'] == 'skipped':
+                pipeline_job = pipeline.jobs.list()[0]
+                job = project.jobs.get(pipeline_job.id, lazy=True)
+                job.play()
+                break
     return master_links, staging_links
 
 
@@ -216,12 +223,15 @@ def make_mr_to_master(config, projects):
 if __name__ == '__main__':
     config = ConfigParser()
     config.read('config.ini')
-    jira_options = {'server': JIRA_SERVER}
-    jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
-    issue = jira.issue('SLOV-5358')
+    # jira_options = {'server': JIRA_SERVER}
+    # jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
+    # issue = jira.issue('SLOV-5358')
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
-    project = gl.projects.get(11)
-    mr = project.mergerequests.list(source_branch='slov-5358', target_branch='master')
-    if mr:
-        mr = mr[0]
-
+    project = gl.projects.get(20)
+    pipelines = project.pipelines.list()
+    for pipeline in pipelines:
+        if pipeline.attributes['ref'] == 'rc-ru-6-1-97' and pipeline.attributes['status'] == 'skipped':
+            pipeline_job = pipeline.jobs.list()[0]
+            job = project.jobs.get(pipeline_job.id, lazy=True)
+            job.play()
+            break

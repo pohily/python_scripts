@@ -8,7 +8,7 @@ from build import get_merge_requests
 from constants import PROJECTS_NUMBERS, JIRA_SERVER, SYSTEM_USERS, COUNTRIES_ABBR
 from send_notifications import get_release_details
 
-""" Показывает деплой логи все измененных в релизе проектов"""
+""" Показывает деплой логи всех измененных в релизе проектов"""
 
 
 def main():
