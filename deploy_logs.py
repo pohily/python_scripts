@@ -1,6 +1,5 @@
 from configparser import ConfigParser
 from datetime import datetime
-import logging
 
 import paramiko
 from jira import JIRA
@@ -20,7 +19,7 @@ def main():
     _, release_input, release_country, fix_issues, _ = get_release_details(config, jira)
     release_country = COUNTRIES_ABBR[release_country]
     used_projects = set()
-    print(f'Выбираем проекты релиза {release_input}')
+    print(f'\033[34m Выбираем проекты релиза {release_input}\033[0m')
     for issue_number in fix_issues:
         MR_count = get_merge_requests(config, issue_number, return_merged=True)
         for merge in MR_count:
@@ -43,6 +42,8 @@ def main():
     client.connect(server, port=22, username=username, password=password, )
 
     today = datetime.now().strftime("%Y-%m-%d")
+    if 'n4slovo' in system_users:
+        system_users += ['ru_lk', 'partner4slovo']
     for user in system_users:
         cmd = f"sudo -Siu {user} awk '/{today}/ ? ++i : i' logs/deploy.log"
         _, ssh_stdout, stderr = client.exec_command(cmd)
@@ -52,7 +53,7 @@ def main():
         else:
             result = ssh_stdout.read().decode('utf-8').strip("\n")
             print(f'{user} ================ Ok. {result}')
-        print(f'Деплой лог для {user}')
+        print(f'\033[34m Деплой лог для {user}\033[0m')
         input('Нажмите Enter для продолжения')
     client.close()
 
