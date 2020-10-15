@@ -1,5 +1,6 @@
 from configparser import ConfigParser
 from datetime import datetime
+import logging
 
 import paramiko
 from jira import JIRA
@@ -8,10 +9,7 @@ from build import get_merge_requests
 from constants import PROJECTS_NUMBERS, JIRA_SERVER, SYSTEM_USERS, COUNTRIES_ABBR
 from send_notifications import get_release_details
 
-""" Показывает статистику по запрошенному релизу: количество задач, проектов и названия проектов, 
-также показываются задачи, которые не подходят для данного релиза (неправильная страна).
-Показывает репозитории, к которым необходимо получить доступ для сборки релиза.
-Показывает мердж конфликты, если такие есть"""
+""" Показывает деплой логи все измененных в релизе проектов"""
 
 
 def main():
@@ -22,8 +20,9 @@ def main():
     _, release_input, release_country, fix_issues, _ = get_release_details(config, jira)
     release_country = COUNTRIES_ABBR[release_country]
     used_projects = set()
+    print(f'Выбираем проекты релиза {release_input}')
     for issue_number in fix_issues:
-        MR_count = get_merge_requests(config, issue_number)
+        MR_count = get_merge_requests(config, issue_number, return_merged=True)
         for merge in MR_count:
             used_projects.add(merge.project)
 
@@ -43,8 +42,9 @@ def main():
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     client.connect(server, port=22, username=username, password=password, )
 
+    today = datetime.now().strftime("%Y-%m-%d")
     for user in system_users:
-        cmd = f'sudo -Siu {user} tail -50 logs/deploy.log'
+        cmd = f"sudo -Siu {user} awk '/{today}/ ? ++i : i' logs/deploy.log"
         _, ssh_stdout, stderr = client.exec_command(cmd)
         err = stderr.read().decode('utf-8').strip("\n")
         if err:
@@ -52,6 +52,8 @@ def main():
         else:
             result = ssh_stdout.read().decode('utf-8').strip("\n")
             print(f'{user} ================ Ok. {result}')
+        print(f'Деплой лог для {user}')
+        input('Нажмите Enter для продолжения')
     client.close()
 
 
