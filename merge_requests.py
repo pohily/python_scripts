@@ -35,10 +35,10 @@ def get_merge_request_details(config, MR):
     details = requests.get(url=MR_BY_IID.format(project, iid, token)).json()
     if details:
         details = details[0]
-        logging.info(
-            f"Details for {iid}: has_conflicts: {details['has_conflicts']}, {details['source_branch']} -> "
-            f"{details['target_branch']}, {details['state']}"
-        )
+        # logging.info(
+        #     f"Details for {iid}: has_conflicts: {details['has_conflicts']}, {details['source_branch']} -> "
+        #     f"{details['target_branch']}, {details['state']}"
+        # )
         return Merge_request_details(
             MR_STATUS[details['has_conflicts']], details['source_branch'], details['target_branch'], details['state']
         )
@@ -192,6 +192,7 @@ def make_mr_to_staging(config, projects, RC_name, docker):
                 pipeline_job = pipeline.jobs.list()[0]
                 job = project.jobs.get(pipeline_job.id, lazy=True)
                 job.play()
+                logging.info(f'Тесты запущены в проекте {PROJECTS_NUMBERS[pr]}')
                 break
     return master_links, staging_links
 

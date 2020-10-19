@@ -1,21 +1,22 @@
-PROJECTS_NAMES = {"4slovo.ru/chestnoe_slovo": 7, "4slovo.ru/4slv":10, "4slovo.kz/crm4slovokz": 11, "4slovo.kz/4slovokz": 12,
-                  "4slovo.ru/chestnoe_slovo_backend": 20, "4slovo.ru/common": 22, "mrloan.ge/mrloange": 23,
-                  "mrloan.ge/crmmrloange": 24, "4slovo.ru/fias": 61, "4slovo.ru/chestnoe_slovo_landing": 62,
-                  "4slovo.ru/api": 79, "4slovo/cache": 86, "4slovo/sawmill": 90, "4slovo/common": 91, "4slovo/inn": 92,
-                  "4slovo/finance": 93, "docker/finance": 94, "docker/api": 97, "docker/ge": 100,
-                  "4slovo/finance_client": 103, "docker/kz": 110, "4slovo/rabbitclient": 113, "4slovo/fs-client": 116,
-                  "4slovo/fs": 117, "4slovo/enum-generator": 121, "4slovo/expression": 125, "almal.ge/almalge": 128,
-                  "almal.ge/crmalmalge": 129, "4slovo.ru/python-tests": 130, "4slovo/logging": 135,
-                  "4slovo/timeservice": 138, "4slovo/timeservice_client": 139, "docker/replicator": 144,
-                  "4slovo.ru/python-scripts": 154, "4slovo.kz/landing": 159, "docker/ru": 166, "docker/ru-db": 167,
-                  "module/msm": 187
+PROJECTS_NAMES = {"4slovo.ru/chestnoe_slovo": 7, "4slovo.ru/4slv":10, "4slovo.kz/crm4slovokz": 11,
+                  "4slovo.kz/4slovokz": 12, "4slovo.ru/chestnoe_slovo_backend": 20, "4slovo.ru/common": 22,
+                  "mrloan.ge/mrloange": 23, "mrloan.ge/crmmrloange": 24, "4slovo.ru/fias": 61,
+                  "4slovo.ru/chestnoe_slovo_landing": 62, "4slovo.ru/api": 79, "4slovo/cache": 86, "4slovo/sawmill": 90,
+                  "4slovo/common": 91, "4slovo/inn": 92,"4slovo/finance": 93, "docker/finance": 94, "docker/api": 97,
+                  "docker/ge": 100, "4slovo/finance_client": 103, "docker/kz": 110, "4slovo/rabbitclient": 113,
+                  "4slovo/fs-client": 116, "4slovo/fs": 117, "4slovo/enum-generator": 121, "4slovo/expression": 125,
+                  "almal.ge/almalge": 128, "almal.ge/crmalmalge": 129, "4slovo.ru/python-tests": 130,
+                  "4slovo/logging": 135, "4slovo/timeservice": 138, "4slovo/timeservice_client": 139,
+                  "docker/replicator": 144, "4slovo.ru/python-scripts": 154, "4slovo.kz/landing": 159, "docker/ru": 166,
+                  "docker/ru-db": 167, "module/msm": 187
                   }
 
-PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo",10: "4slovo.ru/4slv",  11: "4slovo.kz/crm4slovokz", 12: "4slovo.kz/4slovokz",
-                    20: "4slovo.ru/chestnoe_slovo_backend", 22: "4slovo.ru/common", 23: "mrloan.ge/mrloange",
-                    24: "mrloan.ge/crmmrloange", 61: "4slovo.ru/fias", 62: "4slovo.ru/chestnoe_slovo_landing",
-                    79: "4slovo.ru/api", 86: "4slovo/cache", 90: "4slovo/sawmill", 91: "4slovo/common",
-                    92: "4slovo/inn", 93: "4slovo/finance", 94: "docker/finance", 97: "docker/api", 100: "docker/ge",
+PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo",10: "4slovo.ru/4slv",  11: "4slovo.kz/crm4slovokz",
+                    12: "4slovo.kz/4slovokz", 20: "4slovo.ru/chestnoe_slovo_backend", 22: "4slovo.ru/common",
+                    23: "mrloan.ge/mrloange", 24: "mrloan.ge/crmmrloange", 61: "4slovo.ru/fias",
+                    62: "4slovo.ru/chestnoe_slovo_landing", 79: "4slovo.ru/api", 86: "4slovo/cache",
+                    90: "4slovo/sawmill", 91: "4slovo/common", 92: "4slovo/inn", 93: "4slovo/finance",
+                    94: "docker/finance", 97: "docker/api", 100: "docker/ge",
                     103: "4slovo/finance_client", 110: "docker/kz", 113: "4slovo/rabbitclient", 116: "4slovo/fs-client",
                     117: "4slovo/fs", 121: "4slovo/enum-generator", 125: "4slovo/expression", 128: "almal.ge/almalge",
                     129: "almal.ge/crmalmalge", 130: "4slovo.ru/python-tests", 135: "4slovo/logging",
@@ -47,7 +48,7 @@ SYSTEM_USERS = {
     },
     'kz': {
         '4slovo/finance': 'kz_finance', '4slovo/fs': 'kz_fs', '4slovo.kz/4slovokz': 'kz_f',
-        '4slovo.kz/crm4slovokz': 'kz_backend_mfo'
+        '4slovo.kz/crm4slovokz': 'kz_backend_mfo', 'docker/kz': ''
     }
 }
 
@@ -59,8 +60,8 @@ MR_STATUS = {
 PRIORITY = {'Critical': '(*r) - Critical', 'Highest': '(!) - Highest', 'High': '(*) - High', 'Medium': '(*g) - Medium',
             'Low': '(*b) - Low', 'Lowest': '(*b) - Lowest', 'Критический': '(*r) - Critical',
             'MEGA Critical': '(flag) - MEGA Critical'}
-STATUS_FOR_RELEASE = ['MEGA Critical', 'Released to production', 'Passed QA', 'In regression test', 'Ready for release', 'Закрыт',
-                      'Fixed', 'Closed']#, 'Ready for review', 'Ready for technical solution review', 'In QA', 'Готово','Open', 'Ready for QA', 'In development']
+STATUS_FOR_RELEASE = ['MEGA Critical', 'Released to production', 'Passed QA', 'In regression test', 'Ready for release',
+    'Закрыт', 'Fixed', 'Closed']#, 'Ready for review', 'Ready for technical solution review', 'In QA', 'Готово','Open', 'Ready for QA', 'In development']
 STATUS_READY = ['Released to production', 'Ready for release', 'Закрыт', 'Fixed', 'Closed']
 
 TESTERS = ['i.chechikov', 'd.afanasyev', 'm.pohilyj', 'a.zemisov']

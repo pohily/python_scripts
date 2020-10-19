@@ -248,7 +248,7 @@ if __name__ == '__main__':
         if post_deploy:
             for issue in post_deploy:
                 message_post_deploy += f'* *{issue[0]}*: {issue[1]}\r\n'
-                #
+        #
         #           Вывод результата в Jira
         #
         CREATE_JIRA_ISSUE = eval(config['options']['CREATE_JIRA_ISSUE'])
@@ -279,5 +279,5 @@ if __name__ == '__main__':
         file.write(message)
 
         #todo
-        # # запуск скрипта на гитлабе вебхуком от жиры
+        # запуск скрипта на гитлабе вебхуком от жиры
         # развернуть стенд на нужных ветках и запустить тесты в гитлабе и регресс (в Дженкинс?)
