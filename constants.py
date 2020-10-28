@@ -46,6 +46,11 @@ SYSTEM_USERS = {
         '4slovo.ru/chestnoe_slovo_backend': 'crm4slovo', '4slovo.ru/chestnoe_slovo_landing': 'n4slovo',
         '4slovo.ru/api': 'api4slovo', '4slovo.ru/4slv': 'ru_4slv', 'module/msm': 'ru_msm', 'docker/ru': ''
     },
+    'ru2': {
+        '4slovo/finance': 'ru_finance', '4slovo/fs': 'ru_fs', '4slovo.ru/chestnoe_slovo': 'ru_frontend',
+        '4slovo.ru/chestnoe_slovo_backend': 'ru_backend', '4slovo.ru/chestnoe_slovo_landing': 'ru_frontend_new',
+        '4slovo.ru/api': 'ru_api', '4slovo.ru/4slv': 'ru_4slv', 'module/msm': 'ru_msm', 'docker/ru': ''
+    },
     'kz': {
         '4slovo/finance': 'kz_finance', '4slovo/fs': 'kz_fs', '4slovo.kz/4slovokz': 'kz_f',
         '4slovo.kz/crm4slovokz': 'kz_backend_mfo', 'docker/kz': ''
