@@ -32,7 +32,8 @@ def get_merge_requests(config, issue_number, return_merged=None):
                 confluence = link['object']['url']
         if 'commit' in link['object']['url'] or GIT_LAB not in link['object']['url']:
             continue
-        if 'docker' in link['object']['url']:
+        # для предупреждения о запуске тесто после сборки контейнеров
+        if 'docker' in link['object']['url'] or 'msm' in link['object']['url']:
             global docker
             docker = True
         url_parts = link['object']['url'].split('/')

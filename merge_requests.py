@@ -123,7 +123,9 @@ def make_mr_to_staging(config, projects, RC_name, docker):
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
     if docker:
         tests = DOCKER_PROJECTS
-        logging.warning('\033[31m Запустите тесты в Gitlab после сборки контейнеров докера в RC вручную! \033[0m')
+        logging.warning(
+            '\033[31m Запустите тесты в Gitlab после сборки контейнеров докера/msm/финмодуля в RC вручную! \033[0m'
+        )
     else:
         tests = PROJECTS_WITH_TESTS
     for pr in projects:
