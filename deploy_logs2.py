@@ -44,9 +44,8 @@ def main():
     client.connect(server, port=22, username=username, password=password, )
 
     today = datetime.now().strftime("%Y-%m-%d")
-    # меня пока не пускают в этих юзеров 28.10.20
-    # if 'ru_frontend_new' in system_users:
-    #     system_users += ['ru_lk', 'ru_partner']
+    if 'ru_frontend_new' in system_users:
+        system_users += ['ru_lk', 'ru_partner']
     for user in system_users:
         cmd = f"sudo -Siu {user} awk '/{today}/ ? ++i : i' logs/deploy.log"
         _, ssh_stdout, stderr = client.exec_command(cmd)

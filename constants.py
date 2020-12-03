@@ -46,16 +46,20 @@ SYSTEM_USERS = {
         '4slovo/finance': 'ru_finance', '4slovo/fs': 'fs4slovo', '4slovo.ru/chestnoe_slovo': 'f4slovo',
         '4slovo.ru/chestnoe_slovo_backend': 'crm4slovo', '4slovo.ru/chestnoe_slovo_landing': 'n4slovo',
         '4slovo.ru/api': 'api4slovo', '4slovo.ru/4slv': 'ru_4slv', 'module/msm': 'ru_msm', 'docker/ru': '',
-        '4slovo/finance_client': 'ru_finance'
+        '4slovo/finance_client': 'ru_finance', '4slovo/anonymize-replicator': ''
     },
     'ru2': {
         '4slovo/finance': 'ru_finance', '4slovo/fs': 'ru_fs', '4slovo.ru/chestnoe_slovo': 'ru_frontend',
         '4slovo.ru/chestnoe_slovo_backend': 'ru_backend', '4slovo.ru/chestnoe_slovo_landing': 'ru_frontend_new',
         '4slovo.ru/api': 'ru_api', '4slovo.ru/4slv': 'ru_4slv', 'module/msm': 'ru_msm', 'docker/ru': '',
-        '4slovo/finance_client': 'ru_finance'
+        '4slovo/finance_client': 'ru_finance', '4slovo/anonymize-replicator': ''
     },
     'kz': {
         '4slovo/finance': 'kz_finance', '4slovo/fs': 'kz_fs', '4slovo.kz/4slovokz': 'kz_f',
+        '4slovo.kz/crm4slovokz': 'kz_backend_mfo', 'docker/kz': ''
+    },
+    'kz2': {
+        '4slovo/finance': 'kz_finance', '4slovo/fs': 'kz_fileshare', '4slovo.kz/4slovokz': 'kz_frontend',
         '4slovo.kz/crm4slovokz': 'kz_backend_mfo', 'docker/kz': ''
     }
 }
@@ -69,10 +73,11 @@ PRIORITY = {'Critical': '(*r) - Critical', 'Highest': '(!) - Highest', 'High': '
             'Low': '(*b) - Low', 'Lowest': '(*b) - Lowest', 'Критический': '(*r) - Critical',
             'MEGA Critical': '(flag) - MEGA Critical'}
 STATUS_FOR_RELEASE = ['MEGA Critical', 'Released to production', 'Passed QA', 'In regression test', 'Ready for release',
-    'Закрыт', 'Fixed', 'Closed']#, 'Ready for review', 'Ready for technical solution review', 'In QA', 'Готово','Open', 'Ready for QA', 'In development']
+    'Закрыт', 'Fixed', 'Closed', 'Готово'
+    ] #, 'Ready for review', 'Ready for technical solution review', 'In QA','Open', 'Ready for QA', 'In development']
 STATUS_READY = ['Released to production', 'Ready for release', 'Закрыт', 'Fixed', 'Closed']
 
-TESTERS = ['i.chechikov', 'd.afanasyev', 'm.pohilyj', 'a.zemisov']
+TESTERS = ['i.chechikov', 'm.pohilyj', 'a.zemisov']
 
 PROJECTS_WITH_TESTS = [11, 20, 79, 93, 94, 97, 100, 110, 166]
 PROJECTS_WITHOUT_STAGING = [22, 61, 86, 90, 91, 92, 103, 113, 116, 121, 125, 135, 138, 139]
@@ -90,3 +95,13 @@ SMTP_PORT = 587
 SMTP_SERVER = 'smtp.4slovo.ru'
 
 TEST = False
+
+if __name__ == '__main__':
+    import re
+    with open('/Users/user/Desktop/1.txt', 'r') as text:
+        for line in text:
+            pids = re.findall(r'2785\d+', line)
+    with open('/Users/user/Desktop/2.csv', 'w') as file:
+        for pid in sorted(set(pids)):
+            line = str(pid) + '\n'
+            file.write(line)
