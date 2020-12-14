@@ -8,7 +8,7 @@ import gitlab
 from jira import JIRA
 
 from build import get_merge_requests
-from constants import STATUS_FOR_RELEASE, PROJECTS_COUNTRIES, PROJECTS_NUMBERS, JIRA_SERVER
+from constants import STATUS_FOR_RELEASE, PROJECTS_COUNTRIES, PROJECTS_NUMBERS, JIRA_SERVER, TESTERS
 from send_notifications import get_release_details
 from merge_requests import get_merge_request_details
 
@@ -61,11 +61,7 @@ def main():
                 logging.exception(f'У вас нет доступа к проекту {PROJECTS_COUNTRIES[merge.project]}')
     projects = [PROJECTS_NUMBERS[pr] for pr in used_projects]
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
-    user_id = 0
-    users = gl.users.list()
-    for user in users:
-        if user.attributes['username'] == config['user_data']['login']:
-            user_id = user.attributes['id']
+    user_id = TESTERS[config['user_data']['login']]
     reporter = []
     for project in projects:
         pr = gl.projects.get(project)

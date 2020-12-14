@@ -77,7 +77,7 @@ STATUS_FOR_RELEASE = ['MEGA Critical', 'Released to production', 'Passed QA', 'I
     ] #, 'Ready for review', 'Ready for technical solution review', 'In QA','Open', 'Ready for QA', 'In development']
 STATUS_READY = ['Released to production', 'Ready for release', 'Закрыт', 'Fixed', 'Closed']
 
-TESTERS = ['i.chechikov', 'm.pohilyj', 'a.zemisov']
+TESTERS = {'i.chechikov': 76, 'm.pohilyj': 77, 'a.zemisov': 84, 'g.kozlov': 99}
 
 PROJECTS_WITH_TESTS = [11, 20, 79, 93, 94, 97, 100, 110, 166]
 PROJECTS_WITHOUT_STAGING = [22, 61, 86, 90, 91, 92, 103, 113, 116, 121, 125, 135, 138, 139]

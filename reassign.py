@@ -17,7 +17,8 @@ def main():
     jira_options = {'server': JIRA_SERVER}
     jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
     _, release_input, _, fix_issues, _ = get_release_details(config, jira)
-    shuffle(TESTERS)
+    testers = TESTERS.keys()
+    shuffle(testers)
     delta = 0 # offset for TESTERS in case of issue assign skip
     for index, issue in enumerate(fix_issues):
         if 'сборка' in issue.fields.summary.lower():
@@ -26,11 +27,12 @@ def main():
         if issue.fields.status.name in STATUS_READY or issue.fields.status.name not in STATUS_FOR_RELEASE:
             delta += 1
             continue
-        new_assignee = TESTERS[(index - delta) % len(TESTERS)]
+        new_assignee = testers[(index - delta) % len(testers)]
 
         issue.update(fields={
                 'assignee': {'name': new_assignee}
             })
+
 
 if __name__ == '__main__':
     main()

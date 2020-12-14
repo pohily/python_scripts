@@ -226,6 +226,17 @@ if __name__ == '__main__':
     # jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
     # issue = jira.issue('SLOV-5358')
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
+    user_id = 0
+    u = []
+    for number in range (150):
+        try:
+            u.append(gl.users.get(number))
+        except:
+            pass
+    users = gl.users.list()
+    for user in users:
+        if user.attributes['username'] == config['user_data']['login']:
+            user_id = user.attributes['id']
     project = gl.projects.get(20)
     pipelines = project.pipelines.list()
     for pipeline in pipelines:
