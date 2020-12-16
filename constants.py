@@ -8,7 +8,8 @@ PROJECTS_NAMES = {"4slovo.ru/chestnoe_slovo": 7, "4slovo.ru/4slv":10, "4slovo.kz
                   "almal.ge/almalge": 128, "almal.ge/crmalmalge": 129, "4slovo.ru/python-tests": 130,
                   "4slovo/logging": 135, "4slovo/timeservice": 138, "4slovo/timeservice_client": 139,
                   "docker/replicator": 144, "4slovo.ru/python-scripts": 154, "4slovo.kz/landing": 159, "docker/ru": 166,
-                  "docker/ru-db": 167, "4slovo/anonymize-replicator": 178, "module/msm": 187, "4slovo/anon-server": 194
+                  "docker/ru-db": 167, "4slovo/anonymize-replicator": 178, "module/msm": 187, "4slovo/anon-server": 194,
+                  "docker/external_images": 201
                   }
 
 PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo",10: "4slovo.ru/4slv",  11: "4slovo.kz/crm4slovokz",
@@ -22,7 +23,8 @@ PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo",10: "4slovo.ru/4slv",  11: "4s
                     129: "almal.ge/crmalmalge", 130: "4slovo.ru/python-tests", 135: "4slovo/logging",
                     138: "4slovo/timeservice", 139: "4slovo/timeservice_client", 144: "docker/replicator",
                     154: "4slovo.ru/python-scripts", 159: "4slovo.kz/landing", 166: "docker/ru",167: "docker/ru-db",
-                    178: "4slovo/anonymize-replicator", 187: "module/msm", 194: "4slovo/anon-server"
+                    178: "4slovo/anonymize-replicator", 187: "module/msm", 194: "4slovo/anon-server",
+                    201: "docker/external_images"
                     }
 
 PROJECTS_COUNTRIES = {7: "ru", 10: "ru", 11: "kz", 12: "kz", 20: "ru", 22: "kz", 23: "ge", 24: "ge", 61: "ru",
@@ -31,7 +33,7 @@ PROJECTS_COUNTRIES = {7: "ru", 10: "ru", 11: "kz", 12: "kz", 20: "ru", 22: "kz",
                       113: "ru, kz, ge", 116: "ru, kz, ge", 117: "ru, kz, ge", 121: "ge", 125: "ru, kz, ge",
                       128: "ge", 129: "ge", 130: "ru", 135: "ru, kz, ge", 138: "ru, kz, ge", 139: "ru, kz, ge",
                       144: "ru, kz, ge", 154: "ru", 159: "kz", 166: "ru", 167: "ru", 178: "ru, kz", 187: "ru",
-                      194: "ru, kz"
+                      194: "ru, kz", 201: "ru, kz, ge"
                       }
 
 COUNTRIES = {
@@ -46,13 +48,13 @@ SYSTEM_USERS = {
         '4slovo/finance': 'ru_finance', '4slovo/fs': 'fs4slovo', '4slovo.ru/chestnoe_slovo': 'f4slovo',
         '4slovo.ru/chestnoe_slovo_backend': 'crm4slovo', '4slovo.ru/chestnoe_slovo_landing': 'n4slovo',
         '4slovo.ru/api': 'api4slovo', '4slovo.ru/4slv': 'ru_4slv', 'module/msm': 'ru_msm', 'docker/ru': '',
-        '4slovo/finance_client': 'ru_finance', '4slovo/anonymize-replicator': ''
+        '4slovo/finance_client': 'ru_finance', '4slovo/anonymize-replicator': '', 'docker/external_images': ''
     },
     'ru2': {
         '4slovo/finance': 'ru_finance', '4slovo/fs': 'ru_fs', '4slovo.ru/chestnoe_slovo': 'ru_frontend',
         '4slovo.ru/chestnoe_slovo_backend': 'ru_backend', '4slovo.ru/chestnoe_slovo_landing': 'ru_frontend_new',
         '4slovo.ru/api': 'ru_api', '4slovo.ru/4slv': 'ru_4slv', 'module/msm': 'ru_msm', 'docker/ru': '',
-        '4slovo/finance_client': 'ru_finance', '4slovo/anonymize-replicator': ''
+        '4slovo/finance_client': 'ru_finance', '4slovo/anonymize-replicator': '', 'docker/external_images': ''
     },
     'kz': {
         '4slovo/finance': 'kz_finance', '4slovo/fs': 'kz_fs', '4slovo.kz/4slovokz': 'kz_f',
@@ -79,9 +81,9 @@ STATUS_READY = ['Released to production', 'Ready for release', 'Закрыт', '
 
 TESTERS = {'i.chechikov': 76, 'm.pohilyj': 77, 'a.zemisov': 84, 'g.kozlov': 99}
 
-PROJECTS_WITH_TESTS = [11, 20, 79, 93, 94, 97, 100, 110, 166]
-PROJECTS_WITHOUT_STAGING = [22, 61, 86, 90, 91, 92, 103, 113, 116, 121, 125, 135, 138, 139]
-DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167]
+PROJECTS_WITH_TESTS = [11, 20, 79, 93, 94, 97, 100, 110, 166, 178, 187, 194, 201]
+PROJECTS_WITHOUT_STAGING = [22, 61, 86, 90, 91, 92, 103, 113, 116, 121, 125, 135, 138, 139, 178, 187, 194]
+DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167, 187, 201]
 
 GIT_LAB = 'https://gitlab'
 ISSUE_URL = 'https://jira.4slovo.ru/browse/'
