@@ -17,7 +17,7 @@ def main():
     jira_options = {'server': JIRA_SERVER}
     jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
     _, release_input, _, fix_issues, _ = get_release_details(config, jira)
-    testers = TESTERS.keys()
+    testers = list(TESTERS.keys())
     shuffle(testers)
     delta = 0 # offset for TESTERS in case of issue assign skip
     for index, issue in enumerate(fix_issues):
