@@ -8,7 +8,7 @@ PROJECTS_NAMES = {"4slovo.ru/chestnoe_slovo": 7, "4slovo.ru/4slv":10, "4slovo.kz
                   "almal.ge/almalge": 128, "almal.ge/crmalmalge": 129, "4slovo.ru/python-tests": 130,
                   "4slovo/logging": 135, "4slovo/timeservice": 138, "4slovo/timeservice_client": 139,
                   "docker/replicator": 144, "4slovo.ru/python-scripts": 154, "4slovo.kz/landing": 159, "docker/ru": 166,
-                  "docker/ru-db": 167, "4slovo/anonymize-replicator": 178, "module/msm": 187, "4slovo/anon-server": 194,
+                  "docker/ru-db": 167, "docker/fias": 172, "4slovo/anonymize-replicator": 178, "module/msm": 187, "4slovo/anon-server": 194,
                   "docker/external_images": 201, "4slovo/sumsub-client": 207
                   }
 
@@ -23,7 +23,7 @@ PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo",10: "4slovo.ru/4slv",  11: "4s
                     129: "almal.ge/crmalmalge", 130: "4slovo.ru/python-tests", 135: "4slovo/logging",
                     138: "4slovo/timeservice", 139: "4slovo/timeservice_client", 144: "docker/replicator",
                     154: "4slovo.ru/python-scripts", 159: "4slovo.kz/landing", 166: "docker/ru",167: "docker/ru-db",
-                    178: "4slovo/anonymize-replicator", 187: "module/msm", 194: "4slovo/anon-server",
+                    172: "docker/fias", 178: "4slovo/anonymize-replicator", 187: "module/msm", 194: "4slovo/anon-server",
                     201: "docker/external_images", 207: "4slovo/sumsub-client"
                     }
 
@@ -32,7 +32,7 @@ PROJECTS_COUNTRIES = {7: "ru", 10: "ru", 11: "kz", 12: "kz", 20: "ru", 22: "kz",
                       93: "ru, kz, ge", 94: "ru, kz, ge", 97: "ru, kz, ge", 100: "ge", 103: "ru, kz, ge", 110: "kz",
                       113: "ru, kz, ge", 116: "ru, kz, ge", 117: "ru, kz, ge", 121: "ge", 125: "ru, kz, ge",
                       128: "ge", 129: "ge", 130: "ru", 135: "ru, kz, ge", 138: "ru, kz, ge", 139: "ru, kz, ge",
-                      144: "ru, kz, ge", 154: "ru", 159: "kz", 166: "ru", 167: "ru", 178: "ru, kz", 187: "ru",
+                      144: "ru, kz, ge", 154: "ru", 159: "kz", 166: "ru", 167: "ru", 172: "ru, kz", 178: "ru, kz", 187: "ru",
                       194: "ru, kz", 201: "ru, kz, ge", 207: "ru, kz, ge"
                       }
 
@@ -83,9 +83,9 @@ STATUS_READY = ['Released to production', 'Ready for release', 'Закрыт', '
 
 TESTERS = {'i.chechikov': 76, 'm.pohilyj': 77, 'g.kozlov': 99}
 
-PROJECTS_WITH_TESTS = [11, 20, 61, 79, 93, 94, 97, 100, 110, 166, 178, 187, 194, 201]
-PROJECTS_WITHOUT_STAGING = [22, 61, 86, 90, 91, 92, 103, 113, 116, 121, 125, 135, 138, 139, 178, 187, 194, 207]
-DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167, 187, 201]
+PROJECTS_WITH_TESTS = [11, 20, 61, 79, 93, 94, 97, 100, 110, 166, 172, 178, 187, 194, 201]
+PROJECTS_WITHOUT_STAGING = [22, 61, 86, 90, 91, 92, 103, 113, 116, 121, 125, 135, 138, 139, 172, 178, 187, 194, 207]
+DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167, 172, 187, 201]
 
 GIT_LAB = 'https://gitlab'
 ISSUE_URL = 'https://jira.4slovo.ru/browse/'

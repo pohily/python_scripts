@@ -3,3 +3,4 @@ config.ini
 venv
 logs
 __pycache__
+.DS_Store
