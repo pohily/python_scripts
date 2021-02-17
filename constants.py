@@ -49,14 +49,14 @@ SYSTEM_USERS = {
         '4slovo.ru/chestnoe_slovo_backend': 'crm4slovo', '4slovo.ru/chestnoe_slovo_landing': 'n4slovo',
         '4slovo.ru/api': 'api4slovo', '4slovo.ru/4slv': 'ru_4slv', 'module/msm': 'ru_msm', 'docker/ru': '',
         '4slovo/finance_client': 'ru_finance', '4slovo/anonymize-replicator': '', 'docker/external_images': '',
-        'docker/finance': '', '4slovo/logging': ''
+        'docker/finance': '', '4slovo/anon-server': '', '4slovo/logging': '', '4slovo/expression': ''
     },
     'ru2': {
         '4slovo/finance': 'ru_finance', '4slovo/fs': 'ru_fs', '4slovo.ru/chestnoe_slovo': 'ru_frontend',
         '4slovo.ru/chestnoe_slovo_backend': 'ru_backend', '4slovo.ru/chestnoe_slovo_landing': 'ru_frontend_new',
         '4slovo.ru/api': 'ru_api', '4slovo.ru/4slv': 'ru_4slv', 'module/msm': 'ru_msm', 'docker/ru': '',
         '4slovo/finance_client': 'ru_finance', '4slovo/anonymize-replicator': '', 'docker/external_images': '',
-        'docker/finance': '', '4slovo/anon-server': '', '4slovo/logging': ''
+        'docker/finance': '', '4slovo/anon-server': '', '4slovo/logging': '', '4slovo/expression': ''
     },
     'kz': {
         '4slovo/finance': 'kz_finance', '4slovo/fs': 'kz_fs', '4slovo.kz/4slovokz': 'kz_f',
@@ -78,12 +78,12 @@ PRIORITY = {'Critical': '(*r) - Critical', 'Highest': '(!) - Highest', 'High': '
             'MEGA Critical': '(flag) - MEGA Critical'}
 STATUS_FOR_RELEASE = ['MEGA Critical', 'Released to production', 'Passed QA', 'In regression test', 'Ready for release',
     'Закрыт', 'Fixed', 'Closed', 'Готово'
-    ] #, 'Ready for review', 'Ready for technical solution review', 'In QA','Open', 'Ready for QA', 'In development']
+    ]#, 'Ready for review', 'Ready for technical solution review', 'In QA','Open', 'Ready for QA', 'In development']
 STATUS_READY = ['Released to production', 'Ready for release', 'Закрыт', 'Fixed', 'Closed']
 
 TESTERS = {'i.chechikov': 76, 'm.pohilyj': 77, 'g.kozlov': 99}
 
-PROJECTS_WITH_TESTS = [11, 20, 79, 93, 94, 97, 100, 110, 166, 178, 187, 194, 201]
+PROJECTS_WITH_TESTS = [11, 20, 61, 79, 93, 94, 97, 100, 110, 166, 178, 187, 194, 201]
 PROJECTS_WITHOUT_STAGING = [22, 61, 86, 90, 91, 92, 103, 113, 116, 121, 125, 135, 138, 139, 178, 187, 194, 207]
 DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167, 187, 201]
 
