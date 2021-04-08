@@ -9,7 +9,8 @@ PROJECTS_NAMES = {"4slovo.ru/chestnoe_slovo": 7, "4slovo.ru/4slv":10, "4slovo.kz
                   "4slovo/logging": 135, "4slovo/timeservice": 138, "4slovo/timeservice_client": 139,
                   "docker/replicator": 144, "4slovo.ru/python-scripts": 154, "4slovo.kz/landing": 159, "docker/ru": 166,
                   "docker/ru-db": 167, "docker/fias": 172, "4slovo/anonymize-replicator": 178, "module/msm": 187,
-                  "4slovo/anon-server": 194, "docker/external_images": 201, "4slovo/sumsub-client": 207
+                  "4slovo/anon-server": 194, "docker/external_images": 201, "sites/4slokz": 204,
+                  "4slovo/sumsub-client": 207
                   }
 
 PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo",10: "4slovo.ru/4slv",  11: "4slovo.kz/crm4slovokz",
@@ -24,7 +25,8 @@ PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo",10: "4slovo.ru/4slv",  11: "4s
                     138: "4slovo/timeservice", 139: "4slovo/timeservice_client", 144: "docker/replicator",
                     154: "4slovo.ru/python-scripts", 159: "4slovo.kz/landing", 166: "docker/ru",167: "docker/ru-db",
                     172: "docker/fias", 178: "4slovo/anonymize-replicator", 187: "module/msm",
-                    194: "4slovo/anon-server", 201: "docker/external_images", 207: "4slovo/sumsub-client"
+                    194: "4slovo/anon-server", 201: "docker/external_images", 204: "sites/4slokz",
+                    207: "4slovo/sumsub-client"
                     }
 
 PROJECTS_COUNTRIES = {7: "ru", 10: "ru", 11: "kz", 12: "kz", 20: "ru", 22: "kz", 23: "ge", 24: "ge", 61: "ru",
@@ -33,7 +35,7 @@ PROJECTS_COUNTRIES = {7: "ru", 10: "ru", 11: "kz", 12: "kz", 20: "ru", 22: "kz",
                       113: "ru, kz, ge", 116: "ru, kz, ge", 117: "ru, kz, ge", 121: "ge", 125: "ru, kz, ge",
                       128: "ge", 129: "ge", 130: "ru", 135: "ru, kz, ge", 138: "ru, kz, ge", 139: "ru, kz, ge",
                       144: "ru, kz, ge", 154: "ru", 159: "kz", 166: "ru", 167: "ru", 172: "ru, kz", 178: "ru, kz",
-                      187: "ru", 194: "ru, kz", 201: "ru, kz, ge", 207: "ru, kz, ge"
+                      187: "ru", 194: "ru, kz", 201: "ru, kz, ge", 204: "ru, kz, ge", 207: "ru, kz, ge"
                       }
 
 COUNTRIES = {
@@ -62,11 +64,11 @@ SYSTEM_USERS = {
     },
     'kz': {
         '4slovo/finance': 'kz_finance', '4slovo/fs': 'kz_fs', '4slovo.kz/4slovokz': 'kz_f',
-        '4slovo.kz/crm4slovokz': 'kz_backend_mfo', 'docker/kz': '', '4slovo/sumsub-client': ''
+        '4slovo.kz/crm4slovokz': 'kz_backend_mfo', 'docker/kz': '', '4slovo/sumsub-client': '', 'sites/4slokz': ''
     },
     'kz2': {
         '4slovo/finance': 'kz_finance', '4slovo/fs': 'kz_fileshare', '4slovo.kz/4slovokz': 'kz_frontend',
-        '4slovo.kz/crm4slovokz': 'kz_backend_mfo', 'docker/kz': '', '4slovo/sumsub-client': ''
+        '4slovo.kz/crm4slovokz': 'kz_backend_mfo', 'docker/kz': '', '4slovo/sumsub-client': '', 'sites/4slokz': ''
     }
 }
 
@@ -91,7 +93,7 @@ TESTERS = {
 }
 
 PROJECTS_WITH_TESTS = [11, 20, 61, 79, 93, 94, 97, 100, 110, 166, 172, 178, 187, 194, 201]
-PROJECTS_WITHOUT_STAGING = [22, 61, 86, 90, 91, 92, 103, 113, 116, 121, 125, 135, 138, 139, 172, 178, 194, 207]
+PROJECTS_WITHOUT_STAGING = [22, 61, 86, 90, 91, 92, 103, 113, 116, 121, 125, 135, 138, 139, 172, 178, 194, 204, 207]
 DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167, 172, 187, 201]
 
 GIT_LAB = 'https://gitlab'
