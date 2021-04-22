@@ -35,7 +35,7 @@ PROJECTS_COUNTRIES = {7: "ru", 10: "ru", 11: "kz", 12: "kz", 20: "ru", 22: "kz",
                       113: "ru, kz, ge", 116: "ru, kz, ge", 117: "ru, kz, ge", 121: "ge", 125: "ru, kz, ge",
                       128: "ge", 129: "ge", 130: "ru", 135: "ru, kz, ge", 138: "ru, kz, ge", 139: "ru, kz, ge",
                       144: "ru, kz, ge", 154: "ru", 159: "kz", 166: "ru", 167: "ru", 172: "ru, kz", 178: "ru, kz",
-                      187: "ru", 194: "ru, kz", 201: "ru, kz, ge", 204: "ru, kz, ge", 207: "ru, kz, ge"
+                      187: "ru", 194: "ru, kz", 201: "ru, kz, ge", 204: "kz", 207: "ru, kz, ge"
                       }
 
 COUNTRIES = {

@@ -53,6 +53,8 @@ def main():
         else:
             result = ssh_stdout.read().decode('utf-8').strip("\n")
             print(f'{user} ================ Ok. {result}')
+            if 'RuntimeException' in result:
+                print('\033[31m!!!!!!!!!!!!!!!!Есть ошибки!!!!!!!!!!!!!!!!!\033[0m')
         print(f'\033[34m Деплой лог для {user}\033[0m')
         input('Нажмите Enter для продолжения')
     client.close()
