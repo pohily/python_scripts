@@ -88,7 +88,7 @@ def main():
         logging.info('\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n')
         logging.info(f'\033[34m Следующие задачи не подходят для данного релиза (неправильная страна):\033[0m')
         for issue in sorted(wrong_release_issues):
-            logging.info(f'\033[31m {issue}\033[0m', sep=', ')
+            logging.info(f'\033[31m {issue}\033[0m')
 
 
 if __name__ == '__main__':
