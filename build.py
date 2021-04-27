@@ -9,12 +9,9 @@ from jira import JIRA
 
 from constants import PROJECTS_NAMES, PROJECTS_NUMBERS, RELEASE_URL, REMOTE_LINK, GIT_LAB, STATUS_FOR_RELEASE, \
     PRIORITY, ISSUE_URL, MR_STATUS, JIRA_SERVER
-from merge_requests import make_mr_to_rc, make_mr_to_staging, make_mr_to_master, delete_create_RC, merge_rc, \
-    is_merged
+from merge_requests import Build
 from send_notifications import get_release_details
 
-docker = False  # флаг наличия мерджей на докер
-confluence = ''  # ссылка на отчет о тестировании
 Merge_request = namedtuple('Merge_request', ['url', 'iid', 'project', 'issue'])  # iid - номер МР в url'е, project - int
 
 
@@ -26,16 +23,14 @@ def get_merge_requests(config, issue_number, return_merged=None):
     links_json = requests.get(url=REMOTE_LINK.format(issue_number),
                                  auth=(config['user_data']['login'], config['user_data']['jira_password'])).json()
     for link in links_json:
-        global confluence
-        if not confluence:
+        if not build.confluence:
             if 'confluence' in link['object']['url'] and link['relationship'] == "mentioned in":
-                confluence = link['object']['url']
+                build.confluence = link['object']['url']
         if 'commit' in link['object']['url'] or GIT_LAB not in link['object']['url']:
             continue
         # для предупреждения о запуске тесто после сборки контейнеров
         if 'docker' in link['object']['url'] or 'msm' in link['object']['url']:
-            global docker
-            docker = True
+            build.docker = True
         url_parts = link['object']['url'].split('/')
         if len(url_parts) < 6:
             continue
@@ -56,7 +51,7 @@ def get_merge_requests(config, issue_number, return_merged=None):
         if return_merged:
             result.append(merge)
         else:
-            if not is_merged(config, merge):
+            if not build.is_merged(config, merge):
                 result.append(merge)
     return result
 
@@ -73,7 +68,7 @@ def get_links(config, merges):
         #
         logging.info(f'Пытаемся сделать MR из {merge.issue} в {RC_name} в {PROJECTS_NUMBERS[merge.project]}')
 
-        status, url, mr = make_mr_to_rc(config, merge, RC_name)
+        status, url, mr = build.make_mr_to_rc(config, merge, RC_name)
         if MR_STATUS['can_be_merged'] not in status:
             logging.warning(f"Конфликт в задаче {merge.issue} в {merge.project}")
             conflict = True
@@ -102,7 +97,7 @@ def get_links(config, merges):
         if not conflict:
             mr = statuses[line][1]
             logging.info(f"Мержим {issue_number} в {RC_name} в {mr.attributes['references']['full']}")
-            status = merge_rc(config, mr)
+            status = build.merge_rc(config, mr)
         statuses[line].append(status)  # 3
 
     result = ''
@@ -123,6 +118,8 @@ if __name__ == '__main__':
     format = u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s'
     logging.basicConfig(level=level, format=format, handlers=handlers)
     logging.info('--------------Начало сборки----------------')
+
+    build = Build()
     with open('logs/message.txt', 'w') as file:
         config = ConfigParser()
         config.read('config.ini')
@@ -190,7 +187,7 @@ if __name__ == '__main__':
         #
         logging.info('Удаляем и создаем RC')
         for project in used_projects:
-            delete_create_RC(config, project, RC_name)
+            build.delete_create_RC(config, project, RC_name)
         #
         #           Заполняем таблицу
         #
@@ -200,13 +197,13 @@ if __name__ == '__main__':
             result = get_links(config, merge_requests[issue_number])
             message += f"|{index + MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]|{priority}|{result}\r\n"
 
-        if confluence:
-            message += f'\n\r[*Отчет о тестировании*.|{confluence}]\n\r'
+        if build.confluence:
+            message += f'\n\r[*Отчет о тестировании*.|{build.confluence}]\n\r'
         #
         #           Создаем MR RC -> Staging, RC -> Master для Docker и проектов без стейджинга
         #
         logging.info('Делаем МР RC -> Staging, RC -> Master')
-        rc_master_links, staging_links = make_mr_to_staging(config, used_projects, RC_name, docker)
+        rc_master_links, staging_links = build.make_mr_to_staging(config, used_projects, RC_name)
         #
         #           RC -> Staging
         #
@@ -218,7 +215,7 @@ if __name__ == '__main__':
         #           Создаем MR Staging -> Master
         #
         logging.info('Делаем МР Staging -> Master')
-        master_links = make_mr_to_master(config, used_projects)
+        master_links = build.make_mr_to_master(config, used_projects)
         #
         #           Staging -> Master
         #
