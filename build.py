@@ -68,6 +68,7 @@ def get_links(config, merges, build):
         #
         #           Пытаемся создать MR из текущей задачи в RC. Выводим статус в таблицу
         #
+        logging.info('------------------------------------------')
         logging.info(f'Пытаемся сделать MR из {merge.issue} в {RC_name} в {PROJECTS_NUMBERS[merge.project]}')
 
         status, url, mr = build.make_mr_to_rc(config, merge, RC_name)
@@ -87,7 +88,6 @@ def get_links(config, merges, build):
             logging.exception(f'Проверьте задачу {issue_number} - некорректная ссылка {url}')
             continue
         statuses[index].append(f'[{url_parts[3]}/{url_parts[4]}/{iid}|{url}]')  # 2
-        logging.info(status)
     #
     #           Мержим MR из текущей задачи в RC
     #
@@ -98,7 +98,6 @@ def get_links(config, merges, build):
     for line in range(len(statuses)):
         if not conflict:
             mr = statuses[line][1]
-            logging.info(f"Мержим {issue_number} в {RC_name} в {mr.attributes['references']['full']}")
             status = build.merge_rc(config, mr)
         statuses[line].append(status)  # 3
 
@@ -193,11 +192,15 @@ if __name__ == '__main__':
         #
         #           Заполняем таблицу
         #
+        logging.info('-----------------')
         logging.info('Заполняем таблицу')  # делаем МР в RC и заполняем таблицу ссылками и статусами МР
         for index, issue_number in enumerate(sorted(issues_list)):
             priority = issues_list[issue_number]
             result = get_links(config, merge_requests[issue_number], build)
-            message += f"|{index + MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]|{priority}|{result}\r\n"
+            message += f"|{index + MRless_issues_number}|" \
+                       f"[{issue_number}|" \
+                       f"{ISSUE_URL}{issue_number}]|" \
+                       f"{priority}|{result}\r\n"
 
         if build.confluence:
             message += f'\n\r[*Отчет о тестировании*.|{build.confluence}]\n\r'
@@ -278,6 +281,3 @@ if __name__ == '__main__':
         #
         file.write(message)
 
-        #todo
-        # запуск скрипта на гитлабе вебхуком от жиры
-        # развернуть стенд на нужных ветках и запустить тесты в гитлабе и регресс (в Дженкинс?)

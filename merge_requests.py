@@ -5,17 +5,17 @@ from time import sleep
 
 import gitlab
 import requests
-from jira import JIRA
 
 from constants import MR_STATUS, MR_BY_IID, PROJECTS_WITH_TESTS, DOCKER_PROJECTS, PROJECTS_NUMBERS, \
-    PROJECTS_COUNTRIES, TEST, PROJECTS_WITHOUT_STAGING, JIRA_SERVER
-from send_notifications import get_release_details
+    PROJECTS_COUNTRIES, TEST, PROJECTS_WITHOUT_STAGING
 
 
 class Build:
 
     def __init__(self):
-        self.Merge_request_details = namedtuple('Merge_request_details', ['merge_status', 'source_branch', 'target_branch', 'state'])
+        self.Merge_request_details = namedtuple(
+            'Merge_request_details', ['merge_status', 'source_branch', 'target_branch', 'state']
+        )
         self.merge_fail = False     # наличие незамерженных МР
         self.docker = False         # наличие докера в релизе
         self.confluence = ''        # ссылка на конфлуенс
@@ -42,7 +42,7 @@ class Build:
         if details:
             details = details[0]
             return self.Merge_request_details(
-                MR_STATUS[details['has_conflicts']], details['source_branch'], details['target_branch'], details['state']
+               MR_STATUS[details['has_conflicts']], details['source_branch'], details['target_branch'], details['state']
             )
         else:
             logging.error(f'MR не найден {MR}')
@@ -94,7 +94,9 @@ class Build:
                                                'title': f"{(MR.issue).replace('-', '_')} -> {RC_name}",
                                                'target_project_id': MR.project,
                                                })
-        merge_status, _, _, _ = self.get_merge_request_details(config, (1, mr.attributes['iid'], mr.attributes['project_id'], 1))
+        merge_status, _, _, _ = self.get_merge_request_details(
+            config, (1, mr.attributes['iid'], mr.attributes['project_id'], 1)
+        )
         status += merge_status
         url = mr.attributes['web_url']
         return status, url, mr
@@ -105,8 +107,8 @@ class Build:
 
         gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
         if not isinstance(MR, bool) and MR.attributes['state'] != 'merged':
-            logging.info(f"Try to merge MR {MR.attributes['iid']} with merge_status {MR.attributes['merge_status']}, "
-                         f"has_conflicts - {MR.attributes['has_conflicts']} from {MR.attributes['source_branch']} to RC")
+            logging.info(f"Мержим MR {MR.attributes['iid']} merge_status={MR.attributes['merge_status']}, "
+                         f"has_conflicts={MR.attributes['has_conflicts']}, из {MR.attributes['source_branch']} в RC")
             try:
                 MR.merge()
                 logging.info('OK')
@@ -159,15 +161,15 @@ class Build:
             else:
                 staging_links.append(mr.attributes['web_url'])
 
-            # Делаем коммит с названием последнего билда - раньше запускал тесты и билд контейнеров докера, сейчас отключили
-            # автоматический запуск тестов - запускаю дальше вручную
+            # Делаем коммит с названием последнего билда - раньше запускал тесты и билд контейнеров докера,
+            # сейчас отключили автоматический запуск тестов - запускаю дальше вручную
             if pr in tests:
                 try:
                     project.branches.get(RC_name)   # если в проекте нет RC,то и коммит не нужен
                     try:
                         commit_json = {
                             "branch": f"{RC_name}",
-                            "commit_message": "start pipeline commit",
+                            "commit_message": "actualize last_build",
                             "actions": [
                                 {
                                     "action": "update",
@@ -180,7 +182,7 @@ class Build:
                     except gitlab.exceptions.GitlabCreateError:
                         commit_json = {
                             "branch": f"{RC_name}",
-                            "commit_message": "start pipeline commit",
+                            "commit_message": "actualize last_build",
                             "actions": [
                                 {
                                     "action": "create",
@@ -232,22 +234,19 @@ class Build:
 if __name__ == '__main__':
     config = ConfigParser()
     config.read('config.ini')
-    # jira_options = {'server': JIRA_SERVER}
-    # jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
-    # issue = jira.issue('SLOV-5358')
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
-    user_id = 0
-    u = []
-    for number in range (150):
-        try:
-            u.append(gl.users.get(number))
-        except:
-            pass
-    users = gl.users.list()
-    for user in users:
-        if user.attributes['username'] == config['user_data']['login']:
-            user_id = user.attributes['id']
-    project = gl.projects.get(20)
+    # user_id = 0
+    # u = []
+    # for number in range (150):
+    #     try:
+    #         u.append(gl.users.get(number))
+    #     except:
+    #         pass
+    # users = gl.users.list()
+    # for user in users:
+    #     if user.attributes['username'] == config['user_data']['login']:
+    #         user_id = user.attributes['id']
+    project = gl.projects.get(11)
     pipelines = project.pipelines.list()
     for pipeline in pipelines:
         if pipeline.attributes['ref'] == 'rc-ru-6-1-97' and pipeline.attributes['status'] == 'skipped':

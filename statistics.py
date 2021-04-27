@@ -74,7 +74,7 @@ def main():
         if access_level < 30:
             reporter.append(project)
     logging.info(f'\033[34m В релизе {release_input} \033[31m{len(fix_issues)}\033[34m задач(-a, -и)\033[0m')
-    logging.info(f'\033[34m Из них \033[31m{issue_count}\033[34m задач(-a, -и) с изменениями в статусах выше "Passed QA".\033[0m')
+    logging.info(f'\033[34m Из них \033[31m{issue_count}\033[34m задач в статусах выше "Passed QA".\033[0m')
     logging.info(f'\033[34m Изменения в них затронули \033[31m {len(used_projects)} \033[34m проект(-а, '
           f'-ов): \033[31m {", ".join(sorted(projects))}. \033[0m')
     if reporter:
