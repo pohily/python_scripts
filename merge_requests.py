@@ -115,7 +115,7 @@ class Build:
                 sleep(2)  # 2nd try
                 try:
                     MR.merge()
-                    logging.info('OK')
+                    logging.info('2 Try. OK')
                     return '(/) Влит'
                 except:
                     self.merge_fail = True

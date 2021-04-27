@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import logging
 import shelve
 from collections import defaultdict, namedtuple
@@ -15,7 +17,7 @@ from send_notifications import get_release_details
 Merge_request = namedtuple('Merge_request', ['url', 'iid', 'project', 'issue'])  # iid - номер МР в url'е, project - int
 
 
-def get_merge_requests(config, issue_number, return_merged=None):
+def get_merge_requests(config, issue_number, build, return_merged=None):
     """ Ищет ссылки на невлитые МР в задаче и возвращает их список
     :return_merged: передается True если надо вернуть влитые МР, обычно возвращаются только невлитые"""
 
@@ -56,7 +58,7 @@ def get_merge_requests(config, issue_number, return_merged=None):
     return result
 
 
-def get_links(config, merges):
+def get_links(config, merges, build):
     """ принимает список кортежей МР одной задачи. Делает МР SLOV -> RC.
     Заполняет таблицу ссылками на SLOV -> RC и статусами SLOV -> RC """
 
@@ -162,7 +164,7 @@ if __name__ == '__main__':
         MRless_issues = []
         if issues_list:
             for issue_number in issues_list:
-                MR_count = get_merge_requests(config, issue_number)  # возвращаются только невлитые МР
+                MR_count = get_merge_requests(config, issue_number, build)  # возвращаются только невлитые МР
                 if not MR_count: # если в задаче нет МР вносим задачу в таблицу
                     message += f"|{MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]|" \
                                f"{issues_list[issue_number]}| Нет изменений |(/)|\r\n"
@@ -194,7 +196,7 @@ if __name__ == '__main__':
         logging.info('Заполняем таблицу')  # делаем МР в RC и заполняем таблицу ссылками и статусами МР
         for index, issue_number in enumerate(sorted(issues_list)):
             priority = issues_list[issue_number]
-            result = get_links(config, merge_requests[issue_number])
+            result = get_links(config, merge_requests[issue_number], build)
             message += f"|{index + MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]|{priority}|{result}\r\n"
 
         if build.confluence:
