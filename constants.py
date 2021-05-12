@@ -50,7 +50,7 @@ SYSTEM_USERS = {
         '4slovo/finance': 'ru_finance', '4slovo/fs': 'fs4slovo', '4slovo.ru/chestnoe_slovo': 'f4slovo',
         '4slovo.ru/chestnoe_slovo_backend': 'crm4slovo', '4slovo.ru/chestnoe_slovo_landing': 'n4slovo',
         '4slovo.ru/api': 'api4slovo', '4slovo.ru/4slv': 'ru_4slv', 'module/msm': '', 'docker/ru': '',
-        '4slovo/finance_client': 'ru_finance', '4slovo/anonymize-replicator': '', 'docker/external_images': '',
+        '4slovo/finance_client': '', '4slovo/anonymize-replicator': '', 'docker/external_images': '',
         'docker/finance': '', '4slovo/anon-server': '', '4slovo/logging': '', '4slovo/expression': '',
         '4slovo.ru/common': '', '4slovo/common': '', '4slovo/sawmill': ''
     },
@@ -58,7 +58,7 @@ SYSTEM_USERS = {
         '4slovo/finance': 'ru_finance', '4slovo/fs': 'ru_fs', '4slovo.ru/chestnoe_slovo': 'ru_frontend',
         '4slovo.ru/chestnoe_slovo_backend': 'ru_backend', '4slovo.ru/chestnoe_slovo_landing': 'ru_frontend_new',
         '4slovo.ru/api': 'ru_api', '4slovo.ru/4slv': 'ru_4slv', 'module/msm': '', 'docker/ru': '',
-        '4slovo/finance_client': 'ru_finance', '4slovo/anonymize-replicator': '', 'docker/external_images': '',
+        '4slovo/finance_client': '', '4slovo/anonymize-replicator': '', 'docker/external_images': '',
         'docker/finance': '', '4slovo/anon-server': '', '4slovo/logging': '', '4slovo/expression': '',
         '4slovo.ru/common': '', '4slovo/common': '', '4slovo/sawmill': ''
     },
