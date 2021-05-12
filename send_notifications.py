@@ -41,7 +41,6 @@ def get_release_details(config, jira, date=False, release=False):
     country = release_input.split('.')[0].lower()
     release_country = COUNTRIES[country]
     fix_id = fix_issues[0].fields.fixVersions[0].id
-    logging.info(f'Для релиза {release_input}')
     return fix_date, release_input, release_country, fix_issues, fix_id
 
 
