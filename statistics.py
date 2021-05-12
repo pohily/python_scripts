@@ -1,16 +1,18 @@
+# -*- coding: utf-8 -*-
+
 import logging
+import os
 from configparser import ConfigParser
 from itertools import chain
 from re import sub
-import os
 
 import gitlab
 from jira import JIRA
 
 from build import get_merge_requests
 from constants import STATUS_FOR_RELEASE, PROJECTS_COUNTRIES, PROJECTS_NUMBERS, JIRA_SERVER, TESTERS
+from merge_requests import Build
 from send_notifications import get_release_details
-from merge_requests import get_merge_request_details
 
 """ Показывает статистику по запрошенному релизу: количество задач, проектов и названия проектов, 
 также показываются задачи, которые не подходят для данного релиза (неправильная страна).
@@ -28,6 +30,8 @@ def main():
     handlers = [logging.FileHandler('logs/log.txt'), logging.StreamHandler()]
     format = u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s'
     logging.basicConfig(level=level, format=format, handlers=handlers)
+
+    build = Build()
     _, release_input, _, fix_issues, _ = get_release_details(config, jira)
     logging.info(f'Статистика релиза {release_input}')
     used_projects = set()
@@ -47,9 +51,9 @@ def main():
                 post_deploy.append((issue_number.key, pd))
         else:
             continue
-        MR_count = get_merge_requests(config, issue_number)
+        MR_count = get_merge_requests(config, issue_number, build)
         for merge in MR_count:
-            status, _, _, _ = get_merge_request_details(config, merge)
+            status, _, _, _ = build.get_merge_request_details(config, merge)
             if status != '(/) Нет конфликтов, ':
                 logging.exception(f'\033[31m Конфликт в задаче {merge.issue} в мердж реквесте {merge.url}\033[0m')
             used_projects.add(merge.project)
@@ -70,7 +74,7 @@ def main():
         if access_level < 30:
             reporter.append(project)
     logging.info(f'\033[34m В релизе {release_input} \033[31m{len(fix_issues)}\033[34m задач(-a, -и)\033[0m')
-    logging.info(f'\033[34m Из них \033[31m{issue_count}\033[34m задач(-a, -и) с изменениями в статусах выше "Passed QA".\033[0m')
+    logging.info(f'\033[34m Из них \033[31m{issue_count}\033[34m задач в статусах выше "Passed QA".\033[0m')
     logging.info(f'\033[34m Изменения в них затронули \033[31m {len(used_projects)} \033[34m проект(-а, '
           f'-ов): \033[31m {", ".join(sorted(projects))}. \033[0m')
     if reporter:
