@@ -192,7 +192,7 @@ if __name__ == '__main__':
         #
         #           Заполняем таблицу
         #
-        logging.info('-----------------')
+        logging.info('------------------------------------------')
         logging.info('Заполняем таблицу')  # делаем МР в RC и заполняем таблицу ссылками и статусами МР
         for index, issue_number in enumerate(sorted(issues_list)):
             priority = issues_list[issue_number]
@@ -207,6 +207,7 @@ if __name__ == '__main__':
         #
         #           Создаем MR RC -> Staging, RC -> Master для Docker и проектов без стейджинга
         #
+        logging.info('------------------------------------------')
         logging.info('Делаем МР RC -> Staging, RC -> Master')
         rc_master_links, staging_links = build.make_mr_to_staging(config, used_projects, RC_name)
         #
