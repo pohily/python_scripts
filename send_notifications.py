@@ -77,6 +77,7 @@ if __name__ == '__main__':
     jira_options = {'server': JIRA_SERVER}
     jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
     release_date, release_name, release_country, release_issues, _ = get_release_details(config, jira, date=True)
+    logging.info(f'для релиза {release_name}')
     issues_of_release_link = RELEASE_ISSUES_URL.format(release_name)
     issues_list = {}
     message = get_release_message(release_date, release_country, release_name)
