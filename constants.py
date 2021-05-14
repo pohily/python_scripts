@@ -52,7 +52,7 @@ SYSTEM_USERS = {
         '4slovo.ru/api': 'api4slovo', '4slovo.ru/4slv': 'ru_4slv', 'module/msm': '', 'docker/ru': '',
         '4slovo/finance_client': '', '4slovo/anonymize-replicator': '', 'docker/external_images': '',
         'docker/finance': '', '4slovo/anon-server': '', '4slovo/logging': '', '4slovo/expression': '',
-        '4slovo.ru/common': '', '4slovo/common': '', '4slovo/sawmill': ''
+        '4slovo.ru/common': '', '4slovo/common': '', '4slovo/sawmill': '', 'docker/ru-db': ''
     },
     'ru2': {
         '4slovo/finance': 'ru_finance', '4slovo/fs': 'ru_fs', '4slovo.ru/chestnoe_slovo': 'ru_frontend',
@@ -60,7 +60,7 @@ SYSTEM_USERS = {
         '4slovo.ru/api': 'ru_api', '4slovo.ru/4slv': 'ru_4slv', 'module/msm': '', 'docker/ru': '',
         '4slovo/finance_client': '', '4slovo/anonymize-replicator': '', 'docker/external_images': '',
         'docker/finance': '', '4slovo/anon-server': '', '4slovo/logging': '', '4slovo/expression': '',
-        '4slovo.ru/common': '', '4slovo/common': '', '4slovo/sawmill': ''
+        '4slovo.ru/common': '', '4slovo/common': '', '4slovo/sawmill': '', 'docker/ru-db': ''
     },
     'kz': {
         '4slovo/finance': 'kz_finance', '4slovo/fs': 'kz_fs', '4slovo.kz/4slovokz': 'kz_f',
