@@ -1,3 +1,7 @@
+from configparser import ConfigParser
+
+import gitlab
+
 PROJECTS_NAMES = {"4slovo.ru/chestnoe_slovo": 7, "4slovo.ru/4slv":10, "4slovo.kz/crm4slovokz": 11,
                   "4slovo.kz/4slovokz": 12, "4slovo.ru/chestnoe_slovo_backend": 20, "4slovo.ru/common": 22,
                   "mrloan.ge/mrloange": 23, "mrloan.ge/crmmrloange": 24, "4slovo.ru/fias": 61,
@@ -95,7 +99,7 @@ TESTERS = {
 }
 
 PROJECTS_WITH_TESTS = [11, 20, 61, 79, 93, 94, 97, 100, 110, 166, 172, 178, 187, 194, 201]
-PROJECTS_WITHOUT_STAGING = [22, 61, 86, 90, 91, 92, 103, 113, 116, 121, 125, 135, 138, 139, 172, 178, 194, 204, 207]
+PROJECTS_WITHOUT_STAGING = [22, 86, 90, 91, 92, 103, 113, 116, 121, 125, 135, 138, 139, 172, 178, 194, 204, 207]
 DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167, 172, 187, 201]
 
 GIT_LAB = 'https://gitlab'
@@ -112,11 +116,17 @@ SMTP_SERVER = 'smtp.4slovo.ru'
 TEST = False
 
 if __name__ == '__main__':
-    import re
-    with open('/Users/user/Desktop/1.txt', 'r') as text:
-        for line in text:
-            pids = re.findall(r'2785\d+', line)
-    with open('/Users/user/Desktop/2.csv', 'w') as file:
-        for pid in sorted(set(pids)):
-            line = str(pid) + '\n'
-            file.write(line)
+    config = ConfigParser()
+    config.read('config.ini')
+    gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
+    user_id = 0  # находим id нового сотрудника
+    u = []
+    for number in range (150):
+        try:
+            u.append(gl.users.get(number))
+        except:
+            pass
+    users = gl.users.list()
+    for user in users:
+        if user.attributes['username'] == config['user_data']['login']:
+            user_id = user.attributes['id']

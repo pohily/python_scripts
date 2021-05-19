@@ -235,17 +235,6 @@ if __name__ == '__main__':
     config = ConfigParser()
     config.read('config.ini')
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
-    # user_id = 0
-    # u = []
-    # for number in range (150):
-    #     try:
-    #         u.append(gl.users.get(number))
-    #     except:
-    #         pass
-    # users = gl.users.list()
-    # for user in users:
-    #     if user.attributes['username'] == config['user_data']['login']:
-    #         user_id = user.attributes['id']
     project = gl.projects.get(11)
     pipelines = project.pipelines.list()
     for pipeline in pipelines:
