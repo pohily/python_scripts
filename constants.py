@@ -99,8 +99,53 @@ TESTERS = {
 }
 
 PROJECTS_WITH_TESTS = [11, 20, 61, 79, 93, 94, 97, 100, 110, 166, 172, 178, 187, 194, 201]
-PROJECTS_WITHOUT_STAGING = [22, 86, 90, 91, 92, 103, 113, 116, 121, 125, 135, 138, 139, 172, 178, 194, 204, 207]
+"""
+        11: 4slovo.kz/crm4slovokz
+        20: 4slovo.ru/chestnoe_slovo_backend
+        61: 4slovo.ru/fias
+        79: 4slovo.ru/api
+        93: 4slovo/finance
+        94: docker/finance
+        97: docker/api
+        100: docker/ge
+        110: docker/kz
+        166: docker/ru
+        172: docker/fias
+        178: 4slovo/anonymize-replicator
+        187: module/msm
+        194: 4slovo/anon-server
+        201: docker/external_images
+"""
+PROJECTS_WITHOUT_STAGING = [22, 86, 90, 91, 92, 103, 113, 116, 121, 125, 135, 138, 139, 178, 194, 204, 207]
+"""
+        90: 4slovo/sawmill
+        91: 4slovo/common
+        92: 4slovo/inn
+        103: 4slovo/finance_client
+        113: 4slovo/rabbitclient
+        116: 4slovo/fs-client
+        121: 4slovo/enum-generator
+        125: 4slovo/expression
+        135: 4slovo/logging
+        138: 4slovo/timeservice
+        139: 4slovo/timeservice_client
+        178: 4slovo/anonymize-replicator
+        194: 4slovo/anon-server
+        204: sites/4slokz
+        207: 4slovo/sumsub-client
+"""
 DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167, 172, 187, 201]
+"""
+        94: docker/finance
+        97: docker/api
+        100: docker/ge
+        110: docker/kz
+        166: docker/ru
+        167: docker/ru-db
+        172: docker/fias
+        187: module/msm
+        201: docker/external_images
+"""
 
 GIT_LAB = 'https://gitlab'
 ISSUE_URL = 'https://jira.4slovo.ru/browse/'

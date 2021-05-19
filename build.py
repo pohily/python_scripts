@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import logging
-import shelve
 from collections import defaultdict, namedtuple
 from configparser import ConfigParser
 import os
