@@ -48,16 +48,13 @@ class Build:
             logging.error(f'MR не найден {MR}')
             return self.Merge_request_details('MR не найден', '', '', '')
 
-    def is_merged(self, config, merge):
+    def is_merged(self, config, merge) -> bool:
         """ Возвращаем статус МР в мастер """
         gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
         pr = gl.projects.get(f'{merge.project}')
         _, source, _, _ = self.get_merge_request_details(config, merge)
         mr = pr.mergerequests.list(state='merged', source_branch=source, target_branch='master')
-        if mr:
-            return True
-        else:
-            return False
+        return bool(mr)
 
     def make_mr_to_rc(self, config, MR, RC_name):
         """ Создаем МР slov -> RC. Возвращем статус МР, его url и сам МР"""
@@ -121,7 +118,7 @@ class Build:
                     return '(/) Влит'
                 except:
                     self.merge_fail = True
-                    logging.error(f"{MR.attributes['iid']} НЕ ВЛИТ!")
+                    logging.error(f"{MR.attributes['iid']} НЕ ВЛИТ! - Конфликт?")
                     return '(x) Не влит'
 
     def make_mr_to_staging(self, config, projects, RC_name):
@@ -235,17 +232,6 @@ if __name__ == '__main__':
     config = ConfigParser()
     config.read('config.ini')
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
-    # user_id = 0
-    # u = []
-    # for number in range (150):
-    #     try:
-    #         u.append(gl.users.get(number))
-    #     except:
-    #         pass
-    # users = gl.users.list()
-    # for user in users:
-    #     if user.attributes['username'] == config['user_data']['login']:
-    #         user_id = user.attributes['id']
     project = gl.projects.get(11)
     pipelines = project.pipelines.list()
     for pipeline in pipelines:

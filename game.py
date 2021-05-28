@@ -56,19 +56,4 @@ def main(month):
 if __name__ == '__main__':
     month = 3
     main(month)
-    # import requests
-    # import json
-    # config = ConfigParser()
-    # config.read('config.ini')
-    # url = "https://jira.4slovo.ru/rest/api/2/issue/22904/changelog"
-    # auth=(config['user_data']['login'], config['user_data']['jira_password'])
-    # headers = {
-    #     "Accept": "application/json"
-    # }
-    # response = requests.request(
-    #     "GET",
-    #     url,
-    #     headers=headers,
-    #     auth=auth
-    # )
-    # print(json.dumps(json.loads(response.text), sort_keys=True, indent=4, separators=(",", ": ")))
+

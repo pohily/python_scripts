@@ -98,4 +98,3 @@ if __name__ == '__main__':
             logging.exception('Страна для релиза не определена')
             raise Exception('Страна для релиза не определена')
         send_mail(release_country, release_name, country_key, message, config)
-

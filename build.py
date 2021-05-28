@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import logging
-import shelve
 from collections import defaultdict, namedtuple
 from configparser import ConfigParser
 import os
@@ -181,8 +180,6 @@ if __name__ == '__main__':
             if MRless_issues:  # убираем задачу без МР из списка задач для сборки RC
                 for item in MRless_issues:
                     issues_list.pop(item)
-        with shelve.open('logs/used_projects') as projects:  # сохраняем использованные проекты на диске
-            projects[f'{RC_name}'] = list(used_projects)
         #
         #           Удаляем и создаем RC
         #
