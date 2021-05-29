@@ -23,7 +23,8 @@ def main(month):
                        "testing_point numeric default 0,  "
                        "bonus_point numeric default 1, "
                        "fine_point numeric default 1,"
-                       "review_point numeric default 0)")
+                       "review_point numeric default 0,"
+                       "regress_point numeric default 0)")
         config = ConfigParser()
         config.read('config.ini')
         jira_options = {'server': JIRA_SERVER}
@@ -52,7 +53,7 @@ def main(month):
                     f"'{creator}'," \
                     f"'{issue.fields.assignee.displayName}'," \
                     f"'стейджинг'," \
-                    f"'', '', '', '', '')"
+                    f"'', '', '', '', '', '')"
             cursor.execute(query)
             index += 1
         # вносим данные по влитым задачам AT
@@ -67,7 +68,7 @@ def main(month):
                             f"'{mr.attributes['source_branch']}'," \
                             f"''," \
                             f"'{mr.attributes['merged_at'].split('T')[0]}'," \
-                            f"'','', '{action}', '', '', '', '', '')"
+                            f"'','', '{action}', '', '', '', '', '', '')"
                     cursor.execute(query)
                     index += 1
             else:
