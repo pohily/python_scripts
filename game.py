@@ -24,7 +24,8 @@ def main(month):
                        "bonus_point numeric default 1, "
                        "fine_point numeric default 1,"
                        "review_point numeric default 0,"
-                       "regress_point numeric default 0)")
+                       "regress_point numeric default 0,"
+                       "development_point numeric default 0)")
         config = ConfigParser()
         config.read('config.ini')
         jira_options = {'server': JIRA_SERVER}
@@ -53,7 +54,7 @@ def main(month):
                     f"'{creator}'," \
                     f"'{issue.fields.assignee.displayName}'," \
                     f"'стейджинг'," \
-                    f"'', '', '', '', '', '')"
+                    f"'', '', '1', '1', '', '', '')"
             cursor.execute(query)
             index += 1
         # вносим данные по влитым задачам AT
@@ -63,12 +64,19 @@ def main(month):
         for mr in mrs:
             if datetime.strptime(mr.attributes['merged_at'].split('T')[0], '%Y-%m-%d').month == month:
                 for action in ['создание', 'разработка', 'ревью']:
+                    if action == 'разработка':
+                        creator = mr.attributes['author']['name']
+                    else:
+                        creator = ''
                     query = f"insert into data values (" \
                             f"{index + 1}," \
                             f"'{mr.attributes['source_branch']}'," \
                             f"''," \
                             f"'{mr.attributes['merged_at'].split('T')[0]}'," \
-                            f"'','', '{action}', '', '', '', '', '', '')"
+                            f"'{creator}'," \
+                            f"''," \
+                            f"'{action}'," \
+                            f"'', '', '1', '1', '', '', '')"
                     cursor.execute(query)
                     index += 1
             else:
