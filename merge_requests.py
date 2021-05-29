@@ -232,11 +232,13 @@ if __name__ == '__main__':
     config = ConfigParser()
     config.read('config.ini')
     gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
-    project = gl.projects.get(11)
-    pipelines = project.pipelines.list()
-    for pipeline in pipelines:
-        if pipeline.attributes['ref'] == 'rc-ru-6-1-97' and pipeline.attributes['status'] == 'skipped':
-            pipeline_job = pipeline.jobs.list()[0]
-            job = project.jobs.get(pipeline_job.id, lazy=True)
-            job.play()
-            break
+    project = gl.projects.get(130)
+    mr = project.mergerequests.list(state='merged', target_branch='master')
+    pass
+    # pipelines = project.pipelines.list()
+    # for pipeline in pipelines:
+    #     if pipeline.attributes['ref'] == 'rc-ru-6-1-97' and pipeline.attributes['status'] == 'skipped':
+    #         pipeline_job = pipeline.jobs.list()[0]
+    #         job = project.jobs.get(pipeline_job.id, lazy=True)
+    #         job.play()
+    #         break
