@@ -25,8 +25,11 @@ def get_merge_requests(config, issue_number, build, return_merged=None):
                                  auth=(config['user_data']['login'], config['user_data']['jira_password'])).json()
     for link in links_json:
         if not build.confluence:
-            if 'confluence' in link['object']['url'] and link['relationship'] == "mentioned in":
-                build.confluence = link['object']['url']
+            try:
+                if 'confluence' in link['object']['url'] and link['relationship'] == "mentioned in":
+                    build.confluence = link['object']['url']
+            except KeyError:  # у ссылок на отчеты о тестировании нет 'relationship'
+                pass
         if 'commit' in link['object']['url'] or GIT_LAB not in link['object']['url']:
             continue
         # для предупреждения о запуске тесто после сборки контейнеров
