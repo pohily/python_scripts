@@ -2,55 +2,11 @@
 
 import logging
 import os
-from collections import defaultdict, namedtuple
+from collections import defaultdict
 
-import requests
-
-from constants import PROJECTS_NAMES, PROJECTS_NUMBERS, RELEASE_URL, REMOTE_LINK, GIT_LAB, STATUS_FOR_RELEASE, \
+from constants import PROJECTS_NUMBERS, RELEASE_URL, GIT_LAB, STATUS_FOR_RELEASE, \
     PRIORITY, ISSUE_URL, MR_STATUS
 from merge_requests import Build
-
-Merge_request = namedtuple('Merge_request', ['url', 'iid', 'project', 'issue'])  # iid - номер МР в url'е, project - int
-
-
-def get_merge_requests(config, issue_number, build, return_merged=None):
-    """ Ищет ссылки на невлитые МР в задаче и возвращает их список
-    :return_merged: передается True если надо вернуть влитые МР, обычно возвращаются только невлитые"""
-
-    result = []
-    links_json = requests.get(url=REMOTE_LINK.format(issue_number),
-                                 auth=(config['user_data']['login'], config['user_data']['jira_password'])).json()
-    for link in links_json:
-        if 'confluence' in link['object']['url']:
-            continue
-        if 'commit' in link['object']['url'] or GIT_LAB not in link['object']['url']:
-            continue
-        # для предупреждения о запуске тесто после сборки контейнеров
-        if 'docker' in link['object']['url'] or 'msm' in link['object']['url']:
-            build.docker = True
-        url_parts = link['object']['url'].split('/')
-        if len(url_parts) < 6:
-            continue
-        try:
-            project = PROJECTS_NAMES[f'{url_parts[3]}/{url_parts[4]}']
-        except KeyError as e:
-            logging.exception(f'Проверьте задачу {issue_number} - не найден проект {url_parts[3]}/{url_parts[4]}')
-            continue
-        # в связи с обновлением gitlab поменялись url 11/03/20:
-        if GIT_LAB in link['object']['url'] and url_parts[6].isdigit():
-            iid = url_parts[6]
-        elif GIT_LAB in link['object']['url'] and url_parts[7].isdigit():
-            iid = url_parts[7]
-        else:
-            logging.warning(f"Проверьте ссылку {link['object']['url']} в задаче {issue_number}")
-            continue
-        merge = Merge_request(link['object']['url'], iid, project, issue_number)
-        if return_merged:
-            result.append(merge)
-        else:
-            if not build.is_merged(merge):
-                result.append(merge)
-    return result
 
 
 def get_links(merges, build):
@@ -154,7 +110,7 @@ if __name__ == '__main__':
         MRless_issues = []
         if issues_list:
             for issue_number in issues_list:
-                MR_count = get_merge_requests(build.config, issue_number, build)  # возвращаются только невлитые МР
+                MR_count = build.get_merge_requests(issue_number=issue_number)  # возвращаются только невлитые МР
                 if not MR_count: # если в задаче нет МР вносим задачу в таблицу
                     message += f"|{MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]|" \
                                f"{issues_list[issue_number]}| Нет изменений |(/)|\r\n"

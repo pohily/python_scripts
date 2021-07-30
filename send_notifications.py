@@ -1,13 +1,11 @@
 import logging
 import os
-from configparser import ConfigParser
 from email.header import Header
 from email.mime.text import MIMEText
 from smtplib import SMTP
 
-from jira import JIRA
-
-from constants import SMTP_PORT, SMTP_SERVER, ISSUE_URL, RELEASE_ISSUES_URL, JIRA_SERVER
+from constants import SMTP_PORT, SMTP_SERVER, ISSUE_URL
+from merge_requests import Build
 
 
 def get_release_message(release_date, release_country, release_name):
@@ -15,7 +13,7 @@ def get_release_message(release_date, release_country, release_name):
     {release_name}<br>Состав выпуска:<br><br>'
 
 
-def send_mail(release_country, release_name, country_key, message, config):
+def send(release_country, release_name, country_key, message, config):
     connection = SMTP(SMTP_SERVER, SMTP_PORT)
     connection.ehlo()
     connection.starttls()
@@ -31,20 +29,16 @@ def send_mail(release_country, release_name, country_key, message, config):
     connection.quit()
 
 
-if __name__ == '__main__':
+def main():
+    build = Build()
     os.makedirs('logs', exist_ok=True)
-    config = ConfigParser()
-    config.read('config.ini')
     level = logging.INFO
     handlers = [logging.FileHandler('logs/log.txt'), logging.StreamHandler()]
     format = u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s'
     logging.basicConfig(level=level, format=format, handlers=handlers)
     logging.info('--------------Формируем письмо----------------')
-    jira_options = {'server': JIRA_SERVER}
-    jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
-    release_date, release_name, release_country, release_issues, _ = get_release_details(config, jira, date=True)
+    release_date, release_name, release_country, release_issues, _ = build.get_release_details(date=True)
     logging.info(f'для релиза {release_name}')
-    issues_of_release_link = RELEASE_ISSUES_URL.format(release_name)
     issues_list = {}
     message = get_release_message(release_date, release_country, release_name)
     for issue in release_issues:
@@ -63,4 +57,8 @@ if __name__ == '__main__':
         else:
             logging.exception('Страна для релиза не определена')
             raise Exception('Страна для релиза не определена')
-        send_mail(release_country, release_name, country_key, message, config)
+        send(release_country, release_name, country_key, message, build.config)
+
+
+if __name__ == '__main__':
+    main()

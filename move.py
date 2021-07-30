@@ -1,24 +1,19 @@
 import logging
-from configparser import ConfigParser
+import os
 from datetime import datetime
 from sys import argv
-import os
 
-from jira import JIRA
-
-from constants import JIRA_SERVER, STATUS_FOR_RELEASE, STATUS_READY
-from send_notifications import get_release_details
+from constants import STATUS_FOR_RELEASE, STATUS_READY
+from merge_requests import Build
 
 
 def main():
-    config = ConfigParser()
-    config.read('config.ini')
+    build = Build()
     level = logging.DEBUG
     handlers = [logging.FileHandler('logs/log.txt'), logging.StreamHandler()]
     format = u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s'
     logging.basicConfig(level=level, format=format, handlers=handlers)
-    jira_options = {'server': JIRA_SERVER}
-    jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
+
 
     # без флага - переносятся все задачи в статусах неподходящих для релиза:    python move.py ru.1.2.3 ru.1.3.0
     # -g - переносятся задачи в подходящих для релиза статусах                  python move.py -g ru.1.2.3 ru.1.3.0
@@ -38,7 +33,7 @@ def main():
     def move_bad(source, target):
         if is_country_ok(source, target):
             #  Выбираем задачи для релиза в нужных статусах
-            _, _, _, release_issues, _ = get_release_details(config, jira)
+            _, _, _, release_issues, _ = build.get_release_details()
             logging.info(f'Выбираем неготовые задачи из релиза {source}')
             for_move = []
             for issue in release_issues:
@@ -58,7 +53,7 @@ def main():
 
     def move_good(source, target):
         if is_country_ok(source, target):
-            _, _, _, release_issues, _ = get_release_details(config, jira, release=source)
+            _, _, _, release_issues, _ = build.get_release_details(release=source)
             logging.info(f'Выбираем готовые задачи из релиза {source}')
             for_move = []
             for issue in release_issues:
@@ -85,7 +80,7 @@ def main():
             logging.exception('Введите номера задач для переноса!')
         else:
             if is_country_ok(source, target):
-                _, _, _, release_issues, _ = get_release_details(config, jira, release=source)
+                _, _, _, release_issues, _ = build.get_release_details(release=source)
                 for issue in issues:
                     if issue.isdigit():
                         issue = f'SLOV-{issue}'
@@ -108,12 +103,12 @@ def main():
         logging.exception('Пока не реализовано!')
 
     def release(source):
-        _, _, _, release_issues, _ = get_release_details(config, jira, release=source)
+        _, _, _, release_issues, _ = build.get_release_details(release=source)
         for issue in release_issues:
             today = datetime.today().strftime('%Y-%m-%d')
             if issue.fields.status.name in STATUS_READY:
                 logging.info(f'Релизим задачу {issue}')
-                transitions = jira.transitions(issue)
+                transitions = build.jira.transitions(issue)
                 transitions_ids = [(t['id'], t['name']) for t in transitions]
                 id = ''
                 for transition in transitions_ids:
@@ -121,7 +116,7 @@ def main():
                         id = transition[0]
                         break
                 if id:
-                    jira.transition_issue(issue, id)
+                    build.jira.transition_issue(issue, id)
                     issue.update(fields={"fixVersions": {"released": True, "releaseDate": today}})
                 else:
                     logging.exception(f'Задача {issue} еще не переведена в статус подходящий для релиза!')
@@ -135,7 +130,7 @@ def main():
     if not os.path.exists('logs'):
         os.mkdir(os.getcwd() + '/log')
     try:
-        COMMAND_LINE_INPUT = eval(config['options']['COMMAND_LINE_INPUT'])
+        COMMAND_LINE_INPUT = eval(build.config['options']['COMMAND_LINE_INPUT'])
         if COMMAND_LINE_INPUT:
             if not argv[1].startswith('-'):
                 source = argv[1]
@@ -169,9 +164,8 @@ def main():
                     logging.exception('Неизвестная команда!')
                     raise Exception('Неизвестная команда!')
         else:
-            source = 'ru.5.7.20'
-            target = 'ru.5.7.30'
-            move_bad(source, target)
+            logging.exception('Работает только с командной строкой!')
+            raise Exception('Работает только с командной строкой!')
     except IndexError:
         logging.exception('Введите релиз-источник и релиз-назначение!')
         raise Exception('Введите релиз-источник и релиз-назначение!!')

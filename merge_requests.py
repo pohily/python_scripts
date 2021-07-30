@@ -10,11 +10,13 @@ import requests
 from atlassian import Confluence
 from jira import JIRA
 
-from constants import MR_STATUS, MR_BY_IID, PROJECTS_WITH_TESTS, DOCKER_PROJECTS, PROJECTS_NUMBERS, JIRA_SERVER, \
-    PROJECTS_COUNTRIES, TEST, PROJECTS_WITHOUT_STAGING, CONFLUENCE_SERVER, CONFLUENCE_LINK, GIT_LAB_SERVER, COUNTRIES
+from constants import *
 
 
 class Build:
+
+    Merge_request = namedtuple('Merge_request',
+                               ['url', 'iid', 'project', 'issue'])  # iid - номер МР в url'е, project - int
 
     def __init__(self):
         jira_options = {'server': JIRA_SERVER}
@@ -40,8 +42,11 @@ class Build:
             username=self.config['user_data']['login'],
             password=self.config['user_data']['jira_password']
         )
-        link = confluence.get_page_by_title(space='AT', title=f'Релиз {title} Отчет о тестировании')
-        return CONFLUENCE_LINK.format(link['id'])
+        try:
+            link = confluence.get_page_by_title(space='AT', title=f'Релиз {title} Отчет о тестировании')
+            return CONFLUENCE_LINK.format(link['id'])
+        except (TypeError, IndexError):
+            return ''
 
     def get_release_name(self):
         _, name, _, _, _ = self.get_release_details()
@@ -77,6 +82,46 @@ class Build:
         release_country = COUNTRIES[country]
         fix_id = fix_issues[0].fields.fixVersions[0].id
         return fix_date, release_input, release_country, fix_issues, fix_id
+
+    def get_merge_requests(self, issue_number, return_merged=None):
+        """ Ищет ссылки на невлитые МР в задаче и возвращает их список
+        :return_merged: передается True если надо вернуть влитые МР, обычно возвращаются только невлитые"""
+
+        result = []
+        links_json = requests.get(url=REMOTE_LINK.format(issue_number),
+                                  auth=(self.config['user_data']['login'],
+                                        self.config['user_data']['jira_password'])).json()
+        for link in links_json:
+            if 'confluence' in link['object']['url']:
+                continue
+            if 'commit' in link['object']['url'] or GIT_LAB not in link['object']['url']:
+                continue
+            # для предупреждения о запуске тесто после сборки контейнеров
+            if 'docker' in link['object']['url'] or 'msm' in link['object']['url']:
+                self.docker = True
+            url_parts = link['object']['url'].split('/')
+            if len(url_parts) < 6:
+                continue
+            try:
+                project = PROJECTS_NAMES[f'{url_parts[3]}/{url_parts[4]}']
+            except KeyError as e:
+                logging.exception(f'Проверьте задачу {issue_number} - не найден проект {url_parts[3]}/{url_parts[4]}')
+                continue
+            # в связи с обновлением gitlab поменялись url 11/03/20:
+            if GIT_LAB in link['object']['url'] and url_parts[6].isdigit():
+                iid = url_parts[6]
+            elif GIT_LAB in link['object']['url'] and url_parts[7].isdigit():
+                iid = url_parts[7]
+            else:
+                logging.warning(f"Проверьте ссылку {link['object']['url']} в задаче {issue_number}")
+                continue
+            merge = self.Merge_request(link['object']['url'], iid, project, issue_number)
+            if return_merged:
+                result.append(merge)
+            else:
+                if not self.is_merged(merge):
+                    result.append(merge)
+        return result
 
     def delete_create_RC(self, project, RC_name):
         """ Для каждого затронутого релизом проекта удаляем RC, если есть. Затем создаем RC """

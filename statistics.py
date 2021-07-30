@@ -5,7 +5,6 @@ import os
 from itertools import chain
 from re import sub
 
-from build import get_merge_requests
 from constants import STATUS_FOR_RELEASE, PROJECTS_COUNTRIES, PROJECTS_NUMBERS, TESTERS
 from merge_requests import Build
 
@@ -43,7 +42,7 @@ def main():
                 post_deploy.append((issue_number.key, pd))
         else:
             continue
-        MR_count = get_merge_requests(build.config, issue_number, build)
+        MR_count = build.get_merge_requests(issue_number=issue_number)
         for merge in MR_count:
             status, _, _, _ = build.get_merge_request_details(merge)
             if status != '(/) Нет конфликтов, ':

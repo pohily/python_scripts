@@ -2,7 +2,6 @@ from datetime import datetime
 
 import paramiko
 
-from build import get_merge_requests
 from constants import PROJECTS_NUMBERS, SYSTEM_USERS, COUNTRIES_ABBR
 from merge_requests import Build
 
@@ -16,7 +15,7 @@ def main():
     used_projects = set()
     print(f'\033[34m Выбираем проекты релиза {release_input}\033[0m')
     for issue_number in fix_issues:
-        MR_count = get_merge_requests(build.config, issue_number, build, return_merged=True)
+        MR_count = build.get_merge_requests(issue_number=issue_number, return_merged=True)
         for merge in MR_count:
             used_projects.add(merge.project)
 
