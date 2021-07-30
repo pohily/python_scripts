@@ -42,8 +42,8 @@ def main():
                 post_deploy.append((issue_number.key, pd))
         else:
             continue
-        MR_count = build.get_merge_requests(issue_number=issue_number)
-        for merge in MR_count:
+        mr_count = build.get_merge_requests(issue_number=issue_number)
+        for merge in mr_count:
             status, _, _, _ = build.get_merge_request_details(merge)
             if status != '(/) Нет конфликтов, ':
                 logging.exception(f'\033[31m Конфликт в задаче {merge.issue} в мердж реквесте {merge.url}\033[0m')
