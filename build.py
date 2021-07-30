@@ -24,12 +24,8 @@ def get_merge_requests(config, issue_number, build, return_merged=None):
     links_json = requests.get(url=REMOTE_LINK.format(issue_number),
                                  auth=(config['user_data']['login'], config['user_data']['jira_password'])).json()
     for link in links_json:
-        if not build.confluence:
-            try:
-                if 'confluence' in link['object']['url'] and link['relationship'] == "mentioned in":
-                    build.confluence = link['object']['url']
-            except KeyError:  # у ссылок на отчеты о тестировании нет 'relationship'
-                pass
+        if 'confluence' in link['object']['url']:
+            continue
         if 'commit' in link['object']['url'] or GIT_LAB not in link['object']['url']:
             continue
         # для предупреждения о запуске тесто после сборки контейнеров
@@ -55,7 +51,7 @@ def get_merge_requests(config, issue_number, build, return_merged=None):
         if return_merged:
             result.append(merge)
         else:
-            if not build.is_merged(config, merge):
+            if not build.is_merged(merge):
                 result.append(merge)
     return result
 
@@ -73,7 +69,7 @@ def get_links(config, merges, build):
         logging.info('------------------------------------------')
         logging.info(f'Пытаемся сделать MR из {merge.issue} в {RC_name} в {PROJECTS_NUMBERS[merge.project]}')
 
-        status, url, mr = build.make_mr_to_rc(config, merge, RC_name)
+        status, url, mr = build.make_mr_to_rc(merge, RC_name)
         if MR_STATUS['can_be_merged'] not in status:
             logging.warning(f"Конфликт в задаче {merge.issue} в {merge.project}")
             conflict = True
@@ -100,7 +96,7 @@ def get_links(config, merges, build):
     for line in range(len(statuses)):
         if not conflict:
             mr = statuses[line][1]
-            status = build.merge_rc(config, mr)
+            status = build.merge_rc(mr)
         statuses[line].append(status)  # 3
 
     result = ''
@@ -122,7 +118,6 @@ if __name__ == '__main__':
     logging.basicConfig(level=level, format=format, handlers=handlers)
     logging.info('--------------Начало сборки----------------')
 
-    build = Build()
     with open('logs/message.txt', 'w') as file:
         config = ConfigParser()
         config.read('config.ini')
@@ -133,6 +128,7 @@ if __name__ == '__main__':
         #
         logging.info('Определяем состав релиза')
         _, release_name, _, release_issues, release_id = get_release_details(config, jira)
+        build = Build(name=release_name, config=config)
         RC_name = f'rc-{release_name.replace(".", "-")}'
         #
         #           До таблицы
@@ -188,7 +184,7 @@ if __name__ == '__main__':
         #
         logging.info('Удаляем и создаем RC')
         for project in used_projects:
-            build.delete_create_RC(config, project, RC_name)
+            build.delete_create_RC(project, RC_name)
         #
         #           Заполняем таблицу
         #
@@ -209,7 +205,7 @@ if __name__ == '__main__':
         #
         logging.info('------------------------------------------')
         logging.info('Делаем МР RC -> Staging, RC -> Master')
-        rc_master_links, staging_links = build.make_mr_to_staging(config, used_projects, RC_name)
+        rc_master_links, staging_links = build.make_mr_to_staging(used_projects, RC_name)
         #
         #           RC -> Staging
         #
@@ -221,7 +217,7 @@ if __name__ == '__main__':
         #           Создаем MR Staging -> Master
         #
         logging.info('Делаем МР Staging -> Master')
-        master_links = build.make_mr_to_master(config, used_projects)
+        master_links = build.make_mr_to_master(used_projects)
         #
         #           Staging -> Master
         #

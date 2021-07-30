@@ -5,28 +5,38 @@ from time import sleep
 
 import gitlab
 import requests
+from atlassian import Confluence
 
 from constants import MR_STATUS, MR_BY_IID, PROJECTS_WITH_TESTS, DOCKER_PROJECTS, PROJECTS_NUMBERS, \
-    PROJECTS_COUNTRIES, TEST, PROJECTS_WITHOUT_STAGING
+    PROJECTS_COUNTRIES, TEST, PROJECTS_WITHOUT_STAGING, CONFLUENCE_SERVER, CONFLUENCE_LINK, GIT_LAB_SERVER
 
 
 class Build:
 
-    def __init__(self):
+    def __init__(self, name, config):
+        self.name = name
+        self.config = config
+        self.gl = gitlab.Gitlab(GIT_LAB_SERVER, private_token=self.config['user_data']['GITLAB_PRIVATE_TOKEN'])
         self.Merge_request_details = namedtuple(
             'Merge_request_details', ['merge_status', 'source_branch', 'target_branch', 'state']
         )
-        self.merge_fail = False     # наличие незамерженных МР
-        self.docker = False         # наличие докера в релизе
-        self.confluence = ''        # ссылка на конфлуенс
+        self.merge_fail = False                                     # наличие незамерженных МР
+        self.docker = False                                         # наличие докера в релизе
+        self.confluence = self.confluence_link(self.name)           # ссылка на конфлуенс
 
-    def delete_create_RC(self, config, project, RC_name):
+    def confluence_link(self, title):
+        confluence = Confluence(url=CONFLUENCE_SERVER,
+                                username=self.config['user_data']['login'],
+                                password=self.config['user_data']['jira_password'])
+        link = confluence.get_page_by_title(space='AT', title=f'Релиз {title} Отчет о тестировании')
+        return CONFLUENCE_LINK.format(link['id'])
+
+    def delete_create_RC(self, project, RC_name):
         """ Для каждого затронутого релизом проекта удаляем RC, если есть. Затем создаем RC """
         if TEST:
             return '(/)Тест'
 
-        gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
-        pr = gl.projects.get(f'{project}')
+        pr = self.gl.projects.get(f'{project}')
         try:
             rc = pr.branches.get(f'{RC_name}')
             rc.delete()
@@ -34,7 +44,7 @@ class Build:
         except (gitlab.exceptions.GitlabGetError, gitlab.exceptions.GitlabHttpError):
             pr.branches.create({'branch': f'{RC_name}', 'ref': 'master'})
 
-    def get_merge_request_details(self, config, MR):
+    def get_merge_request_details(self, MR):
         """ Возвращает статус (есть или нет конфликты), source_branch """
         _, iid, project, _ = MR
         token = f"private_token={(config['user_data']['GITLAB_PRIVATE_TOKEN'])}"
@@ -48,23 +58,20 @@ class Build:
             logging.error(f'MR не найден {MR}')
             return self.Merge_request_details('MR не найден', '', '', '')
 
-    def is_merged(self, config, merge) -> bool:
+    def is_merged(self, merge) -> bool:
         """ Возвращаем статус МР в мастер """
-        gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
-        pr = gl.projects.get(f'{merge.project}')
-        _, source, _, _ = self.get_merge_request_details(config, merge)
+        pr = self.gl.projects.get(f'{merge.project}')
+        _, source, _, _ = self.get_merge_request_details(merge)
         mr = pr.mergerequests.list(state='merged', source_branch=source, target_branch='master')
         return bool(mr)
 
-    def make_mr_to_rc(self, config, MR, RC_name):
+    def make_mr_to_rc(self, MR, RC_name):
         """ Создаем МР slov -> RC. Возвращем статус МР, его url и сам МР"""
         if TEST:
             return '(/) Тест', 'https://gitlab.4slovo.ru/4slovo.ru/chestnoe_slovo_backend/merge_requests/тест', 'тест'
 
-        gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
-        project = gl.projects.get(f'{MR.project}')
-
-        _, source_branch, target_branch, state = self.get_merge_request_details(config, MR)
+        project = self.gl.projects.get(f'{MR.project}')
+        _, source_branch, target_branch, state = self.get_merge_request_details(MR)
         if state == 'merged' and target_branch == 'master':              # если МР уже влит в мастер - не берем его в RC
             logging.warning(f'В задаче {MR.issue} мердж реквест {MR.project} уже в мастере')
             return '(/) Уже в мастере, ', MR.url, False
@@ -92,17 +99,16 @@ class Build:
                                                'target_project_id': MR.project,
                                                })
         merge_status, _, _, _ = self.get_merge_request_details(
-            config, (1, mr.attributes['iid'], mr.attributes['project_id'], 1)
+            (1, mr.attributes['iid'], mr.attributes['project_id'], 1)
         )
         status += merge_status
         url = mr.attributes['web_url']
         return status, url, mr
 
-    def merge_rc (self, config, MR):
+    def merge_rc (self, MR):
         if TEST:
             return
 
-        gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
         if not isinstance(MR, bool) and MR.attributes['state'] != 'merged':
             logging.info(f"Мержим MR {MR.attributes['iid']} merge_status={MR.attributes['merge_status']}, "
                          f"has_conflicts={MR.attributes['has_conflicts']}, из {MR.attributes['source_branch']} в RC")
@@ -121,14 +127,13 @@ class Build:
                     logging.error(f"{MR.attributes['iid']} НЕ ВЛИТ! - Конфликт?")
                     return '(x) Не влит'
 
-    def make_mr_to_staging(self, config, projects, RC_name):
+    def make_mr_to_staging(self, projects, RC_name):
         """ Делаем МР из RC в стейджинг для всех затронутых проектов и возвращаем список ссылок на МР """
         if TEST:
             return [projects]
 
         staging_links = []  # ссылки для вывода под таблицей
         master_links = []
-        gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
         if self.docker:
             tests = DOCKER_PROJECTS
             logging.warning(
@@ -137,7 +142,7 @@ class Build:
         else:
             tests = PROJECTS_WITH_TESTS
         for pr in projects:
-            project = gl.projects.get(pr)
+            project = self.gl.projects.get(pr)
             source_branch = RC_name
             if pr in DOCKER_PROJECTS or pr in PROJECTS_WITHOUT_STAGING:
                 target_branch = 'master'
@@ -204,17 +209,16 @@ class Build:
                             break
         return master_links, staging_links
 
-    def make_mr_to_master(self, config, projects):
+    def make_mr_to_master(self, projects):
         """ Делаем МР из стейджинга в мастер для всех затронутых проектов и возвращаем список ссылок на МР """
         if TEST:
             return [projects]
 
         mr_links = [] # ссылки для вывода под таблицей
-        gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
         for pr in projects:
             if pr in DOCKER_PROJECTS or pr in PROJECTS_WITHOUT_STAGING:
                 continue
-            project = gl.projects.get(pr)
+            project = self.gl.projects.get(pr)
             mr = project.mergerequests.list(state='opened', source_branch='staging', target_branch='master')
             if mr:
                 mr = mr[0]

@@ -18,8 +18,8 @@ def main():
     jira_options = {'server': JIRA_SERVER}
     jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
 
-    build = Build()
     _, release_input, release_country, fix_issues, _ = get_release_details(config, jira)
+    build = Build(name=release_input, config=config)
     release_country = COUNTRIES_ABBR[release_country]
     used_projects = set()
     print(f'\033[34m Выбираем проекты релиза {release_input}\033[0m')

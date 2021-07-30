@@ -31,8 +31,8 @@ def main():
     format = u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s'
     logging.basicConfig(level=level, format=format, handlers=handlers)
 
-    build = Build()
     _, release_input, _, fix_issues, _ = get_release_details(config, jira)
+    build = Build(name=release_input, config=config)
     logging.info(f'Статистика релиза {release_input}')
     used_projects = set()
     issue_count = 0
@@ -53,7 +53,7 @@ def main():
             continue
         MR_count = get_merge_requests(config, issue_number, build)
         for merge in MR_count:
-            status, _, _, _ = build.get_merge_request_details(config, merge)
+            status, _, _, _ = build.get_merge_request_details(merge)
             if status != '(/) Нет конфликтов, ':
                 logging.exception(f'\033[31m Конфликт в задаче {merge.issue} в мердж реквесте {merge.url}\033[0m')
             used_projects.add(merge.project)
@@ -64,11 +64,10 @@ def main():
             except:
                 logging.exception(f'У вас нет доступа к проекту {PROJECTS_COUNTRIES[merge.project]}')
     projects = [PROJECTS_NUMBERS[pr] for pr in used_projects]
-    gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
     user_id = TESTERS[config['user_data']['login']]
     reporter = []
     for project in projects:
-        pr = gl.projects.get(project)
+        pr = build.gl.projects.get(project)
         member = pr.members.get(user_id)
         access_level = member.attributes['access_level']
         if access_level < 30:
