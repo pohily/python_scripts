@@ -6,7 +6,7 @@ from itertools import chain
 from re import sub
 
 from constants import STATUS_FOR_RELEASE, PROJECTS_COUNTRIES, PROJECTS_NUMBERS, TESTERS
-from merge_requests import Build
+from build import Build
 
 """ Показывает статистику по запрошенному релизу: количество задач, проектов и названия проектов, 
 также показываются задачи, которые не подходят для данного релиза (неправильная страна).

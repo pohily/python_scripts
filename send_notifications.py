@@ -5,7 +5,7 @@ from email.mime.text import MIMEText
 from smtplib import SMTP
 
 from constants import SMTP_PORT, SMTP_SERVER, ISSUE_URL
-from merge_requests import Build
+from build import Build
 
 
 def get_release_message(release_date, release_country, release_name):
@@ -14,19 +14,18 @@ def get_release_message(release_date, release_country, release_name):
 
 
 def send(release_country, release_name, country_key, message, config):
-    connection = SMTP(SMTP_SERVER, SMTP_PORT)
-    connection.ehlo()
-    connection.starttls()
-    connection.ehlo()
-    connection.login(config['user_data']['login'], config['user_data']['domain_password'])
-    msg = MIMEText(message, 'plain', 'utf-8')
-    msg['subject'] = Header('Релиз для {}: {}'.format(release_country, release_name), 'utf-8')
-    msg['from'] = config['user_data']['login'] + '@4slovo.ru'
-    msg['to'] = config['recipients'][country_key]
-    msg.add_header('Content-Type', 'text/html')
-    logging.info('Высылаем письмо')
-    connection.sendmail(msg['from'], [msg['to']], msg.as_string())
-    connection.quit()
+    with SMTP(SMTP_SERVER, SMTP_PORT) as connection:
+        connection.ehlo()
+        connection.starttls()
+        connection.ehlo()
+        connection.login(config['user_data']['login'], config['user_data']['domain_password'])
+        msg = MIMEText(message, 'plain', 'utf-8')
+        msg['subject'] = Header('Релиз для {}: {}'.format(release_country, release_name), 'utf-8')
+        msg['from'] = config['user_data']['login'] + '@4slovo.ru'
+        msg['to'] = config['recipients'][country_key]
+        msg.add_header('Content-Type', 'text/html')
+        logging.info('Высылаем письмо')
+        connection.sendmail(msg['from'], [msg['to']], msg.as_string())
 
 
 def main():

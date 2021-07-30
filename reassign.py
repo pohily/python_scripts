@@ -2,7 +2,7 @@ import os
 from random import shuffle
 
 from constants import TESTERS, STATUS_READY, STATUS_FOR_RELEASE
-from merge_requests import Build
+from build import Build
 
 """ Переназначает задачи текущего релиза между тестировщиками """
 

@@ -4,7 +4,7 @@ from datetime import datetime
 from sys import argv
 
 from constants import STATUS_FOR_RELEASE, STATUS_READY
-from merge_requests import Build
+from build import Build
 
 
 def main():

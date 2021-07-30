@@ -155,6 +155,7 @@ GIT_LAB = 'https://gitlab'
 GIT_LAB_SERVER = 'https://gitlab.4slovo.ru/'
 ISSUE_URL = 'https://jira.4slovo.ru/browse/'
 JIRA_SERVER = 'https://jira.4slovo.ru/'
+JIRA_OPTIONS = {'server': JIRA_SERVER}
 CONFLUENCE_SERVER = "https://confluence.4slovo.ru/"
 CONFLUENCE_LINK = "https://confluence.4slovo.ru/pages/viewpage.action?pageId={}"
 MR_BY_IID = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?iids[]={}&{}&"with_merge_status_recheck"=True'

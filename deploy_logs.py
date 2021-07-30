@@ -3,7 +3,7 @@ from datetime import datetime
 import paramiko
 
 from constants import PROJECTS_NUMBERS, SYSTEM_USERS, COUNTRIES_ABBR
-from merge_requests import Build
+from build import Build
 
 """ Показывает деплой логи всех измененных в релизе проектов"""
 
