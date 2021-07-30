@@ -2,17 +2,12 @@
 
 import logging
 import os
-from configparser import ConfigParser
 from itertools import chain
 from re import sub
 
-import gitlab
-from jira import JIRA
-
 from build import get_merge_requests
-from constants import STATUS_FOR_RELEASE, PROJECTS_COUNTRIES, PROJECTS_NUMBERS, JIRA_SERVER, TESTERS
+from constants import STATUS_FOR_RELEASE, PROJECTS_COUNTRIES, PROJECTS_NUMBERS, TESTERS
 from merge_requests import Build
-from send_notifications import get_release_details
 
 """ Показывает статистику по запрошенному релизу: количество задач, проектов и названия проектов, 
 также показываются задачи, которые не подходят для данного релиза (неправильная страна).
@@ -22,17 +17,14 @@ from send_notifications import get_release_details
 
 def main():
     os.makedirs('logs', exist_ok=True)
-    config = ConfigParser()
-    config.read('config.ini')
-    jira_options = {'server': JIRA_SERVER}
-    jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
+
     level = logging.INFO
     handlers = [logging.FileHandler('logs/log.txt'), logging.StreamHandler()]
     format = u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s'
     logging.basicConfig(level=level, format=format, handlers=handlers)
 
-    _, release_input, _, fix_issues, _ = get_release_details(config, jira)
-    build = Build(name=release_input, config=config)
+    build = Build()
+    _, release_input, _, fix_issues, _ = build.get_release_details()
     logging.info(f'Статистика релиза {release_input}')
     used_projects = set()
     issue_count = 0
@@ -51,7 +43,7 @@ def main():
                 post_deploy.append((issue_number.key, pd))
         else:
             continue
-        MR_count = get_merge_requests(config, issue_number, build)
+        MR_count = get_merge_requests(build.config, issue_number, build)
         for merge in MR_count:
             status, _, _, _ = build.get_merge_request_details(merge)
             if status != '(/) Нет конфликтов, ':
@@ -64,7 +56,7 @@ def main():
             except:
                 logging.exception(f'У вас нет доступа к проекту {PROJECTS_COUNTRIES[merge.project]}')
     projects = [PROJECTS_NUMBERS[pr] for pr in used_projects]
-    user_id = TESTERS[config['user_data']['login']]
+    user_id = TESTERS[build.config['user_data']['login']]
     reporter = []
     for project in projects:
         pr = build.gl.projects.get(project)

@@ -1,47 +1,13 @@
 import logging
+import os
 from configparser import ConfigParser
-from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
 from smtplib import SMTP
-from sys import argv
-import os
 
 from jira import JIRA
 
-from constants import SMTP_PORT, SMTP_SERVER, ISSUE_URL, RELEASE_ISSUES_URL, JIRA_SERVER, COUNTRIES
-
-
-def get_release_details(config, jira, date=False, release=False):
-    """ Получает имя релиза из коммандной строки, либо передается агрументом, либо в тестовом режиме - хардкод
-        Возвращает: дату, имя, страну, задачи релиза и id """
-
-    if not release:
-        try:
-            COMMAND_LINE_INPUT = eval(config['options']['COMMAND_LINE_INPUT'])
-            if COMMAND_LINE_INPUT:
-                release_input = argv[1]
-            else:
-                release_input = config['options']['hardcode_release']
-        except IndexError:
-            logging.exception('Введите имя релиза!')
-            raise Exception('Введите имя релиза!')
-    else:
-        release_input = release
-    fix_issues = jira.search_issues(f'fixVersion={release_input}')
-    if date:
-        try:
-            fix_date = fix_issues[0].fields.fixVersions[0].releaseDate
-            fix_date = datetime.strptime(fix_date, '%Y-%m-%d').strftime('%d.%m.%Y')
-        except (AttributeError, UnboundLocalError, TypeError):
-            fix_date = None
-            logging.exception(f'Релиз {release_input} еще не выпущен!')
-    else:
-        fix_date = None
-    country = release_input.split('.')[0].lower()
-    release_country = COUNTRIES[country]
-    fix_id = fix_issues[0].fields.fixVersions[0].id
-    return fix_date, release_input, release_country, fix_issues, fix_id
+from constants import SMTP_PORT, SMTP_SERVER, ISSUE_URL, RELEASE_ISSUES_URL, JIRA_SERVER
 
 
 def get_release_message(release_date, release_country, release_name):

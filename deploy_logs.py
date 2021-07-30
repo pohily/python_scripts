@@ -1,30 +1,22 @@
-from configparser import ConfigParser
 from datetime import datetime
 
 import paramiko
-from jira import JIRA
 
 from build import get_merge_requests
+from constants import PROJECTS_NUMBERS, SYSTEM_USERS, COUNTRIES_ABBR
 from merge_requests import Build
-from constants import PROJECTS_NUMBERS, JIRA_SERVER, SYSTEM_USERS, COUNTRIES_ABBR
-from send_notifications import get_release_details
 
 """ Показывает деплой логи всех измененных в релизе проектов"""
 
 
 def main():
-    config = ConfigParser()
-    config.read('config.ini')
-    jira_options = {'server': JIRA_SERVER}
-    jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
-
-    _, release_input, release_country, fix_issues, _ = get_release_details(config, jira)
-    build = Build(name=release_input, config=config)
+    build = Build()
+    _, release_input, release_country, fix_issues, _ = build.get_release_details()
     release_country = COUNTRIES_ABBR[release_country]
     used_projects = set()
     print(f'\033[34m Выбираем проекты релиза {release_input}\033[0m')
     for issue_number in fix_issues:
-        MR_count = get_merge_requests(config, issue_number, build, return_merged=True)
+        MR_count = get_merge_requests(build.config, issue_number, build, return_merged=True)
         for merge in MR_count:
             used_projects.add(merge.project)
 
@@ -32,8 +24,8 @@ def main():
     system_users = [SYSTEM_USERS[release_country][pr] for pr in projects]
     system_users = [user for user in system_users if user]
 
-    username = config['staging'][f"user_{release_country}"]
-    password = config['staging'][f"staging_password_{release_country}"]
+    username = build.config['staging'][f"user_{release_country}"]
+    password = build.config['staging'][f"staging_password_{release_country}"]
 
     if release_country == 'ru':
         server = 'staging.4slovo.ru'

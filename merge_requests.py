@@ -1,35 +1,82 @@
 import logging
 from collections import namedtuple
 from configparser import ConfigParser
+from datetime import datetime
+from sys import argv
 from time import sleep
 
 import gitlab
 import requests
 from atlassian import Confluence
+from jira import JIRA
 
-from constants import MR_STATUS, MR_BY_IID, PROJECTS_WITH_TESTS, DOCKER_PROJECTS, PROJECTS_NUMBERS, \
-    PROJECTS_COUNTRIES, TEST, PROJECTS_WITHOUT_STAGING, CONFLUENCE_SERVER, CONFLUENCE_LINK, GIT_LAB_SERVER
+from constants import MR_STATUS, MR_BY_IID, PROJECTS_WITH_TESTS, DOCKER_PROJECTS, PROJECTS_NUMBERS, JIRA_SERVER, \
+    PROJECTS_COUNTRIES, TEST, PROJECTS_WITHOUT_STAGING, CONFLUENCE_SERVER, CONFLUENCE_LINK, GIT_LAB_SERVER, COUNTRIES
 
 
 class Build:
 
-    def __init__(self, name, config):
-        self.name = name
-        self.config = config
-        self.gl = gitlab.Gitlab(GIT_LAB_SERVER, private_token=self.config['user_data']['GITLAB_PRIVATE_TOKEN'])
-        self.Merge_request_details = namedtuple(
-            'Merge_request_details', ['merge_status', 'source_branch', 'target_branch', 'state']
+    def __init__(self):
+        jira_options = {'server': JIRA_SERVER}
+        self.config = ConfigParser()
+        self.config.read('config.ini')
+        self.jira = JIRA(
+            options=jira_options,
+            auth=(self.config['user_data']['login'],
+                  self.config['user_data']['jira_password'])
         )
+        self.name = self.get_release_name()
+        self.gl = gitlab.Gitlab(GIT_LAB_SERVER, private_token=self.config['user_data']['GITLAB_PRIVATE_TOKEN'])
         self.merge_fail = False                                     # наличие незамерженных МР
         self.docker = False                                         # наличие докера в релизе
         self.confluence = self.confluence_link(self.name)           # ссылка на конфлуенс
+        self.Merge_request_details = namedtuple(
+            'Merge_request_details', ['merge_status', 'source_branch', 'target_branch', 'state']
+        )
 
     def confluence_link(self, title):
-        confluence = Confluence(url=CONFLUENCE_SERVER,
-                                username=self.config['user_data']['login'],
-                                password=self.config['user_data']['jira_password'])
+        confluence = Confluence(
+            url=CONFLUENCE_SERVER,
+            username=self.config['user_data']['login'],
+            password=self.config['user_data']['jira_password']
+        )
         link = confluence.get_page_by_title(space='AT', title=f'Релиз {title} Отчет о тестировании')
         return CONFLUENCE_LINK.format(link['id'])
+
+    def get_release_name(self):
+        _, name, _, _, _ = self.get_release_details()
+        return name
+
+    def get_release_details(self, date=False, release=False):
+        """ Получает имя релиза из коммандной строки, либо передается агрументом, либо в тестовом режиме - хардкод
+            Возвращает: дату, имя, страну, задачи релиза и id """
+
+        if not release:
+            try:
+                COMMAND_LINE_INPUT = eval(self.config['options']['COMMAND_LINE_INPUT'])
+                if COMMAND_LINE_INPUT:
+                    release_input = argv[1]
+                else:
+                    release_input = config['options']['hardcode_release']
+            except IndexError:
+                logging.exception('Введите имя релиза!')
+                raise Exception('Введите имя релиза!')
+        else:
+            release_input = release
+        fix_issues = self.jira.search_issues(f'fixVersion={release_input}')
+        if date:
+            try:
+                fix_date = fix_issues[0].fields.fixVersions[0].releaseDate
+                fix_date = datetime.strptime(fix_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+            except (AttributeError, UnboundLocalError, TypeError):
+                fix_date = None
+                logging.exception(f'Релиз {release_input} еще не выпущен!')
+        else:
+            fix_date = None
+        country = release_input.split('.')[0].lower()
+        release_country = COUNTRIES[country]
+        fix_id = fix_issues[0].fields.fixVersions[0].id
+        return fix_date, release_input, release_country, fix_issues, fix_id
 
     def delete_create_RC(self, project, RC_name):
         """ Для каждого затронутого релизом проекта удаляем RC, если есть. Затем создаем RC """
@@ -47,7 +94,7 @@ class Build:
     def get_merge_request_details(self, MR):
         """ Возвращает статус (есть или нет конфликты), source_branch """
         _, iid, project, _ = MR
-        token = f"private_token={(config['user_data']['GITLAB_PRIVATE_TOKEN'])}"
+        token = f"private_token={(self.config['user_data']['GITLAB_PRIVATE_TOKEN'])}"
         details = requests.get(url=MR_BY_IID.format(project, iid, token)).json()
         if details:
             details = details[0]

@@ -1,17 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import logging
-from collections import defaultdict, namedtuple
-from configparser import ConfigParser
 import os
+from collections import defaultdict, namedtuple
 
 import requests
-from jira import JIRA
 
 from constants import PROJECTS_NAMES, PROJECTS_NUMBERS, RELEASE_URL, REMOTE_LINK, GIT_LAB, STATUS_FOR_RELEASE, \
-    PRIORITY, ISSUE_URL, MR_STATUS, JIRA_SERVER
+    PRIORITY, ISSUE_URL, MR_STATUS
 from merge_requests import Build
-from send_notifications import get_release_details
 
 Merge_request = namedtuple('Merge_request', ['url', 'iid', 'project', 'issue'])  # iid - номер МР в url'е, project - int
 
@@ -56,7 +53,7 @@ def get_merge_requests(config, issue_number, build, return_merged=None):
     return result
 
 
-def get_links(config, merges, build):
+def get_links(merges, build):
     """ принимает список кортежей МР одной задачи. Делает МР SLOV -> RC.
     Заполняет таблицу ссылками на SLOV -> RC и статусами SLOV -> RC """
 
@@ -119,16 +116,12 @@ if __name__ == '__main__':
     logging.info('--------------Начало сборки----------------')
 
     with open('logs/message.txt', 'w') as file:
-        config = ConfigParser()
-        config.read('config.ini')
-        jira_options = {'server': JIRA_SERVER}
-        jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
         #
         #           Определяем состав релиза
         #
         logging.info('Определяем состав релиза')
-        _, release_name, _, release_issues, release_id = get_release_details(config, jira)
-        build = Build(name=release_name, config=config)
+        build = Build()
+        _, release_name, _, release_issues, release_id = build.get_release_details()
         RC_name = f'rc-{release_name.replace(".", "-")}'
         #
         #           До таблицы
@@ -161,7 +154,7 @@ if __name__ == '__main__':
         MRless_issues = []
         if issues_list:
             for issue_number in issues_list:
-                MR_count = get_merge_requests(config, issue_number, build)  # возвращаются только невлитые МР
+                MR_count = get_merge_requests(build.config, issue_number, build)  # возвращаются только невлитые МР
                 if not MR_count: # если в задаче нет МР вносим задачу в таблицу
                     message += f"|{MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]|" \
                                f"{issues_list[issue_number]}| Нет изменений |(/)|\r\n"
@@ -192,7 +185,7 @@ if __name__ == '__main__':
         logging.info('Заполняем таблицу')  # делаем МР в RC и заполняем таблицу ссылками и статусами МР
         for index, issue_number in enumerate(sorted(issues_list)):
             priority = issues_list[issue_number]
-            result = get_links(config, merge_requests[issue_number], build)
+            result = get_links(merge_requests[issue_number], build)
             message += f"|{index + MRless_issues_number}|" \
                        f"[{issue_number}|" \
                        f"{ISSUE_URL}{issue_number}]|" \
@@ -251,10 +244,10 @@ if __name__ == '__main__':
         #
         #           Вывод результата в Jira
         #
-        CREATE_JIRA_ISSUE = eval(config['options']['CREATE_JIRA_ISSUE'])
+        CREATE_JIRA_ISSUE = eval(build.config['options']['CREATE_JIRA_ISSUE'])
         if CREATE_JIRA_ISSUE:
             logging.info('Вывод результата в Jira')
-            existing_issue = jira.search_issues(f'project=SLOV AND summary ~ "Сборка {release_name}"')
+            existing_issue = build.jira.search_issues(f'project=SLOV AND summary ~ "Сборка {release_name}"')
             if existing_issue:
                 existing_issue = existing_issue[0]
                 existing_issue.update(fields={
@@ -272,7 +265,7 @@ if __name__ == '__main__':
                     'customfield_15303': message_before_deploy,
                     'customfield_15302': message_post_deploy,
                 }
-                new_issue = jira.create_issue(fields=issue_dict)
+                new_issue = build.jira.create_issue(fields=issue_dict)
         #
         #           Вывод результата в файл
         #
