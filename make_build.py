@@ -77,7 +77,7 @@ def main():
         #
         logging.info('Удаляем и создаем RC')
         for project in used_projects:
-            build.delete_create_rc(project, build.rc_name)
+            build.delete_create_rc(project)
         #
         #           Заполняем таблицу
         #
@@ -98,7 +98,7 @@ def main():
         #
         logging.info('------------------------------------------')
         logging.info('Делаем МР RC -> Staging, RC -> Master')
-        rc_master_links, staging_links = build.make_mr_to_staging(used_projects, build.rc_name)
+        rc_master_links, staging_links = build.make_mr_to_staging(projects=used_projects)
         #
         #           RC -> Staging
         #
@@ -110,7 +110,7 @@ def main():
         #           Создаем MR Staging -> Master
         #
         logging.info('Делаем МР Staging -> Master')
-        master_links = build.make_mr_to_master(used_projects)
+        master_links = build.make_mr_to_master(projects=used_projects)
         #
         #           Staging -> Master
         #

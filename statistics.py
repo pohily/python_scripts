@@ -58,7 +58,7 @@ def main():
     user_id = TESTERS[build.config['user_data']['login']]
     reporter = []
     for project in projects:
-        pr = build.gl.projects.get(project)
+        pr = build.gitlab.projects.get(project)
         member = pr.members.get(user_id)
         access_level = member.attributes['access_level']
         if access_level < 30:
