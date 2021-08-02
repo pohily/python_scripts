@@ -57,9 +57,12 @@ class Build:
             try:
                 COMMAND_LINE_INPUT = eval(self.config['options']['COMMAND_LINE_INPUT'])
                 if COMMAND_LINE_INPUT:
-                    release_input = argv[1]
+                    if argv[1].startswith('-'):
+                        release_input = argv[2]
+                    else:
+                        release_input = argv[1]
                 else:
-                    release_input = config['options']['hardcode_release']
+                    release_input = self.config['options']['hardcode_release']
             except IndexError:
                 logging.exception('Введите имя релиза!')
                 raise Exception('Введите имя релиза!')
@@ -133,7 +136,7 @@ class Build:
             logging.info('------------------------------------------')
             logging.info(f'Пытаемся сделать MR из {merge.issue} в {self.rc_name} в {PROJECTS_NUMBERS[merge.project]}')
 
-            status, url, mr = self.make_mr_to_rc(merge)
+            status, url, mr = self.make_mr_to_rc(mr=merge)
             if MR_STATUS['can_be_merged'] not in status:
                 logging.warning(f"Конфликт в задаче {merge.issue} в {merge.project}")
                 conflict = True
@@ -231,21 +234,21 @@ class Build:
                     logging.warning(f'В задаче {mr.issue} в проекте {PROJECTS_NUMBERS[mr.project]} не прошли тесты')
                     status = '(x) Тесты не прошли!, '
 
-        mr = project.mergerequests.list(state='opened', source_branch=source_branch, target_branch=target_branch)
-        if mr:
-            mr = mr[0]
+        merge = project.mergerequests.list(state='opened', source_branch=source_branch, target_branch=target_branch)
+        if merge:
+            merge = merge[0]
         else:
-            mr = project.mergerequests.create({'source_branch': source_branch,
-                                               'target_branch': target_branch,
-                                               'title': f"{mr.issue.replace('-', '_')} -> {self.rc_name}",
-                                               'target_project_id': mr.project,
-                                               })
+            merge = project.mergerequests.create({'source_branch': source_branch,
+                                                  'target_branch': target_branch,
+                                                  'title': f"{mr.issue.replace('-', '_')} -> {self.rc_name}",
+                                                  'target_project_id': mr.project,
+                                                  })
         merge_status, _, _, _ = self.get_merge_request_details(
-            (1, mr.attributes['iid'], mr.attributes['project_id'], 1)
+            (1, merge.attributes['iid'], merge.attributes['project_id'], 1)
         )
         status += merge_status
-        url = mr.attributes['web_url']
-        return status, url, mr
+        url = merge.attributes['web_url']
+        return status, url, merge
 
     def merge_rc(self, mr):
         if TEST:
