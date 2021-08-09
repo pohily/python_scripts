@@ -42,7 +42,10 @@ def main(month):
             )
             if tmp:
                 for i in tmp:
-                    fixes.add(i.fields.fixVersions[0].name)
+                    try:
+                        fixes.add(i.fields.fixVersions[0].name)
+                    except IndexError:
+                        pass
             date = next_day
         # теперь ищем все задачи из найденных релизов
         issues = []
@@ -92,5 +95,6 @@ def main(month):
 
 
 if __name__ == '__main__':
-    month = 5
+    """ Геймификация - https://confluence.4slovo.ru/pages/viewpage.action?pageId=77201416 """
+    month = 7
     main(month)
