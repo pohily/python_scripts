@@ -1,6 +1,7 @@
 jira==2.0.0
 python-gitlab==2.0.0
 requests==2.22.0
+atlassian-python-api==3.12.1
 
 
 paramiko~=2.7.2

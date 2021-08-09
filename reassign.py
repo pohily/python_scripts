@@ -1,22 +1,16 @@
 import os
-from configparser import ConfigParser
 from random import shuffle
 
-from jira import JIRA
-
-from constants import JIRA_SERVER, TESTERS, STATUS_READY, STATUS_FOR_RELEASE
-from send_notifications import get_release_details
+from constants import TESTERS, STATUS_READY, STATUS_FOR_RELEASE
+from build import Build
 
 """ Переназначает задачи текущего релиза между тестировщиками """
 
 
 def main():
     os.makedirs('logs', exist_ok=True)
-    config = ConfigParser()
-    config.read('config.ini')
-    jira_options = {'server': JIRA_SERVER}
-    jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
-    _, release_input, _, fix_issues, _ = get_release_details(config, jira)
+    build = Build()
+    _, release_input, _, fix_issues, _ = build.get_release_details()
     testers = list(TESTERS.keys())
     shuffle(testers)
     delta = 0  # offset for TESTERS in case of issue assign skip

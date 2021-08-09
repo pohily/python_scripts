@@ -1,284 +1,377 @@
-# -*- coding: utf-8 -*-
-
 import logging
-from collections import defaultdict, namedtuple
+from collections import namedtuple
 from configparser import ConfigParser
-import os
+from datetime import datetime
+from sys import argv
+from time import sleep
 
+import gitlab
 import requests
+from atlassian import Confluence
 from jira import JIRA
 
-from constants import PROJECTS_NAMES, PROJECTS_NUMBERS, RELEASE_URL, REMOTE_LINK, GIT_LAB, STATUS_FOR_RELEASE, \
-    PRIORITY, ISSUE_URL, MR_STATUS, JIRA_SERVER
-from merge_requests import Build
-from send_notifications import get_release_details
-
-Merge_request = namedtuple('Merge_request', ['url', 'iid', 'project', 'issue'])  # iid - номер МР в url'е, project - int
+from constants import *
 
 
-def get_merge_requests(config, issue_number, build, return_merged=None):
-    """ Ищет ссылки на невлитые МР в задаче и возвращает их список
-    :return_merged: передается True если надо вернуть влитые МР, обычно возвращаются только невлитые"""
+class Build:
 
-    result = []
-    links_json = requests.get(url=REMOTE_LINK.format(issue_number),
-                                 auth=(config['user_data']['login'], config['user_data']['jira_password'])).json()
-    for link in links_json:
-        if not build.confluence:
-            try:
-                if 'confluence' in link['object']['url'] and link['relationship'] == "mentioned in":
-                    build.confluence = link['object']['url']
-            except KeyError:  # у ссылок на отчеты о тестировании нет 'relationship'
-                pass
-        if 'commit' in link['object']['url'] or GIT_LAB not in link['object']['url']:
-            continue
-        # для предупреждения о запуске тесто после сборки контейнеров
-        if 'docker' in link['object']['url'] or 'msm' in link['object']['url']:
-            build.docker = True
-        url_parts = link['object']['url'].split('/')
-        if len(url_parts) < 6:
-            continue
+    Merge_request = namedtuple('Merge_request',
+                               ['url', 'iid', 'project', 'issue'])  # iid - номер МР в url'е, project - int
+
+    def __init__(self):
+        self.config = ConfigParser()
+        self.config.read('config.ini')
+        self.jira = JIRA(options=JIRA_OPTIONS, auth=(self.config['user_data']['login'],
+                                                     self.config['user_data']['jira_password']))
+        self.gitlab = gitlab.Gitlab(GIT_LAB_SERVER, private_token=self.config['user_data']['GITLAB_PRIVATE_TOKEN'])
+        self.name = self.get_release_name()
+        self.rc_name = f'rc-{self.name.replace(".", "-")}'
+        self.merge_fail = False                                     # наличие незамерженных МР
+        self.docker = False                                         # наличие докера в релизе
+        self.confluence = self.confluence_link(self.name)           # ссылка на конфлуенс
+        self.merge_request_details = namedtuple(
+            'Merge_request_details', ['merge_status', 'source_branch', 'target_branch', 'state']
+        )
+
+    def confluence_link(self, title):
+        confluence = Confluence(
+            url=CONFLUENCE_SERVER,
+            username=self.config['user_data']['login'],
+            password=self.config['user_data']['jira_password']
+        )
         try:
-            project = PROJECTS_NAMES[f'{url_parts[3]}/{url_parts[4]}']
-        except KeyError as e:
-            logging.exception(f'Проверьте задачу {issue_number} - не найден проект {url_parts[3]}/{url_parts[4]}')
-            continue
-        # в связи с обновлением gitlab поменялись url 11/03/20:
-        if GIT_LAB in link['object']['url'] and url_parts[6].isdigit():
-            iid = url_parts[6]
-        elif GIT_LAB in link['object']['url'] and url_parts[7].isdigit():
-            iid = url_parts[7]
+            link = confluence.get_page_by_title(space='AT', title=f'Релиз {title} Отчет о тестировании')
+            return CONFLUENCE_LINK.format(link['id'])
+        except (TypeError, IndexError):
+            return ''
+
+    def get_release_name(self):
+        _, name, _, _, _ = self.get_release_details()
+        return name
+
+    def get_release_details(self, date=False, release=False):
+        """ Получает имя релиза из коммандной строки, либо передается агрументом, либо в тестовом режиме - хардкод
+            Возвращает: дату, имя, страну, задачи релиза и id """
+
+        if not release:
+            try:
+                COMMAND_LINE_INPUT = eval(self.config['options']['COMMAND_LINE_INPUT'])
+                if COMMAND_LINE_INPUT:
+                    if argv[1].startswith('-'):
+                        release_input = argv[2]
+                    else:
+                        release_input = argv[1]
+                else:
+                    release_input = self.config['options']['hardcode_release']
+            except IndexError:
+                logging.exception('Введите имя релиза!')
+                raise Exception('Введите имя релиза!')
         else:
-            logging.warning(f"Проверьте ссылку {link['object']['url']} в задаче {issue_number}")
-            continue
-        merge = Merge_request(link['object']['url'], iid, project, issue_number)
-        if return_merged:
-            result.append(merge)
+            release_input = release
+        fix_issues = self.jira.search_issues(f'fixVersion={release_input}')
+        if date:
+            try:
+                fix_date = fix_issues[0].fields.fixVersions[0].releaseDate
+                fix_date = datetime.strptime(fix_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+            except (AttributeError, UnboundLocalError, TypeError):
+                fix_date = None
+                logging.exception(f'Релиз {release_input} еще не выпущен!')
         else:
-            if not build.is_merged(config, merge):
-                result.append(merge)
-    return result
+            fix_date = None
+        country = release_input.split('.')[0].lower()
+        release_country = COUNTRIES[country]
+        fix_id = fix_issues[0].fields.fixVersions[0].id
+        return fix_date, release_input, release_country, fix_issues, fix_id
 
+    def get_merge_requests(self, issue_number, return_merged=False) -> list:
+        """ Ищет ссылки на МР в задаче и возвращает их список
+        :return_merged: передается True если надо вернуть влитые МР, обычно возвращаются только невлитые"""
 
-def get_links(config, merges, build):
-    """ принимает список кортежей МР одной задачи. Делает МР SLOV -> RC.
-    Заполняет таблицу ссылками на SLOV -> RC и статусами SLOV -> RC """
-
-    statuses = {}  # предварительно собираем статусы, затем все сразу вписываем в таблицу
-    conflict = False  # флаг наличия конфликтов с RC
-    for index, merge in enumerate(merges):
-        #
-        #           Пытаемся создать MR из текущей задачи в RC. Выводим статус в таблицу
-        #
-        logging.info('------------------------------------------')
-        logging.info(f'Пытаемся сделать MR из {merge.issue} в {RC_name} в {PROJECTS_NUMBERS[merge.project]}')
-
-        status, url, mr = build.make_mr_to_rc(config, merge, RC_name)
-        if MR_STATUS['can_be_merged'] not in status:
-            logging.warning(f"Конфликт в задаче {merge.issue} в {merge.project}")
-            conflict = True
-
-        statuses[index] = [status]  # 0
-        statuses[index].append(mr)  # 1
-        url_parts = url.split('/')
-        # в связи с обновлением gitlab поменялись url 11/03/20:
-        if GIT_LAB in url and url_parts[6].isdigit():
-            iid = url_parts[6]
-        elif GIT_LAB in url and url_parts[7].isdigit():
-            iid = url_parts[7]
-        else:
-            logging.exception(f'Проверьте задачу {issue_number} - некорректная ссылка {url}')
-            continue
-        statuses[index].append(f'[{url_parts[3]}/{url_parts[4]}/{iid}|{url}]')  # 2
-    #
-    #           Мержим MR из текущей задачи в RC
-    #
-    if conflict:
-        status = '(x) Не влит'
-    else:
-        status = '(/) Влит'
-    for line in range(len(statuses)):
-        if not conflict:
-            mr = statuses[line][1]
-            status = build.merge_rc(config, mr)
-        statuses[line].append(status)  # 3
-
-    result = ''
-    start = True  # флаг первого МР, если их в задаче несколько
-    # 0 - статус slov -> RC, 1 - mr, 2 - MR url, 3 - влит/не влит
-    for line in range(len(statuses)):
-        if not start: # если МР не первый - добавляем перенос на следующую строку и три пустых ячейки
-            result += f'\n|  |  |  |'
-        result += f'{statuses[line][2]}|{statuses[line][0]}{statuses[line][3]}|'
-        start = False
-    return result
-
-
-if __name__ == '__main__':
-    os.makedirs('logs', exist_ok=True)
-    level = logging.INFO
-    handlers = [logging.FileHandler('logs/log.txt'), logging.StreamHandler()]
-    format = u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s'
-    logging.basicConfig(level=level, format=format, handlers=handlers)
-    logging.info('--------------Начало сборки----------------')
-
-    build = Build()
-    with open('logs/message.txt', 'w') as file:
-        config = ConfigParser()
-        config.read('config.ini')
-        jira_options = {'server': JIRA_SERVER}
-        jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
-        #
-        #           Определяем состав релиза
-        #
-        logging.info('Определяем состав релиза')
-        _, release_name, _, release_issues, release_id = get_release_details(config, jira)
-        RC_name = f'rc-{release_name.replace(".", "-")}'
-        #
-        #           До таблицы
-        #
-        message = f"[*Состав релиза:*|{RELEASE_URL.format(release_id)}]\r\n" \
-                  f"||№||Задача||Приоритет||Мердж реквесты SLOV -> RC||Статус мердж реквеста SLOV -> RC||\r\n"
-        #
-        #           Выбираем задачи для релиза в нужных статусах
-        #
-        logging.info(f'Выбираем задачи для релиза {release_name} в нужных статусах')
-        issues_list = {}
-        before_deploy = []
-        post_deploy = []
-        for issue in release_issues:
-            if 'сборка' not in issue.fields.summary.lower() and issue.fields.status.name in STATUS_FOR_RELEASE:
-                issues_list[issue.key] = PRIORITY[issue.fields.priority.name]
-                bd = issue.fields.customfield_15303  # переддеплойные действия
-                if bd:
-                    before_deploy.append((issue.key, bd))
-                pd = issue.fields.customfield_15302  # постдеплойные действия
-                if pd:
-                    post_deploy.append((issue.key, pd))
-        #
-        #           Собираем мердж реквесты
-        #
-        logging.info('Собираем мердж реквесты')
-        merge_requests = defaultdict(list)  # словарь- задача: список кортежей ссылок и проектов
-        used_projects = set()  # сет проектов всего затронутых в релизе
-        MRless_issues_number = 1
-        MRless_issues = []
-        if issues_list:
-            for issue_number in issues_list:
-                MR_count = get_merge_requests(config, issue_number, build)  # возвращаются только невлитые МР
-                if not MR_count: # если в задаче нет МР вносим задачу в таблицу
-                    message += f"|{MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]|" \
-                               f"{issues_list[issue_number]}| Нет изменений |(/)|\r\n"
-                    MRless_issues_number += 1
-                    MRless_issues.append(issue_number)
-                    continue
-
-                issue_projects = set()  # сет проектов всего затронутых в задаче
-                for merge in MR_count:
-                    used_projects.add(merge.project)
-                    if merge.project not in issue_projects:  # проверяем не было ли в этой задаче нескольких МР в одном
-                        issue_projects.add(merge.project)    # проекте, если несколько - берем один
-                        merge_requests[issue_number].append(merge)
-
-            if MRless_issues:  # убираем задачу без МР из списка задач для сборки RC
-                for item in MRless_issues:
-                    issues_list.pop(item)
-        #
-        #           Удаляем и создаем RC
-        #
-        logging.info('Удаляем и создаем RC')
-        for project in used_projects:
-            build.delete_create_RC(config, project, RC_name)
-        #
-        #           Заполняем таблицу
-        #
-        logging.info('------------------------------------------')
-        logging.info('Заполняем таблицу')  # делаем МР в RC и заполняем таблицу ссылками и статусами МР
-        for index, issue_number in enumerate(sorted(issues_list)):
-            priority = issues_list[issue_number]
-            result = get_links(config, merge_requests[issue_number], build)
-            message += f"|{index + MRless_issues_number}|" \
-                       f"[{issue_number}|" \
-                       f"{ISSUE_URL}{issue_number}]|" \
-                       f"{priority}|{result}\r\n"
-
-        if build.confluence:
-            message += f'\n\r[*Отчет о тестировании*.|{build.confluence}]\n\r'
-        #
-        #           Создаем MR RC -> Staging, RC -> Master для Docker и проектов без стейджинга
-        #
-        logging.info('------------------------------------------')
-        logging.info('Делаем МР RC -> Staging, RC -> Master')
-        rc_master_links, staging_links = build.make_mr_to_staging(config, used_projects, RC_name)
-        #
-        #           RC -> Staging
-        #
-        logging.info('Заполняем ссылки на МР RC -> Staging')
-        message += '\n\r*RC -> Staging*\r\n'
-        for link in staging_links:
-            message += f'\n[{link}]\r'
-        #
-        #           Создаем MR Staging -> Master
-        #
-        logging.info('Делаем МР Staging -> Master')
-        master_links = build.make_mr_to_master(config, used_projects)
-        #
-        #           Staging -> Master
-        #
-        logging.info('Заполняем ссылки на МР Staging -> Master')
-        message += '\n\r*Staging -> Master*\r\n'
-        for link in master_links:
-            message += f'\n[{link}]\r'
-        #
-        #           Docker и проекты без стейджинга -> Master
-        #
-        if rc_master_links:
-            logging.info('Заполняем ссылки на МР RC -> Master')
-            message += '\r\n*RC -> Master*\r\n'
-            for link in rc_master_links:
-                message += f'\n[{link}]\r'
-        #
-        #           Преддеплойные действия
-        #
-        logging.info('Заполняем деплойные действия')
-        message_before_deploy = ''
-        if before_deploy:
-            for issue in before_deploy:
-                message_before_deploy += f'* *{issue[0]}*: {issue[1]}\r\n'
-        #
-        #           Постдеплойные действия
-        #
-        message_post_deploy = ''
-        if post_deploy:
-            for issue in post_deploy:
-                message_post_deploy += f'* *{issue[0]}*: {issue[1]}\r\n'
-        #
-        #           Вывод результата в Jira
-        #
-        CREATE_JIRA_ISSUE = eval(config['options']['CREATE_JIRA_ISSUE'])
-        if CREATE_JIRA_ISSUE:
-            logging.info('Вывод результата в Jira')
-            existing_issue = jira.search_issues(f'project=SLOV AND summary ~ "Сборка {release_name}"')
-            if existing_issue:
-                existing_issue = existing_issue[0]
-                existing_issue.update(fields={
-                    'description': message,
-                    'customfield_15303': message_before_deploy,
-                    'customfield_15302': message_post_deploy,
-                })
+        result = []
+        links_json = requests.get(url=REMOTE_LINK.format(issue_number),
+                                  auth=(self.config['user_data']['login'],
+                                        self.config['user_data']['jira_password'])).json()
+        for link in links_json:
+            if 'confluence' in link['object']['url']:
+                continue
+            if 'commit' in link['object']['url'] or GIT_LAB not in link['object']['url']:
+                continue
+            # для предупреждения о запуске тесто после сборки контейнеров
+            if 'docker' in link['object']['url'] or 'msm' in link['object']['url']:
+                self.docker = True
+            url_parts = link['object']['url'].split('/')
+            if len(url_parts) < 6:
+                continue
+            try:
+                project = PROJECTS_NAMES[f'{url_parts[3]}/{url_parts[4]}']
+            except KeyError:
+                logging.exception(f'Проверьте задачу {issue_number} - не найден проект {url_parts[3]}/{url_parts[4]}')
+                continue
+            # в связи с обновлением gitlab поменялись url 11/03/20:
+            if GIT_LAB in link['object']['url'] and url_parts[6].isdigit():
+                iid = url_parts[6]
+            elif GIT_LAB in link['object']['url'] and url_parts[7].isdigit():
+                iid = url_parts[7]
             else:
-                issue_dict = {
-                    "fixVersions": [{"name": release_name,}],
-                    'project': {'key': 'SLOV'},
-                    'summary': f"Сборка {release_name}",
-                    'description': message,
-                    'issuetype': {'name': 'RC'},  #  специальный тип задачи для сборок
-                    'customfield_15303': message_before_deploy,
-                    'customfield_15302': message_post_deploy,
-                }
-                new_issue = jira.create_issue(fields=issue_dict)
-        #
-        #           Вывод результата в файл
-        #
-        file.write(message)
+                logging.warning(f"Проверьте ссылку {link['object']['url']} в задаче {issue_number}")
+                continue
+            merge = self.Merge_request(link['object']['url'], iid, project, issue_number)
+            if return_merged:
+                result.append(merge)
+            else:
+                if not self.is_merged(merge):
+                    result.append(merge)
+        return result
 
+    def get_links(self, issue_number, merges):
+        """ принимает номер задачи и список кортежей ее МР. Делает МР SLOV -> RC.
+        Заполняет таблицу ссылками на SLOV -> RC и статусами SLOV -> RC """
+
+        statuses = {}  # предварительно собираем статусы, затем все сразу вписываем в таблицу
+        conflict = False  # флаг наличия конфликтов с RC
+        for index, merge in enumerate(merges):
+            #
+            #           Пытаемся создать MR из текущей задачи в RC. Выводим статус в таблицу
+            #
+            logging.info('------------------------------------------')
+            logging.info(f'Пытаемся сделать MR из {merge.issue} в {self.rc_name} в {PROJECTS_NUMBERS[merge.project]}')
+
+            status, url, mr = self.make_mr_to_rc(mr=merge)
+            if MR_STATUS['can_be_merged'] not in status:
+                logging.warning(f"Конфликт в задаче {merge.issue} в {merge.project}")
+                conflict = True
+
+            statuses[index] = [status]  # 0
+            statuses[index].append(mr)  # 1
+            url_parts = url.split('/')
+            # в связи с обновлением gitlab поменялись url 11/03/20:
+            if GIT_LAB in url and url_parts[6].isdigit():
+                iid = url_parts[6]
+            elif GIT_LAB in url and url_parts[7].isdigit():
+                iid = url_parts[7]
+            else:
+                logging.exception(f'Проверьте задачу {issue_number} - некорректная ссылка {url}')
+                continue
+            statuses[index].append(f'[{url_parts[3]}/{url_parts[4]}/{iid}|{url}]')  # 2
+        #
+        #           Мержим MR из текущей задачи в RC
+        #
+        if conflict:
+            status = '(x) Не влит'
+        else:
+            status = '(/) Влит'
+        for line in range(len(statuses)):
+            if not conflict:
+                mr = statuses[line][1]
+                status = self.merge_rc(mr)
+            statuses[line].append(status)  # 3
+
+        result = ''
+        start = True  # флаг первого МР, если их в задаче несколько
+        # 0 - статус slov -> RC, 1 - mr, 2 - MR url, 3 - влит/не влит
+        for line in range(len(statuses)):
+            if not start:  # если МР не первый - добавляем перенос на следующую строку и три пустых ячейки
+                result += f'\n|  |  |  |'
+            result += f'{statuses[line][2]}|{statuses[line][0]}{statuses[line][3]}|'
+            start = False
+        return result
+
+    def delete_create_rc(self, project):
+        """ Для каждого затронутого релизом проекта удаляем RC, если есть. Затем создаем RC """
+        if TEST:
+            return '(/)Тест'
+
+        pr = self.gitlab.projects.get(f'{project}')
+        try:
+            rc = pr.branches.get(f'{self.rc_name}')
+            rc.delete()
+            pr.branches.create({'branch': f'{self.rc_name}', 'ref': 'master'})
+        except (gitlab.exceptions.GitlabGetError, gitlab.exceptions.GitlabHttpError):
+            pr.branches.create({'branch': f'{self.rc_name}', 'ref': 'master'})
+
+    def get_merge_request_details(self, mr):
+        """ Возвращает статус (есть или нет конфликты), source_branch """
+        _, iid, project, _ = mr
+        token = f"private_token={(self.config['user_data']['GITLAB_PRIVATE_TOKEN'])}"
+        details = requests.get(url=MR_BY_IID.format(project, iid, token)).json()
+        if details:
+            details = details[0]
+            return self.merge_request_details(
+               MR_STATUS[details['has_conflicts']], details['source_branch'], details['target_branch'], details['state']
+            )
+        else:
+            logging.error(f'MR не найден {mr}')
+            return self.merge_request_details('MR не найден', '', '', '')
+
+    def is_merged(self, merge) -> bool:
+        """ Возвращаем статус МР в мастер """
+        pr = self.gitlab.projects.get(f'{merge.project}')
+        _, source, _, _ = self.get_merge_request_details(merge)
+        mr = pr.mergerequests.list(state='merged', source_branch=source, target_branch='master')
+        return bool(mr)
+
+    def make_mr_to_rc(self, mr):
+        """ Создаем МР slov -> RC. Возвращем статус МР, его url и сам МР"""
+        if TEST:
+            return '(/) Тест', 'https://gitlab.4slovo.ru/4slovo.ru/chestnoe_slovo_backend/merge_requests/тест', 'тест'
+
+        project = self.gitlab.projects.get(f'{mr.project}')
+        _, source_branch, target_branch, state = self.get_merge_request_details(mr)
+        if state == 'merged' and target_branch == 'master':              # если МР уже влит в мастер - не берем его в RC
+            logging.warning(f'В задаче {mr.issue} мердж реквест {mr.project} уже в мастере')
+            return '(/) Уже в мастере, ', mr.url, False
+        target_branch = f'{self.rc_name}'
+        #
+        #           проверка статусов pipeline
+        #
+        status = ''
+        if mr.project in PROJECTS_WITH_TESTS:
+            issue = mr.issue.lower()
+            pipelines = project.pipelines.list(ref=f'{issue}')
+            if pipelines:
+                pipelines = pipelines[0]
+                if pipelines.attributes['status'] != 'success':
+                    logging.warning(f'В задаче {mr.issue} в проекте {PROJECTS_NUMBERS[mr.project]} не прошли тесты')
+                    status = '(x) Тесты не прошли!, '
+
+        merge = project.mergerequests.list(state='opened', source_branch=source_branch, target_branch=target_branch)
+        if merge:
+            merge = merge[0]
+        else:
+            merge = project.mergerequests.create({'source_branch': source_branch,
+                                                  'target_branch': target_branch,
+                                                  'title': f"{mr.issue.replace('-', '_')} -> {self.rc_name}",
+                                                  'target_project_id': mr.project,
+                                                  })
+        merge_status, _, _, _ = self.get_merge_request_details(
+            (1, merge.attributes['iid'], merge.attributes['project_id'], 1)
+        )
+        status += merge_status
+        url = merge.attributes['web_url']
+        return status, url, merge
+
+    def merge_rc(self, mr):
+        if TEST:
+            return
+
+        if not isinstance(mr, bool) and mr.attributes['state'] != 'merged':
+            logging.info(f"Мержим MR {mr.attributes['iid']} merge_status={mr.attributes['merge_status']}, "
+                         f"has_conflicts={mr.attributes['has_conflicts']}, из {mr.attributes['source_branch']} в RC")
+            try:
+                mr.merge()
+                logging.info('OK')
+                return '(/) Влит'
+            except:
+                sleep(2)  # 2nd try после обновления Гитлаб бывает не сразу дает статус МР
+                try:
+                    mr.merge()
+                    logging.info('2 Try. OK')
+                    return '(/) Влит'
+                except:
+                    self.merge_fail = True
+                    logging.error(f"{mr.attributes['iid']} НЕ ВЛИТ! - Конфликт?")
+                    return '(x) Не влит'
+
+    def make_mr_to_staging(self, projects):
+        """ Делаем МР из RC в стейджинг для всех затронутых проектов и возвращаем список ссылок на МР """
+        if TEST:
+            return [projects]
+
+        staging_links = []  # ссылки для вывода под таблицей
+        master_links = []
+        if self.docker:
+            tests = DOCKER_PROJECTS
+            logging.warning(
+                '\033[31m Запустите тесты в Gitlab после сборки контейнеров докера/msm/финмодуля в RC вручную! \033[0m'
+            )
+        else:
+            tests = PROJECTS_WITH_TESTS
+        for pr in projects:
+            project = self.gitlab.projects.get(pr)
+            source_branch = self.rc_name
+            if pr in DOCKER_PROJECTS or pr in PROJECTS_WITHOUT_STAGING:
+                target_branch = 'master'
+            else:
+                target_branch = 'staging'
+            title = f'{self.rc_name} -> {target_branch}'
+            mr = project.mergerequests.list(state='opened', source_branch=source_branch, target_branch=target_branch)
+            if mr:
+                mr = mr[0]
+            else:
+                mr = project.mergerequests.create({'source_branch': source_branch,
+                                                   'target_branch': target_branch,
+                                                   'title': title,
+                                                   'target_project_id': pr,
+                                                   })
+            if pr in DOCKER_PROJECTS or pr in PROJECTS_WITHOUT_STAGING:
+                master_links.append(mr.attributes['web_url'])
+            else:
+                staging_links.append(mr.attributes['web_url'])
+
+            # Делаем коммит с названием последнего билда - раньше запускал тесты и билд контейнеров докера,
+            # сейчас отключили автоматический запуск тестов - запускаю дальше вручную
+            if pr in tests:
+                try:
+                    project.branches.get(self.rc_name)   # если в проекте нет RC,то и коммит не нужен
+                    try:
+                        commit_json = {
+                            "branch": f"{self.rc_name}",
+                            "commit_message": "actualize last_build",
+                            "actions": [
+                                {
+                                    "action": "update",
+                                    "file_path": f"last_build",
+                                    "content": f"{self.rc_name}"
+                                },
+                            ]
+                        }
+                        project.commits.create(commit_json)
+                    except gitlab.exceptions.GitlabCreateError:
+                        commit_json = {
+                            "branch": f"{self.rc_name}",
+                            "commit_message": "actualize last_build",
+                            "actions": [
+                                {
+                                    "action": "create",
+                                    "file_path": f"last_build",
+                                    "content": f"{self.rc_name}"
+                                },
+                            ]
+                        }
+                        project.commits.create(commit_json)
+                except gitlab.exceptions.GitlabGetError:
+                    logging.exception(f'Не найдена ветка {self.rc_name} в {PROJECTS_COUNTRIES[pr]}')
+
+                if not self.merge_fail:
+                    pipelines = project.pipelines.list()
+                    # Запуск тестов в проекте
+                    for pipeline in pipelines:
+                        if pipeline.attributes['ref'] == self.rc_name and pipeline.attributes['status'] == 'skipped':
+                            pipeline_job = pipeline.jobs.list()[0]
+                            job = project.jobs.get(pipeline_job.id, lazy=True)
+                            job.play()
+                            logging.info(f'Тесты запущены в проекте {PROJECTS_NUMBERS[pr]}')
+                            break
+        return master_links, staging_links
+
+    def make_mr_to_master(self, projects):
+        """ Делаем МР из стейджинга в мастер для всех затронутых проектов и возвращаем список ссылок на МР """
+        if TEST:
+            return [projects]
+
+        mr_links = []  # ссылки для вывода под таблицей
+        for pr in projects:
+            if pr in DOCKER_PROJECTS or pr in PROJECTS_WITHOUT_STAGING:
+                continue
+            project = self.gitlab.projects.get(pr)
+            mr = project.mergerequests.list(state='opened', source_branch='staging', target_branch='master')
+            if mr:
+                mr = mr[0]
+            else:
+                mr = project.mergerequests.create({'source_branch': 'staging',
+                                                   'target_branch': 'master',
+                                                   'title': 'staging -> master',
+                                                   'target_project_id': pr,
+                                                   })
+            mr_links.append(mr.attributes['web_url'])
+        return mr_links
