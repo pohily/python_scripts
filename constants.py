@@ -14,7 +14,8 @@ PROJECTS_NAMES = {"4slovo.ru/chestnoe_slovo": 7, "4slovo.ru/4slv":10, "4slovo.kz
                   "docker/replicator": 144, "4slovo.ru/python-scripts": 154, "4slovo.kz/landing": 159, "docker/ru": 166,
                   "docker/ru-db": 167, "docker/fias": 172, "4slovo/anonymize-replicator": 178, "module/msm": 187,
                   "4slovo/anon-server": 194, "docker/external_images": 201, "sites/4slokz": 204,
-                  "4slovo/sumsub-client": 207, "docker/alpine-pkgs-repo": 212, "4slovo.ru/osticket": 223
+                  "4slovo/sumsub-client": 207, "docker/alpine-pkgs-repo": 212, "4slovo.ru/osticket": 223,
+                  "4slovo/short_link_client": 225
                   }
 
 PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo",10: "4slovo.ru/4slv",  11: "4slovo.kz/crm4slovokz",
@@ -30,7 +31,8 @@ PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo",10: "4slovo.ru/4slv",  11: "4s
                     154: "4slovo.ru/python-scripts", 159: "4slovo.kz/landing", 166: "docker/ru",167: "docker/ru-db",
                     172: "docker/fias", 178: "4slovo/anonymize-replicator", 187: "module/msm",
                     194: "4slovo/anon-server", 201: "docker/external_images", 204: "sites/4slokz",
-                    207: "4slovo/sumsub-client", 212: "docker/alpine-pkgs-repo", 223: "4slovo.ru/osticket"
+                    207: "4slovo/sumsub-client", 212: "docker/alpine-pkgs-repo", 223: "4slovo.ru/osticket",
+                    225: "4slovo/short_link_client"
                     }
 
 PROJECTS_COUNTRIES = {7: "ru", 10: "ru", 11: "kz", 12: "kz", 20: "ru", 22: "kz", 23: "ge", 24: "ge", 61: "ru",
@@ -40,7 +42,7 @@ PROJECTS_COUNTRIES = {7: "ru", 10: "ru", 11: "kz", 12: "kz", 20: "ru", 22: "kz",
                       128: "ge", 129: "ge", 130: "ru", 135: "ru, kz, ge", 138: "ru, kz, ge", 139: "ru, kz, ge",
                       144: "ru, kz, ge", 154: "ru", 159: "kz", 166: "ru", 167: "ru", 172: "ru, kz", 178: "ru, kz",
                       187: "ru", 194: "ru, kz", 201: "ru, kz, ge", 204: "kz", 207: "ru, kz, ge", 212: "ru, kz, ge",
-                      223: "ru"
+                      223: "ru", 225: "ru"
                       }
 
 COUNTRIES = {
@@ -58,7 +60,7 @@ SYSTEM_USERS = {
         '4slovo/finance_client': '', '4slovo/anonymize-replicator': '', 'docker/external_images': '',
         'docker/finance': '', '4slovo/anon-server': '', '4slovo/logging': '', '4slovo/expression': '',
         '4slovo.ru/common': '', '4slovo/common': '', '4slovo/sawmill': '', 'docker/ru-db': '', 'docker/fias': '',
-        '4slovo.ru/fias': '', 'docker/alpine-pkgs-repo': '', '4slovo.ru/osticket': 'ost'
+        '4slovo.ru/fias': '', 'docker/alpine-pkgs-repo': '', '4slovo.ru/osticket': '', "4slovo/short_link_client": ''
     },
     'ru2': {
         '4slovo/finance': 'ru_finance', '4slovo/fs': 'ru_fs', '4slovo.ru/chestnoe_slovo': 'ru_frontend',
@@ -67,7 +69,7 @@ SYSTEM_USERS = {
         '4slovo/finance_client': '', '4slovo/anonymize-replicator': '', 'docker/external_images': '',
         'docker/finance': '', '4slovo/anon-server': '', '4slovo/logging': '', '4slovo/expression': '',
         '4slovo.ru/common': '', '4slovo/common': '', '4slovo/sawmill': '', 'docker/ru-db': '', 'docker/fias': '',
-        '4slovo.ru/fias': '', 'docker/alpine-pkgs-repo': ''
+        '4slovo.ru/fias': '', 'docker/alpine-pkgs-repo': '', '4slovo.ru/osticket': '', "4slovo/short_link_client": ''
     },
     'kz': {
         '4slovo/finance': 'kz_finance', '4slovo/fs': 'kz_fs', '4slovo.kz/4slovokz': 'kz_f',
