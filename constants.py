@@ -12,13 +12,13 @@ PROJECTS_NAMES = {"4slovo.ru/chestnoe_slovo": 7, "4slovo.ru/4slv":10, "4slovo.kz
                   "almal.ge/almalge": 128, "almal.ge/crmalmalge": 129, "4slovo.ru/python-tests": 130,
                   "4slovo/logging": 135, "4slovo/timeservice": 138, "4slovo/timeservice_client": 139,
                   "docker/replicator": 144, "4slovo.ru/python-scripts": 154, "4slovo.kz/landing": 159, "docker/ru": 166,
-                  "docker/ru-db": 167, "docker/fias": 172, "4slovo/anonymize-replicator": 178, "module/msm": 187,
-                  "4slovo/anon-server": 194, "docker/external_images": 201, "sites/4slokz": 204,
+                  "docker/ru-db": 167, "docker/kz-db": 171, "docker/fias": 172, "4slovo/anonymize-replicator": 178,
+                  "module/msm": 187, "4slovo/anon-server": 194, "docker/external_images": 201, "sites/4slokz": 204,
                   "4slovo/sumsub-client": 207, "docker/alpine-pkgs-repo": 212, "4slovo.ru/osticket": 223,
                   "4slovo/short_link_client": 225
                   }
 
-PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo",10: "4slovo.ru/4slv",  11: "4slovo.kz/crm4slovokz",
+PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo", 10: "4slovo.ru/4slv", 11: "4slovo.kz/crm4slovokz",
                     12: "4slovo.kz/4slovokz", 20: "4slovo.ru/chestnoe_slovo_backend", 22: "4slovo.ru/common",
                     23: "mrloan.ge/mrloange", 24: "mrloan.ge/crmmrloange", 61: "4slovo.ru/fias",
                     62: "4slovo.ru/chestnoe_slovo_landing", 79: "4slovo.ru/api", 86: "4slovo/cache",
@@ -29,20 +29,20 @@ PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo",10: "4slovo.ru/4slv",  11: "4s
                     129: "almal.ge/crmalmalge", 130: "4slovo.ru/python-tests", 135: "4slovo/logging",
                     138: "4slovo/timeservice", 139: "4slovo/timeservice_client", 144: "docker/replicator",
                     154: "4slovo.ru/python-scripts", 159: "4slovo.kz/landing", 166: "docker/ru",167: "docker/ru-db",
-                    172: "docker/fias", 178: "4slovo/anonymize-replicator", 187: "module/msm",
+                    171: "docker/kz-db", 172: "docker/fias", 178: "4slovo/anonymize-replicator", 187: "module/msm",
                     194: "4slovo/anon-server", 201: "docker/external_images", 204: "sites/4slokz",
                     207: "4slovo/sumsub-client", 212: "docker/alpine-pkgs-repo", 223: "4slovo.ru/osticket",
                     225: "4slovo/short_link_client"
                     }
 
-PROJECTS_COUNTRIES = {7: "ru", 10: "ru", 11: "kz", 12: "kz", 20: "ru", 22: "kz", 23: "ge", 24: "ge", 61: "ru",
+PROJECTS_COUNTRIES = {7: "ru", 10: "ru, kz", 11: "kz", 12: "kz", 20: "ru", 22: "kz", 23: "ge", 24: "ge", 61: "ru",
                       62: "ru", 79: "ru", 86: "ru, kz, ge", 90: "ru, kz, ge", 91: "ru, kz, ge", 92: "ru, kz, ge",
                       93: "ru, kz, ge", 94: "ru, kz, ge", 97: "ru, kz, ge", 100: "ge", 103: "ru, kz, ge", 110: "kz",
                       113: "ru, kz, ge", 116: "ru, kz, ge", 117: "ru, kz, ge", 121: "ge", 125: "ru, kz, ge",
                       128: "ge", 129: "ge", 130: "ru", 135: "ru, kz, ge", 138: "ru, kz, ge", 139: "ru, kz, ge",
-                      144: "ru, kz, ge", 154: "ru", 159: "kz", 166: "ru", 167: "ru", 172: "ru, kz", 178: "ru, kz",
-                      187: "ru", 194: "ru, kz", 201: "ru, kz, ge", 204: "kz", 207: "ru, kz, ge", 212: "ru, kz, ge",
-                      223: "ru", 225: "ru"
+                      144: "ru, kz, ge", 154: "ru", 159: "kz", 166: "ru", 167: "ru", 171: "kz", 172: "ru, kz",
+                      178: "ru, kz", 187: "ru", 194: "ru, kz", 201: "ru, kz, ge", 204: "kz", 207: "ru, kz, ge",
+                      212: "ru, kz, ge", 223: "ru", 225: "ru, kz, ge"
                       }
 
 COUNTRIES = {
@@ -73,11 +73,13 @@ SYSTEM_USERS = {
     },
     'kz': {
         '4slovo/finance': 'kz_finance', '4slovo/fs': 'kz_fs', '4slovo.kz/4slovokz': 'kz_f',
-        '4slovo.kz/crm4slovokz': 'kz_backend_mfo', 'docker/kz': '', '4slovo/sumsub-client': '', 'sites/4slokz': ''
+        '4slovo.kz/crm4slovokz': 'kz_backend_mfo', 'docker/kz': '', '4slovo/sumsub-client': '', 'sites/4slokz': '',
+        'docker/kz-db': ''
     },
     'kz2': {
         '4slovo/finance': 'kz_finance', '4slovo/fs': 'kz_fileshare', '4slovo.kz/4slovokz': 'kz_frontend',
-        '4slovo.kz/crm4slovokz': 'kz_backend_mfo', 'docker/kz': '', '4slovo/sumsub-client': '', 'sites/4slokz': ''
+        '4slovo.kz/crm4slovokz': 'kz_backend_mfo', 'docker/kz': '', '4slovo/sumsub-client': '', 'sites/4slokz': '',
+        'docker/kz-db': ''
     }
 }
 
