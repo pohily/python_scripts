@@ -49,7 +49,7 @@ COUNTRIES = {
     'ru': 'Россия', 'kz': 'Казахстан', 'ge': 'Грузия'
 }
 COUNTRIES_ABBR = {
-    'Россия': 'ru', 'Казахстан': 'kz', 'Грузия':'ge'
+    'Россия': 'ru', 'Казахстан': 'kz', 'Грузия': 'ge'
 }
 
 SYSTEM_USERS = {
@@ -172,6 +172,9 @@ SMTP_PORT = 587
 SMTP_SERVER = 'smtp.4slovo.ru'
 
 TEST = False
+
+DATABASE = {'BACK': 'BACK',
+            'FRONT': 'FRONT'}
 
 if __name__ == '__main__':
     config = ConfigParser()
