@@ -1,6 +1,7 @@
 import paramiko
 import sys
 from build import ConfigParser
+from tqdm import tqdm
 
 
 class Staging:
@@ -61,7 +62,10 @@ class Staging:
 
 def main():
     staging = Staging()
-    staging.connect()
+    t = tqdm()
+    tqdm.display(t, msg="Прогресс загрузки дампов", pos=None)
+    for call in ['connect', 'upload_frontend_dump', 'upload_backed_dump']:
+        eval(f'staging.call()')
 
 
 if __name__ == '__main__':
