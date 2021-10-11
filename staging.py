@@ -9,14 +9,9 @@ class Staging:
     def __init__(self):
         self.country = self.get_country()
         self.client = self.server = self.username = self.password = None
-        self.locale = None
+        self.locale = self.staging_ru_password_backend_database = None
 
     def connect(self):
-        config = ConfigParser()
-        config.read('config.ini')
-        self.server = config['staging'][f'host_{self.country}']
-        self.username = config['staging'][f'user_{self.country}']
-        self.password = config['staging'][f'staging_password_{self.country}']
         self.client = paramiko.SSHClient()
         self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         self.client.connect(self.server, port=22, username=self.username, password=self.password)
@@ -53,19 +48,31 @@ class Staging:
                     f'mysql -u {self.username} -p {self.country}_backend{postfix_db}' \
                     f' < {self.country}_backend{postfix_db}.sql'
                 self.client.exec_command(command)
-        else:
+        elif self.country == 'ru':
+
             cmd_login = 'sudo -Siu crm4slovo '
-            command = cmd_login + f'mysql -u {self.username} -p {self.country}_backend < {self.country}_backend.sql'
-            self.client.exec_command(command)
+            command = cmd_login + f'mysql -u {self.country}_backend -p {self.staging_ru_password_backend_database}' \
+                                  f' {self.country}_backend < dumps/mariadb/{self.country}_backend.sql'
+            _, ssh_stdout, _ = self.client.exec_command(command)
+            result = ssh_stdout.read().decode('utf-8').strip("\n")
         self.client.close()
+
+    def get_config_data(self):
+        config = ConfigParser()
+        config.read('config.ini')
+        self.server = config['staging'][f'host_{self.country}']
+        self.username = config['staging'][f'user_{self.country}']
+        self.password = config['staging'][f'staging_password_{self.country}']
+        self.staging_ru_password_backend_database = \
+            config['staging'][f'staging_{self.country}_password_backend_database']
 
 
 def main():
     staging = Staging()
     t = tqdm()
     tqdm.display(t, msg="Прогресс загрузки дампов", pos=None)
-    for call in ['connect', 'upload_frontend_dump', 'upload_backed_dump']:
-        eval(f'staging.call()')
+    for call in ['get_config_data', 'connect', 'upload_backend_dump']:
+        eval(f'staging.{call}()')
 
 
 if __name__ == '__main__':
