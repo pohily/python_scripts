@@ -40,10 +40,28 @@ class Staging:
         _, ssh_stdout, _ = self.client.exec_command(command)
         self.client.close()
 
+    def upload_backend_dump(self):
+        self.connect()
+        if self.country == 'kz':
+            cmd_login = 'sudo -Siu kz_{} '
+            for postfix in ['crm:', 'backend_mfo:_mfo']:
+                postfix_list = postfix.split(':')
+                postfix_login = postfix_list[0]
+                postfix_db = postfix_list[1]
+                command = cmd_login.format(postfix_login) +\
+                    f'mysql -u {self.username} -p {self.country}_backend{postfix_db}' \
+                    f' < {self.country}_backend{postfix_db}.sql'
+                self.client.exec_command(command)
+        else:
+            cmd_login = 'sudo -Siu crm4slovo '
+            command = cmd_login + f'mysql -u {self.username} -p {self.country}_backend < {self.country}_backend.sql'
+            self.client.exec_command(command)
+        self.client.close()
+
 
 def main():
-    upload_dump_to_staging = Staging()
-    upload_dump_to_staging.connect()
+    staging = Staging()
+    staging.connect()
 
 
 if __name__ == '__main__':
