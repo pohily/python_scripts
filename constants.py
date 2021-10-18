@@ -142,7 +142,7 @@ PROJECTS_WITHOUT_STAGING = [22, 86, 90, 91, 92, 103, 113, 116, 121, 125, 135, 13
         207: 4slovo/sumsub-client
         212: docker/alpine-pkgs-repo
 """
-DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167, 172, 187, 201]
+DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167, 172, 201]
 """
         94: docker/finance
         97: docker/api
@@ -151,7 +151,7 @@ DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167, 172, 187, 201]
         166: docker/ru
         167: docker/ru-db
         172: docker/fias
-        187: module/msm
+        187: module/msm - пока убрали - надо вливать в стейджинг
         201: docker/external_images
         212: docker/alpine-pkgs-repo
 """
