@@ -9,7 +9,9 @@ class Staging:
     def __init__(self):
         self.country = self.get_country()
         self.client = self.server = self.username = self.password = None
-        self.locale = self.staging_ru_password_backend_database = self.staging_ru_password_frontend_database = None
+        self.staging_frontend_user_database = self.staging_backend_user_database = None
+        self.locale = self.staging_frontend_password_database = self.staging_backend_password_database = None
+        self.staging_frontend_base_name = self.staging_backend_base_name = None
         self.frontend_path = 'dumps/docker/frontend_dump.sql'
         self.backend_path = 'dumps/docker/backend_dump.sql'
         self.cmd_login = None
@@ -36,17 +38,22 @@ class Staging:
         self.connect()
         self.get_cmd_login()
         command = f'{self.cmd_login} cat {self.frontend_path} |' + self.cmd_login + \
-                  f'mysql -u{self.username} -p{self.staging_ru_password_frontend_database} {self.country}_frontend.sql'
+                  f'mysql -u{self.staging_frontend_user_database} ' \
+                  f'-p{self.staging_frontend_password_database} {self.staging_frontend_base_name}'
         _, ssh_stdout, _ = self.client.exec_command(command)
+        result = ssh_stdout.read().decode('utf-8').strip("\n")
+        print(result)
         self.client.close()
 
     def upload_backend_dump(self):
         self.connect()
         self.get_cmd_login()
         command = f'{self.cmd_login} cat {self.backend_path} |' + self.cmd_login + \
-                  f'mysql -u{self.username} -p{self.staging_ru_password_backend_database} {self.country}_frontend.sql'
+                  f'mysql -u{self.staging_backend_user_database} ' \
+                  f'-p{self.staging_backend_password_database} {self.staging_backend_base_name}'
         _, ssh_stdout, _ = self.client.exec_command(command)
         result = ssh_stdout.read().decode('utf-8').strip("\n")
+        print(result)
         self.client.close()
 
     def get_config_data(self):
@@ -55,10 +62,14 @@ class Staging:
         self.server = config['staging'][f'host_{self.country}']
         self.username = config['staging'][f'user_{self.country}']
         self.password = config['staging'][f'staging_password_{self.country}']
-        self.staging_ru_password_backend_database = \
-            config['staging'][f'staging_{self.country}_password_backend_database']
-        self.staging_ru_password_frontend_database = \
-            config['staging'][f'staging_{self.country}_password_frontend_database']
+        self.staging_frontend_user_database = config['staging'][f'staging_{self.country}_frontend_user_database']
+        self.staging_backend_user_database = config['staging'][f'staging_{self.country}_backend_user_database']
+        self.staging_frontend_password_database = \
+            config['staging'][f'staging_{self.country}_frontend_password_database']
+        self.staging_backend_password_database = \
+            config['staging'][f'staging_{self.country}_backend_password_database']
+        self.staging_frontend_base_name = config['staging'][f'staging_{self.country}_frontend_base_name']
+        self.staging_backend_base_name = config['staging'][f'staging_{self.country}_backend_base_name']
 
     def get_cmd_login(self):
         self.cmd_login = 'sudo -Siu crm4slovo' if self.country == 'ru' else 'sudo -Siu kz_backend_mfo'
@@ -69,7 +80,7 @@ def main():
     staging = Staging()
     t = tqdm()
     tqdm.display(t, msg="Прогресс загрузки дампов", pos=None)
-    for call in ['get_config_data', 'connect', 'upload_backend_dump']:
+    for call in ['get_config_data', 'upload_frontend_dump', 'upload_backend_dump']:
         eval(f'staging.{call}()')
 
 
