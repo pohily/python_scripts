@@ -93,12 +93,22 @@ class Staging:
         self.cmd_login = 'sudo -Siu crm4slovo' if self.country == 'ru' else 'sudo -Siu kz_backend_mfo'
         return self.cmd_login
 
+    def run_migration(self):
+        self.connect()
+        self.get_cmd_login()
+        command = f'{self.cmd_login} + httpdocs/vendor/bin/phinx m'
+        _, ssh_stdout, _ = self.client.exec_command(command)
+        result = ssh_stdout.read().decode('utf-8').strip("\n")
+        print(result)
+        self.client.close()
+
 
 def main():
     staging = Staging()
     t = tqdm()
     tqdm.display(t, msg="Заливаю дампы", pos=None)
-    for method in ['get_config_data', 'upload_frontend_dump', 'upload_backend_dump', 'upload_finance_dump']:
+    for method in ['get_config_data', 'upload_frontend_dump', 'upload_backend_dump', 'upload_finance_dump',
+                   'run_migration']:
         eval(f'staging.{method}()')
 
 
