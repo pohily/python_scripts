@@ -40,42 +40,42 @@ class Staging:
     def upload_frontend_dump(self):
         self.connect()
         self.get_cmd_login()
-        command = f'{self.cmd_login} cat {self.frontend_path} |' + self.cmd_login + \
+        command = f'{self.cmd_login} cat {self.frontend_path} | ' + self.cmd_login + ' ' \
                   f'mysql -u{self.staging_frontend_user_database} ' \
                   f'-p{self.staging_frontend_password_database} {self.staging_frontend_base_name}'
         _, ssh_stdout, _ = self.client.exec_command(command)
         result = ssh_stdout.read().decode('utf-8').strip("\n")
-        print(result)
         self.client.close()
+        return result
 
     def upload_backend_dump(self):
         self.connect()
         self.get_cmd_login()
-        command = f'{self.cmd_login} cat {self.backend_path} |' + self.cmd_login + \
+        command = f'{self.cmd_login} cat {self.backend_path} | ' + self.cmd_login + ' ' \
                   f'mysql -u{self.staging_backend_user_database} ' \
                   f'-p{self.staging_backend_password_database} {self.staging_backend_base_name}'
         _, ssh_stdout, _ = self.client.exec_command(command)
         result = ssh_stdout.read().decode('utf-8').strip("\n")
-        print(result)
         self.client.close()
+        return result
 
     def upload_finance_dump(self):
         self.connect()
         self.get_cmd_login()
-        command = f'{self.cmd_login} cat {self.finance_path} |' + self.cmd_login + \
+        command = f'{self.cmd_login} cat {self.finance_path} | ' + self.cmd_login + ' ' \
                   f'mysql -u{self.staging_finance_user_database} ' \
                   f'-p{self.staging_finance_password_database} {self.staging_finance_base_name}'
         _, ssh_stdout, _ = self.client.exec_command(command)
         result = ssh_stdout.read().decode('utf-8').strip("\n")
-        print(result)
         self.client.close()
+        return result
 
     def get_config_data(self):
         config = ConfigParser()
         config.read('config.ini')
         self.server = config['staging'][f'host_{self.country}']
         self.username = config['staging'][f'user_{self.country}']
-        self.password = config['staging'][f'staging_password_{self.country}']
+        self.password = config['staging'][f'password_{self.country}']
         self.staging_frontend_user_database = config['staging'][f'staging_{self.country}_frontend_user_database']
         self.staging_backend_user_database = config['staging'][f'staging_{self.country}_backend_user_database']
         self.staging_finance_user_database = config['staging'][f'staging_{self.country}_finance_user_database']
@@ -96,20 +96,24 @@ class Staging:
     def run_migration(self):
         self.connect()
         self.get_cmd_login()
-        command = f'{self.cmd_login} + httpdocs/vendor/bin/phinx m'
-        _, ssh_stdout, _ = self.client.exec_command(command)
-        result = ssh_stdout.read().decode('utf-8').strip("\n")
-        print(result)
+        commands = [self.cmd_login, 'cd httpdocs', 'vendor/bin/phinx m']
+        for command in commands:
+            _, ssh_stdout, _ = self.client.exec_command(command)
+            result = ssh_stdout.read().decode('utf-8').strip("\n")
         self.client.close()
+        return result
 
 
 def main():
     staging = Staging()
     t = tqdm()
-    tqdm.display(t, msg="Заливаю дампы", pos=None)
-    for method in ['get_config_data', 'upload_frontend_dump', 'upload_backend_dump', 'upload_finance_dump',
-                   'run_migration']:
-        eval(f'staging.{method}()')
+    staging.get_config_data()
+    for method in tqdm(['upload_frontend_dump()', 'upload_backend_dump()', 'upload_finance_dump()']):
+        tqdm.display(t, msg="Загрузка дампов", pos=None)
+        eval(f'staging.{method}')
+    for method in tqdm(['run_migration()']):
+        tqdm.display(t, msg="Накатывание миграций", pos=None)
+        eval(f'staging.{method}')
 
 
 if __name__ == '__main__':
