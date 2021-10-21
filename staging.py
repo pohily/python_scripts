@@ -108,11 +108,17 @@ def main():
     staging = Staging()
     t = tqdm()
     staging.get_config_data()
-    for method in tqdm(['upload_frontend_dump()', 'upload_backend_dump()', 'upload_finance_dump()']):
-        tqdm.display(t, msg="Загрузка дампов", pos=None)
+    for method in tqdm(['upload_frontend_dump()']):
+        tqdm.display(t, msg="Загружаю дамп во фронтенд", pos=None)
+        eval(f'staging.{method}')
+    for method in tqdm(['upload_backend_dump()']):
+        tqdm.display(t, msg="Загружаю дамп в бекенд", pos=None)
+        eval(f'staging.{method}')
+    for method in tqdm(['upload_finance_dump()']):
+        tqdm.display(t, msg="Чищу финансовый модуль", pos=None)
         eval(f'staging.{method}')
     for method in tqdm(['run_migration()']):
-        tqdm.display(t, msg="Накатывание миграций", pos=None)
+        tqdm.display(t, msg="Накатываю миграции", pos=None)
         eval(f'staging.{method}')
 
 

@@ -173,9 +173,6 @@ SMTP_SERVER = 'smtp.4slovo.ru'
 
 TEST = False
 
-DATABASE = {'BACK': 'BACK',
-            'FRONT': 'FRONT'}
-
 if __name__ == '__main__':
     config = ConfigParser()
     config.read('config.ini')

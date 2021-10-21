@@ -1,8 +1,11 @@
 import logging
 from collections import namedtuple
+from configparser import ConfigParser
 from datetime import datetime
 from sys import argv
 from time import sleep
+
+import gitlab
 import requests
 from atlassian import Confluence
 from jira import JIRA
