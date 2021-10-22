@@ -2,19 +2,30 @@ import paramiko
 import sys
 from build import ConfigParser
 from tqdm import tqdm
-from time import sleep
 
 
 class Staging:
 
     def __init__(self):
         self.country = self.get_country()
-        self.client = self.server = self.username = self.password = None
-        self.staging_frontend_user_database = self.staging_backend_user_database = None
-        self.locale = self.staging_frontend_password_database = self.staging_backend_password_database = None
-        self.staging_finance_user_database = self.staging_finance_password_database =\
-            self.staging_finance_base_name = None
-        self.staging_frontend_base_name = self.staging_backend_base_name = None
+        self.config = ConfigParser()
+        self.config.read('config.ini')
+        self.client = None
+        self.server = self.config['staging'][f'host_{self.country}']
+        self.username = self.config['staging'][f'user_{self.country}']
+        self.password = self.config['staging'][f'password_{self.country}']
+        self.staging_frontend_user_database = self.config['staging'][f'staging_{self.country}_frontend_user_database']
+        self.staging_backend_user_database = self.config['staging'][f'staging_{self.country}_backend_user_database']
+        self.staging_finance_user_database = self.config['staging'][f'staging_{self.country}_finance_user_database']
+        self.staging_frontend_password_database = \
+            self.config['staging'][f'staging_{self.country}_frontend_password_database']
+        self.staging_backend_password_database = \
+            self.config['staging'][f'staging_{self.country}_backend_password_database']
+        self.staging_finance_password_database = \
+            self.config['staging'][f'staging_{self.country}_finance_password_database']
+        self.staging_frontend_base_name = self.config['staging'][f'staging_{self.country}_frontend_base_name']
+        self.staging_backend_base_name = self.config['staging'][f'staging_{self.country}_backend_base_name']
+        self.staging_finance_base_name = self.config['staging'][f'staging_{self.country}_finance_base_name']
         self.frontend_path = 'dumps/docker/frontend_dump.sql'
         self.backend_path = 'dumps/docker/backend_dump.sql'
         self.finance_path = 'dumps/docker/finance_dump.sql'
@@ -28,14 +39,14 @@ class Staging:
 
     def get_country(self):
         try:
-            if sys.argv[1] == 'ru':
+            if sys.argv[1] == 'upload_dumps' and sys.argv[2] == 'ru':
                 self.country = 'ru'
-            elif sys.argv[1] == 'kz':
+            elif sys.argv[1] == 'upload_dumps' and sys.argv[2] == 'kz':
                 self.country = 'kz'
-            elif sys.argv[1] and sys.argv[1] != 'ru' and sys.argv[1] != 'kz':
+            elif sys.argv[1] and sys.argv[2] and sys.argv[2] != 'ru' and sys.argv[2] != 'kz':
                 raise TypeError("Неверно название страны")
         except IndexError:
-            raise IndexError("Не передано название страны")
+            raise IndexError("Не передана команда для загрузки дампов или название страны")
         return self.country
 
     def upload_frontend_dump(self):
@@ -71,25 +82,6 @@ class Staging:
         self.client.close()
         return result
 
-    def get_config_data(self):
-        config = ConfigParser()
-        config.read('config.ini')
-        self.server = config['staging'][f'host_{self.country}']
-        self.username = config['staging'][f'user_{self.country}']
-        self.password = config['staging'][f'password_{self.country}']
-        self.staging_frontend_user_database = config['staging'][f'staging_{self.country}_frontend_user_database']
-        self.staging_backend_user_database = config['staging'][f'staging_{self.country}_backend_user_database']
-        self.staging_finance_user_database = config['staging'][f'staging_{self.country}_finance_user_database']
-        self.staging_frontend_password_database = \
-            config['staging'][f'staging_{self.country}_frontend_password_database']
-        self.staging_backend_password_database = \
-            config['staging'][f'staging_{self.country}_backend_password_database']
-        self.staging_finance_password_database = \
-            config['staging'][f'staging_{self.country}_finance_password_database']
-        self.staging_frontend_base_name = config['staging'][f'staging_{self.country}_frontend_base_name']
-        self.staging_backend_base_name = config['staging'][f'staging_{self.country}_backend_base_name']
-        self.staging_finance_base_name = config['staging'][f'staging_{self.country}_finance_base_name']
-
     def get_cmd_login(self):
         self.cmd_login = 'sudo -Siu crm4slovo' if self.country == 'ru' else 'sudo -Siu kz_backend_mfo'
         return self.cmd_login
@@ -107,7 +99,6 @@ class Staging:
 def main():
     staging = Staging()
     t = tqdm()
-    staging.get_config_data()
     for method in tqdm(['upload_frontend_dump()']):
         tqdm.display(t, msg="Загружаю дамп во фронтенд", pos=None)
         eval(f'staging.{method}')
