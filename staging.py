@@ -2,6 +2,7 @@ import paramiko
 import sys
 from build import ConfigParser
 from tqdm import tqdm
+from time import sleep
 
 
 class Staging:
@@ -96,10 +97,9 @@ class Staging:
     def run_migration(self):
         self.connect()
         self.get_cmd_login()
-        commands = [self.cmd_login, 'cd httpdocs', 'vendor/bin/phinx m']
-        for command in commands:
-            _, ssh_stdout, _ = self.client.exec_command(command)
-            result = ssh_stdout.read().decode('utf-8').strip("\n")
+        command = f'{self.cmd_login} bash -c "cd ~/httpdocs && vendor/bin/phinx m"'
+        _, ssh_stdout, _ = self.client.exec_command(command)
+        result = ssh_stdout.read().decode('utf-8').strip("\n")
         self.client.close()
         return result
 
