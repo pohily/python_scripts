@@ -74,12 +74,12 @@ SYSTEM_USERS = {
     'kz': {
         '4slovo/finance': 'kz_finance', '4slovo/fs': 'kz_fs', '4slovo.kz/4slovokz': 'kz_f',
         '4slovo.kz/crm4slovokz': 'kz_backend_mfo', 'docker/kz': '', '4slovo/sumsub-client': '', 'sites/4slokz': '',
-        'docker/kz-db': ''
+        'docker/kz-db': '', '4slovo.ru/4slv': '','docker/finance': ''
     },
     'kz2': {
         '4slovo/finance': 'kz_finance', '4slovo/fs': 'kz_fileshare', '4slovo.kz/4slovokz': 'kz_frontend',
         '4slovo.kz/crm4slovokz': 'kz_backend_mfo', 'docker/kz': '', '4slovo/sumsub-client': '', 'sites/4slokz': '',
-        'docker/kz-db': ''
+        'docker/kz-db': '', '4slovo.ru/4slv': '', 'docker/finance': ''
     }
 }
 
@@ -93,8 +93,7 @@ PRIORITY = {'Critical': '(*r) - Critical', 'Highest': '(!) - Highest', 'High': '
             'MEGA Critical': '(flag) - MEGA Critical'}
 STATUS_FOR_RELEASE = ['MEGA Critical', 'Released to production', 'Passed QA', 'In regression test', 'Ready for release',
     'Закрыт', 'Fixed', 'Closed', 'Готово'
-    ]#, 'Ready for review', 'Ready for technical solution review', 'In QA', 'Open', 'Ready for QA', 'In development',
-    #'Reopen', 'Reviewing' ]
+    ]#, 'Ready for review', 'Ready for technical solution review', 'In QA', 'Open', 'Ready for QA', 'In development', 'Reopened', 'Reviewing' ]
 STATUS_READY = ['Released to production', 'Ready for release', 'Закрыт', 'Fixed', 'Closed']
 
 TESTERS = {
@@ -123,7 +122,7 @@ PROJECTS_WITH_TESTS = [11, 20, 61, 79, 93, 94, 97, 100, 110, 166, 172, 178, 187,
         201: docker/external_images
         212: docker/alpine-pkgs-repo
 """
-PROJECTS_WITHOUT_STAGING = [22, 86, 90, 91, 92, 103, 113, 116, 121, 125, 135, 138, 139, 178, 194, 204, 207, 212]
+PROJECTS_WITHOUT_STAGING = [22, 86, 90, 91, 92, 103, 113, 116, 121, 125, 135, 138, 139, 171, 178, 194, 204, 207, 212]
 """
         90: 4slovo/sawmill
         91: 4slovo/common
@@ -136,13 +135,14 @@ PROJECTS_WITHOUT_STAGING = [22, 86, 90, 91, 92, 103, 113, 116, 121, 125, 135, 13
         135: 4slovo/logging
         138: 4slovo/timeservice
         139: 4slovo/timeservice_client
+        171: docker/kz-db
         178: 4slovo/anonymize-replicator
         194: 4slovo/anon-server
         204: sites/4slokz
         207: 4slovo/sumsub-client
         212: docker/alpine-pkgs-repo
 """
-DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167, 172, 187, 201]
+DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167, 172, 201]
 """
         94: docker/finance
         97: docker/api
@@ -151,7 +151,7 @@ DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167, 172, 187, 201]
         166: docker/ru
         167: docker/ru-db
         172: docker/fias
-        187: module/msm
+        187: module/msm - пока убрали - надо вливать в стейджинг
         201: docker/external_images
         212: docker/alpine-pkgs-repo
 """

@@ -97,7 +97,7 @@ class Build:
             if 'commit' in link['object']['url'] or GIT_LAB not in link['object']['url']:
                 continue
             # для предупреждения о запуске тесто после сборки контейнеров
-            if 'docker' in link['object']['url'] or 'msm' in link['object']['url']:
+            if 'docker' in link['object']['url']:  # or 'msm' in link['object']['url']: - пока убрали - надо вливать в стейджинг
                 self.docker = True
             url_parts = link['object']['url'].split('/')
             if len(url_parts) < 6:

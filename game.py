@@ -96,5 +96,5 @@ def main(month):
 
 if __name__ == '__main__':
     """ Геймификация - https://confluence.4slovo.ru/pages/viewpage.action?pageId=77201416 """
-    month = 7
+    month = 9
     main(month)
