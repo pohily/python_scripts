@@ -13,7 +13,7 @@ class Staging:
         self.client = None
         self.server = self.config['staging'][f'host_{self.country}']
         self.username = self.config['staging'][f'user_{self.country}']
-        self.password = self.config['staging'][f'password_{self.country}']
+        self.password = self.config['staging'][f'staging_password_{self.country}']
         self.staging_frontend_user_database = self.config['staging'][f'staging_{self.country}_frontend_user_database']
         self.staging_backend_user_database = self.config['staging'][f'staging_{self.country}_backend_user_database']
         self.staging_finance_user_database = self.config['staging'][f'staging_{self.country}_finance_user_database']
