@@ -1,7 +1,9 @@
-import paramiko
 import sys
-from build import ConfigParser
+
+import paramiko
 from tqdm import tqdm
+
+from build import ConfigParser
 
 
 class Staging:
