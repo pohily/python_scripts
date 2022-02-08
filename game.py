@@ -29,9 +29,16 @@ def main(month):
         config.read('config.ini')
         jira_options = {'server': JIRA_SERVER}
         jira = JIRA(options=jira_options, auth=(config['user_data']['login'], config['user_data']['jira_password']))
-        start = f'{datetime.datetime.now().strftime("%Y")}-{month}-01'
+
+        if 0 < month < 12:
+            start = f'{datetime.datetime.now().strftime("%Y")}-{month}-01'
+            finish = datetime.datetime.strptime(f'{datetime.datetime.now().strftime("%Y")}-{month + 1}-01', '%Y-%m-%d')
+        elif month == 12:
+            start = f'{str(int(datetime.datetime.now().strftime("%Y")) - 1)}-{month}-01'
+            finish = datetime.datetime.strptime(f'{datetime.datetime.now().strftime("%Y")}-01-01', '%Y-%m-%d')
+        else:
+            raise Exception('Некорректный месяц')
         date = datetime.datetime.strptime(start, '%Y-%m-%d')
-        finish = datetime.datetime.strptime(f'{datetime.datetime.now().strftime("%Y")}-{month + 1}-01', '%Y-%m-%d')
         # сперва ищем названия всех зарелиженных релизов
         fixes = set()
         while date < finish:
@@ -96,5 +103,5 @@ def main(month):
 
 if __name__ == '__main__':
     """ Геймификация - https://confluence.4slovo.ru/pages/viewpage.action?pageId=77201416 """
-    month = 9
+    month = 1
     main(month)
