@@ -17,7 +17,7 @@ PROJECTS_NAMES = {"4slovo.ru/chestnoe_slovo": 7, "4slovo.ru/4slv":10, "4slovo.kz
                   "4slovo/sumsub-client": 207, "docker/alpine-pkgs-repo": 212, "4slovo/S3Client": 215,
                   "4slovo.ru/osticket": 223, "4slovo/short_link_client": 225, '4slovo/mock-server': 227,
                   "4slovo/event-manager": 228, "4slovo/reflection": 229, "4slovo/cast-type": 230, "4slovo/dto": 231,
-                  "4slovo/csv": 232
+                  "4slovo/csv": 232, "4slovo/xxtea": 233
                   }
 
 PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo", 10: "4slovo.ru/4slv", 11: "4slovo.kz/crm4slovokz",
@@ -36,7 +36,7 @@ PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo", 10: "4slovo.ru/4slv", 11: "4s
                     207: "4slovo/sumsub-client", 212: "docker/alpine-pkgs-repo", 215: "4slovo/S3Client",
                     223: "4slovo.ru/osticket", 225: "4slovo/short_link_client", 227: '4slovo/mock-server',
                     228: "4slovo/event-manager", 229: "4slovo/reflection", 230: "4slovo/cast-type", 231: "4slovo/dto",
-                    232: "4slovo/csv"
+                    232: "4slovo/csv", 233: "4slovo/xxtea"
                     }
 
 PROJECTS_COUNTRIES = {7: "ru", 10: "ru, kz", 11: "kz", 12: "kz", 20: "ru", 22: "kz", 23: "ge", 24: "ge", 61: "ru",
@@ -47,7 +47,7 @@ PROJECTS_COUNTRIES = {7: "ru", 10: "ru, kz", 11: "kz", 12: "kz", 20: "ru", 22: "
                       144: "ru, kz, ge", 154: "ru", 159: "kz", 166: "ru", 167: "ru", 171: "kz", 172: "ru, kz",
                       178: "ru, kz", 187: "ru", 194: "ru, kz", 201: "ru, kz, ge", 204: "kz", 207: "ru, kz, ge",
                       212: "ru, kz, ge", 215: "kz", 223: "ru", 225: "ru, kz, ge", 227: "ru, kz, ge", 228: "ru, kz, ge",
-                      229: "", 230: "ru, kz, ge", 231: "ru, kz, ge", 232: "ru, kz, ge"
+                      229: "", 230: "ru, kz, ge", 231: "ru, kz, ge", 232: "ru, kz, ge", 233: "ru, kz, ge"
                       }
 
 COUNTRIES = {
@@ -67,7 +67,7 @@ SYSTEM_USERS = {
         '4slovo.ru/common': '', '4slovo/common': '', '4slovo/sawmill': '', 'docker/ru-db': '', 'docker/fias': '',
         '4slovo.ru/fias': '', 'docker/alpine-pkgs-repo': '', '4slovo.ru/osticket': '', "4slovo/short_link_client": '',
         '4slovo/mock-server': '', "4slovo/event-manager": '', "4slovo/cast-type": '', "4slovo/dto": '',
-        '4slovo/reflection': '', '4slovo/csv': ''
+        '4slovo/reflection': '', '4slovo/csv': '', '4slovo/xxtea': ''
     },
     'ru2': {
         '4slovo/finance': 'ru_finance', '4slovo/fs': 'ru_fs', '4slovo.ru/chestnoe_slovo': 'ru_frontend',
@@ -78,21 +78,21 @@ SYSTEM_USERS = {
         '4slovo.ru/common': '', '4slovo/common': '', '4slovo/sawmill': '', 'docker/ru-db': '', 'docker/fias': '',
         '4slovo.ru/fias': '', 'docker/alpine-pkgs-repo': '', '4slovo.ru/osticket': '', "4slovo/short_link_client": '',
         '4slovo/mock-server': '', "4slovo/event-manager": '', "4slovo/cast-type": '', "4slovo/dto": '',
-        '4slovo/reflection': '', '4slovo/csv': ''
+        '4slovo/reflection': '', '4slovo/csv': '', '4slovo/xxtea': ''
     },
     'kz': {
         '4slovo/finance': 'kz_finance', '4slovo/fs': 'kz_fs', '4slovo.kz/4slovokz': 'kz_f',
         '4slovo.kz/crm4slovokz': 'kz_backend_mfo', 'docker/kz': '', '4slovo/sumsub-client': '', 'sites/4slokz': '',
         'docker/kz-db': '', '4slovo.ru/4slv': '','docker/finance': '', '4slovo/mock-server': '', '4slovo/sawmill': '',
         '4slovo/S3Client': '', "4slovo/event-manager": '', "4slovo/cast-type": '', "4slovo/dto": '',
-        '4slovo/reflection': '', '4slovo/csv': ''
+        '4slovo/reflection': '', '4slovo/csv': '', '4slovo/xxtea': ''
     },
     'kz2': {
         '4slovo/finance': 'kz_finance', '4slovo/fs': 'kz_fileshare', '4slovo.kz/4slovokz': 'kz_frontend',
         '4slovo.kz/crm4slovokz': 'kz_backend_mfo', 'docker/kz': '', '4slovo/sumsub-client': '', 'sites/4slokz': '',
         'docker/kz-db': '', '4slovo.ru/4slv': '', 'docker/finance': '', '4slovo/mock-server': '', '4slovo/sawmill': '',
         '4slovo/S3Client': '', "4slovo/event-manager": '', "4slovo/cast-type": '', "4slovo/dto": '',
-        '4slovo/reflection': '', '4slovo/csv': ''
+        '4slovo/reflection': '', '4slovo/csv': '', '4slovo/xxtea': ''
     }
 }
 
@@ -112,7 +112,8 @@ STATUS_READY = ['Released to production', 'Ready for release', 'Закрыт', '
 TESTERS = {
     'm.pohilyj': 77,
     'g.kozlov': 99,
-    'a.melnik': 101
+    'a.melnik': 101,
+    'a.tangaev': 112
 }
 
 PROJECTS_WITH_TESTS = [11, 20, 61, 79, 93, 94, 97, 100, 110, 166, 172, 178, 187, 194, 201, 227]
@@ -137,7 +138,7 @@ PROJECTS_WITH_TESTS = [11, 20, 61, 79, 93, 94, 97, 100, 110, 166, 172, 178, 187,
 """
 PROJECTS_WITHOUT_STAGING = [
     22, 86, 90, 91, 92, 103, 113, 116, 121, 125, 135, 138, 139, 171, 178, 194, 204, 207, 212, 215, 227, 228, 229, 230,
-    231, 232
+    231, 232, 233
 ]
 """
         90: 4slovo/sawmill
@@ -164,6 +165,7 @@ PROJECTS_WITHOUT_STAGING = [
         230: 4slovo/cast-type, 
         231: 4slovo/dto
         232: 4slovo/csv
+        233: 4slovo/xxtea
 """
 DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167, 172, 201]
 """
