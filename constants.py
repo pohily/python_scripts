@@ -113,7 +113,8 @@ TESTERS = {
     'm.pohilyj': 77,
     'g.kozlov': 99,
     'a.melnik': 101,
-    'a.tangaev': 112
+    'a.tangaev': 112,
+    'a.tsyuan': 114
 }
 
 PROJECTS_WITH_TESTS = [11, 20, 61, 79, 93, 94, 97, 100, 110, 166, 172, 178, 187, 194, 201, 227]
