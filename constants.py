@@ -113,7 +113,6 @@ TESTERS = {
     'm.pohilyj': 77,
     'g.kozlov': 99,
     'a.melnik': 101,
-    'a.tangaev': 112,
     'a.tsyuan': 114
 }
 

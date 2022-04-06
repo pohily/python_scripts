@@ -8,23 +8,10 @@ from jira import JIRA
 from constants import JIRA_SERVER, TESTERS
 
 
-def main(month):
-    with sqlite3.connect(f'game{datetime.datetime.now().strftime("%y%m%d")}-{month}.db') as connection:
-        cursor = connection.cursor()
-        cursor.execute("create table data ("
-                       "id integer primary key autoincrement, "
-                       "issue text not null, "
-                       "release_name text,"
-                       "release_date text not null, "
-                       "tester_name text not null,"
-                       "action text, "
-                       "creation_point numeric default 0, "
-                       "testing_point numeric default 0,  "
-                       "bonus_point numeric default 1, "
-                       "fine_point numeric default 1,"
-                       "review_point numeric default 0,"
-                       "regress_point numeric default 0,"
-                       "development_point numeric default 0)")
+def csv(month):
+    with open(f'game{datetime.datetime.now().strftime("%y%m%d")}-{month}.csv', 'a') as file:
+        file.write("id, issue,release_name,release_date,tester_name,action,creation_point,testing_point,bonus_point,"
+                   "fine_point,review_point,regress_point,development_point\n")
         config = ConfigParser()
         config.read('config.ini')
         jira_options = {'server': JIRA_SERVER}
@@ -65,15 +52,12 @@ def main(month):
                 creator = issue.fields.creator.displayName
             else:
                 creator = ''
-            query = f"insert into data values (" \
-                    f"{index + 1}," \
-                    f"'{issue.key}'," \
-                    f"'{issue.fields.fixVersions[0].name}'," \
-                    f"'{issue.fields.fixVersions[0].releaseDate}'," \
-                    f"'{creator}'," \
-                    f"''," \
-                    f"'', '', '1', '1', '', '', '')"
-            cursor.execute(query)
+            query = f"{index + 1}," \
+                    f"{issue.key}," \
+                    f"{issue.fields.fixVersions[0].name}," \
+                    f"{issue.fields.fixVersions[0].releaseDate}," \
+                    f"{creator},,,,1,1,,,\n"
+            file.write(query)
             index += 1
         # вносим данные по влитым задачам AT
         gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
@@ -86,22 +70,18 @@ def main(month):
                         creator = mr.attributes['author']['name']
                     else:
                         creator = ''
-                    query = f"insert into data values (" \
-                            f"{index + 1}," \
-                            f"'{mr.attributes['source_branch']}'," \
-                            f"''," \
-                            f"'{mr.attributes['merged_at'].split('T')[0]}'," \
-                            f"'{creator}'," \
-                            f"'{action}'," \
-                            f"'', '', '1', '1', '', '', '')"
-                    cursor.execute(query)
+                    query = f"{index + 1}," \
+                            f"{mr.attributes['source_branch']},," \
+                            f"{mr.attributes['merged_at'].split('T')[0]}," \
+                            f"{creator}," \
+                            f"{action},,,1,1,,,\n"
+                    file.write(query)
                     index += 1
             else:
                 continue
-        connection.commit()
 
 
 if __name__ == '__main__':
     """ Геймификация - https://confluence.4slovo.ru/pages/viewpage.action?pageId=77201416 """
-    month = 1
-    main(month)
+    month = 3
+    csv(month)
