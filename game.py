@@ -1,5 +1,4 @@
 import datetime
-import sqlite3
 from configparser import ConfigParser
 
 import gitlab

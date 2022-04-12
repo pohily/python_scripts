@@ -39,15 +39,16 @@ PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo", 10: "4slovo.ru/4slv", 11: "4s
                     232: "4slovo/csv", 233: "4slovo/xxtea"
                     }
 
-PROJECTS_COUNTRIES = {7: "ru", 10: "ru, kz", 11: "kz", 12: "kz", 20: "ru", 22: "kz", 23: "ge", 24: "ge", 61: "ru",
-                      62: "ru", 79: "ru", 86: "ru, kz, ge", 90: "ru, kz, ge", 91: "ru, kz, ge", 92: "ru, kz, ge",
-                      93: "ru, kz, ge", 94: "ru, kz, ge", 97: "ru, kz, ge", 100: "ge", 103: "ru, kz, ge", 110: "kz",
-                      113: "ru, kz, ge", 116: "ru, kz, ge", 117: "ru, kz, ge", 121: "ge", 125: "ru, kz, ge",
-                      128: "ge", 129: "ge", 130: "ru", 135: "ru, kz, ge", 138: "ru, kz, ge", 139: "ru, kz, ge",
-                      144: "ru, kz, ge", 154: "ru", 159: "kz", 166: "ru", 167: "ru", 171: "kz", 172: "ru, kz",
-                      178: "ru, kz", 187: "ru", 194: "ru, kz", 201: "ru, kz, ge", 204: "kz", 207: "ru, kz, ge",
-                      212: "ru, kz, ge", 215: "kz", 223: "ru", 225: "ru, kz, ge", 227: "ru, kz, ge", 228: "ru, kz, ge",
-                      229: "", 230: "ru, kz, ge", 231: "ru, kz, ge", 232: "ru, kz, ge", 233: "ru, kz, ge"
+PROJECTS_COUNTRIES = {7: "ru", 10: "ru, kz", 11: "kz", 12: "kz", 20: "ru", 22: "ru, kz, ge", 23: "ge", 24: "ge",
+                      61: "ru", 62: "ru", 79: "ru", 86: "ru, kz, ge", 90: "ru, kz, ge", 91: "ru, kz, ge",
+                      92: "ru, kz, ge", 93: "ru, kz, ge", 94: "ru, kz, ge", 97: "ru, kz, ge", 100: "ge",
+                      103: "ru, kz, ge", 110: "kz", 113: "ru, kz, ge", 116: "ru, kz, ge", 117: "ru, kz, ge",
+                      121: "ge", 125: "ru, kz, ge", 128: "ge", 129: "ge", 130: "ru", 135: "ru, kz, ge",
+                      138: "ru, kz, ge", 139: "ru, kz, ge",144: "ru, kz, ge", 154: "ru", 159: "kz", 166: "ru",
+                      167: "ru", 171: "kz", 172: "ru, kz", 178: "ru, kz", 187: "ru", 194: "ru, kz", 201: "ru, kz, ge",
+                      204: "kz", 207: "ru, kz, ge", 212: "ru, kz, ge", 215: "kz", 223: "ru", 225: "ru, kz, ge",
+                      227: "ru, kz, ge", 228: "ru, kz, ge", 229: "", 230: "ru, kz, ge", 231: "ru, kz, ge",
+                      232: "ru, kz, ge", 233: "ru, kz, ge"
                       }
 
 COUNTRIES = {
@@ -137,8 +138,8 @@ PROJECTS_WITH_TESTS = [11, 20, 61, 79, 93, 94, 97, 100, 110, 166, 172, 178, 187,
         227: 4slovo/mock-server
 """
 PROJECTS_WITHOUT_STAGING = [
-    22, 86, 90, 91, 92, 103, 113, 116, 121, 125, 135, 138, 139, 171, 178, 194, 204, 207, 212, 215, 227, 228, 229, 230,
-    231, 232, 233
+    22, 86, 90, 91, 92, 103, 113, 116, 121, 125, 128, 129, 135, 138, 139, 171, 178, 194, 204, 207, 212, 215, 227, 228,
+    229, 230, 231, 232, 233
 ]
 """
         90: 4slovo/sawmill
@@ -149,6 +150,8 @@ PROJECTS_WITHOUT_STAGING = [
         116: 4slovo/fs-client
         121: 4slovo/enum-generator
         125: 4slovo/expression
+        128: almal.ge/almalge
+        129: almal.ge/crmalmalge
         135: 4slovo/logging
         138: 4slovo/timeservice
         139: 4slovo/timeservice_client
