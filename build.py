@@ -34,6 +34,8 @@ class Build:
         )
 
     def get_issues_list_and_deploy_actions(self, release_issues):
+        """ возвращаем  словарь: навание задачи: ее приоритет - для таблички
+                        пред- и пост- деплойные действия"""
         issues_list = {}
         before_deploy = []
         post_deploy = []
@@ -48,14 +50,21 @@ class Build:
                     post_deploy.append((issue.key, pd))
         return issues_list, before_deploy, post_deploy
 
-    def get_mrs_and_used_projects(self, issues_list, message):
+    def get_mrs_and_used_projects(self, issues_list, message, return_merged=False):
+        """
+        возвращаем  словарь- задача: список кортежей ссылок и проектов
+                    сет проектов всего затронутых в релизе
+                    количество задач без реквестов
+                    и записывает в табличку задачи без реквестов
+        """
         merge_requests = defaultdict(list)  # словарь- задача: список кортежей ссылок и проектов
         used_projects = set()  # сет проектов всего затронутых в релизе
         MRless_issues_number = 1
         MRless_issues = []
         if issues_list:
             for issue_number in issues_list:
-                MR_count = self.get_merge_requests(issue_number=issue_number)  # возвращаются только невлитые МР
+                # :return_merged: передается True если надо вернуть влитые МР, обычно возвращаются только невлитые"""
+                MR_count = self.get_merge_requests(issue_number=issue_number, return_merged=return_merged)
                 if not MR_count:  # если в задаче нет МР вносим задачу в таблицу
                     if message:
                         message += f"|{MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]|" \
