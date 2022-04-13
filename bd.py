@@ -4,8 +4,9 @@ from re import findall
 
 
 def make_full_lines():
-    with open('../Downloads/msc.csv', 'r') as file:
-        with open('../Downloads/tmp.csv', 'a') as rest:
+    """ Удаляет лишние переносы строки"""
+    with open('../Downloads/bd/spb1.csv', 'r') as file:
+        with open('../Downloads/bd/spb.csv', 'a') as rest:
             tmp = ''
             for line in file:
                 results = findall(r'000Z,.*$', line)
@@ -17,9 +18,9 @@ def make_full_lines():
                     tmp = ''
 
 
-def main():
+def moscow():
     # Предварительно удалить все апострофы. Косяки в файле tmp.csv
-    with sqlite3.connect(f'moscow.db') as connection:
+    with sqlite3.connect(f'spb.db') as connection:
         cursor = connection.cursor()
         cursor.execute("create table data ("
                        "id integer primary key,"
@@ -41,8 +42,8 @@ def main():
                        "user_agent text,"
                        "created_at text,"
                        "address_doorcode  text);")
-        with open('../Downloads/msc.csv', 'r') as file:
-            with open('../Downloads/tmp.csv', 'w') as rest:
+        with open('../Downloads/bd/spb.csv', 'r') as file:
+            with open('../Downloads/bd/tmp.csv', 'w') as rest:
                 for line in file:
                     results = findall(r',"(.+?)",', line.strip())
                     for result in results:
@@ -76,7 +77,53 @@ def main():
         connection.commit()
 
 
+def join_files():
+    from os import listdir
+    dirname = '../Downloads/bd/na/'
+    files = listdir(dirname)
+    with open('../Downloads/bd/phones.csv', 'a') as result:
+        for file in files:
+            with open(f'../Downloads/bd/na/{file}', 'r') as source:
+                for line in source:
+                    result.write(line)
+
+
+def phones():
+    # Предварительно удалить все апострофы. Косяки в файле tmp.csv
+    with sqlite3.connect(f'phones.db') as connection:
+        cursor = connection.cursor()
+        cursor.execute("create table data ("
+                       "id integer primary key,"
+                       "full_name text,"
+                       "email text,"
+                       "phone_number text);")
+        with open('../Downloads/bd/phones.csv', 'r') as file:
+            with open('../Downloads/bd/tmp.csv', 'w') as rest:
+                for line in file:
+                    results = findall(r',\"(.+)\",', line.strip())
+                    for result in results:
+                        tmp = result.replace(',', '')
+                        tmp = tmp.replace("'", '')
+                        tmp = tmp.replace('"', '')
+                        line = line.replace(result, tmp)
+                    spl = line.split(',')
+                    if len(spl) != 4:
+                        rest.write(line)
+                        continue
+                    id, full_name, email, phone_number = spl
+                    if id == 'id':
+                        continue
+                    id = int(id)
+                    query = f"insert into data values ({id},'{full_name}','{email}','{phone_number.strip()}')"
+                    try:
+                        cursor.execute(query)
+                    except Exception as e:
+                        print(e)
+                        print(line)
+        connection.commit()
+
+
 if __name__ == '__main__':
     start = datetime.now()
-    main()
+    moscow()
     print(datetime.now() - start)

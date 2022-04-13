@@ -2,7 +2,6 @@
 
 import logging
 import os
-from collections import defaultdict
 
 from constants import RELEASE_URL, STATUS_FOR_RELEASE, PRIORITY, ISSUE_URL
 from build import Build
@@ -48,30 +47,8 @@ def main():
         #           Собираем мердж реквесты
         #
         logging.info('Собираем мердж реквесты')
-        merge_requests = defaultdict(list)  # словарь- задача: список кортежей ссылок и проектов
-        used_projects = set()  # сет проектов всего затронутых в релизе
-        MRless_issues_number = 1
-        MRless_issues = []
-        if issues_list:
-            for issue_number in issues_list:
-                MR_count = build.get_merge_requests(issue_number=issue_number)  # возвращаются только невлитые МР
-                if not MR_count:  # если в задаче нет МР вносим задачу в таблицу
-                    message += f"|{MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]|" \
-                               f"{issues_list[issue_number]}| Нет изменений |(/)|\r\n"
-                    MRless_issues_number += 1
-                    MRless_issues.append(issue_number)
-                    continue
-
-                issue_projects = set()  # сет проектов всего затронутых в задаче
-                for merge in MR_count:
-                    used_projects.add(merge.project)
-                    if merge.project not in issue_projects:  # проверяем не было ли в этой задаче нескольких МР в одном
-                        issue_projects.add(merge.project)  # проекте, если несколько - берем один
-                        merge_requests[issue_number].append(merge)
-
-            if MRless_issues:  # убираем задачу без МР из списка задач для сборки RC
-                for item in MRless_issues:
-                    issues_list.pop(item)
+        merge_requests, used_projects, MRless_issues_number, message = build.get_mrs_and_used_projects(
+            issues_list, message)
         #
         #           Удаляем и создаем RC
         #

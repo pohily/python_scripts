@@ -37,6 +37,11 @@ def main():
     logging.basicConfig(level=level, format=format, handlers=handlers)
     logging.info('--------------Формируем письмо----------------')
     release_date, release_name, release_country, release_issues, _ = build.get_release_details(date=True)
+    _, release_projects, _, _ = build.get_mrs_and_used_projects(release_issues, '')
+    logging.info('создаем в Gitlab теги с именем релиза в каждом измененном проекте')
+    for pr in release_projects:
+        project = build.gitlab.projects.get(pr)
+        project.tags.create({'tag_name': release_name, 'ref': 'master'})
     logging.info(f'для релиза {release_name}')
     issues_list = {}
     message = get_release_message(release_date, release_country, release_name)

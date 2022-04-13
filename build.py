@@ -1,5 +1,5 @@
 import logging
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 from configparser import ConfigParser
 from datetime import datetime
 from sys import argv
@@ -32,6 +32,33 @@ class Build:
         self.merge_request_details = namedtuple(
             'Merge_request_details', ['merge_status', 'source_branch', 'target_branch', 'state']
         )
+
+    def get_mrs_and_used_projects(self, issues_list, message):
+        merge_requests = defaultdict(list)  # словарь- задача: список кортежей ссылок и проектов
+        used_projects = set()  # сет проектов всего затронутых в релизе
+        MRless_issues_number = 1
+        MRless_issues = []
+        if issues_list:
+            for issue_number in issues_list:
+                MR_count = self.get_merge_requests(issue_number=issue_number)  # возвращаются только невлитые МР
+                if not MR_count:  # если в задаче нет МР вносим задачу в таблицу
+                    message += f"|{MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]|" \
+                               f"{issues_list[issue_number]}| Нет изменений |(/)|\r\n"
+                    MRless_issues_number += 1
+                    MRless_issues.append(issue_number)
+                    continue
+
+                issue_projects = set()  # сет проектов всего затронутых в задаче
+                for merge in MR_count:
+                    used_projects.add(merge.project)
+                    if merge.project not in issue_projects:  # проверяем не было ли в этой задаче нескольких МР в одном
+                        issue_projects.add(merge.project)  # проекте, если несколько - берем один
+                        merge_requests[issue_number].append(merge)
+
+            if MRless_issues:  # убираем задачу без МР из списка задач для сборки RC
+                for item in MRless_issues:
+                    issues_list.pop(item)
+            return merge_requests, used_projects, MRless_issues_number, message
 
     def confluence_link(self, title):
         confluence = Confluence(
