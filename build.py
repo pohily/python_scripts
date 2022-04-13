@@ -33,6 +33,21 @@ class Build:
             'Merge_request_details', ['merge_status', 'source_branch', 'target_branch', 'state']
         )
 
+    def get_issues_list_and_deploy_actions(self, release_issues):
+        issues_list = {}
+        before_deploy = []
+        post_deploy = []
+        for issue in release_issues:
+            if 'сборка' not in issue.fields.summary.lower() and issue.fields.status.name in STATUS_FOR_RELEASE:
+                issues_list[issue.key] = PRIORITY[issue.fields.priority.name]
+                bd = issue.fields.customfield_15303  # переддеплойные действия
+                if bd:
+                    before_deploy.append((issue.key, bd))
+                pd = issue.fields.customfield_15302  # постдеплойные действия
+                if pd:
+                    post_deploy.append((issue.key, pd))
+        return issues_list, before_deploy, post_deploy
+
     def get_mrs_and_used_projects(self, issues_list, message):
         merge_requests = defaultdict(list)  # словарь- задача: список кортежей ссылок и проектов
         used_projects = set()  # сет проектов всего затронутых в релизе
@@ -42,8 +57,9 @@ class Build:
             for issue_number in issues_list:
                 MR_count = self.get_merge_requests(issue_number=issue_number)  # возвращаются только невлитые МР
                 if not MR_count:  # если в задаче нет МР вносим задачу в таблицу
-                    message += f"|{MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]|" \
-                               f"{issues_list[issue_number]}| Нет изменений |(/)|\r\n"
+                    if message:
+                        message += f"|{MRless_issues_number}|[{issue_number}|{ISSUE_URL}{issue_number}]|" \
+                                   f"{issues_list[issue_number]}| Нет изменений |(/)|\r\n"
                     MRless_issues_number += 1
                     MRless_issues.append(issue_number)
                     continue

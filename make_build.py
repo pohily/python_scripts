@@ -31,18 +31,7 @@ def main():
         #           Выбираем задачи для релиза в нужных статусах
         #
         logging.info(f'Выбираем задачи для релиза {release_name} в нужных статусах')
-        issues_list = {}
-        before_deploy = []
-        post_deploy = []
-        for issue in release_issues:
-            if 'сборка' not in issue.fields.summary.lower() and issue.fields.status.name in STATUS_FOR_RELEASE:
-                issues_list[issue.key] = PRIORITY[issue.fields.priority.name]
-                bd = issue.fields.customfield_15303  # переддеплойные действия
-                if bd:
-                    before_deploy.append((issue.key, bd))
-                pd = issue.fields.customfield_15302  # постдеплойные действия
-                if pd:
-                    post_deploy.append((issue.key, pd))
+        issues_list, before_deploy, post_deploy = build.get_issues_list_and_deploy_actions(release_issues)
         #
         #           Собираем мердж реквесты
         #
