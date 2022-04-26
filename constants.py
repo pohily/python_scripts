@@ -68,7 +68,7 @@ SYSTEM_USERS = {
         '4slovo.ru/common': '', '4slovo/common': '', '4slovo/sawmill': '', 'docker/ru-db': '', 'docker/fias': '',
         '4slovo.ru/fias': '', 'docker/alpine-pkgs-repo': '', '4slovo.ru/osticket': '', "4slovo/short_link_client": '',
         '4slovo/mock-server': '', "4slovo/event-manager": '', "4slovo/cast-type": '', "4slovo/dto": '',
-        '4slovo/reflection': '', '4slovo/csv': '', '4slovo/xxtea': ''
+        '4slovo/reflection': '', '4slovo/csv': '', '4slovo/xxtea': '', '4slovo/cache': ''
     },
     'ru2': {
         '4slovo/finance': 'ru_finance', '4slovo/fs': 'ru_fs', '4slovo.ru/chestnoe_slovo': 'ru_frontend',
@@ -79,21 +79,21 @@ SYSTEM_USERS = {
         '4slovo.ru/common': '', '4slovo/common': '', '4slovo/sawmill': '', 'docker/ru-db': '', 'docker/fias': '',
         '4slovo.ru/fias': '', 'docker/alpine-pkgs-repo': '', '4slovo.ru/osticket': '', "4slovo/short_link_client": '',
         '4slovo/mock-server': '', "4slovo/event-manager": '', "4slovo/cast-type": '', "4slovo/dto": '',
-        '4slovo/reflection': '', '4slovo/csv': '', '4slovo/xxtea': ''
+        '4slovo/reflection': '', '4slovo/csv': '', '4slovo/xxtea': '', '4slovo/cache': ''
     },
     'kz': {
         '4slovo/finance': 'kz_finance', '4slovo/fs': 'kz_fs', '4slovo.kz/4slovokz': 'kz_f',
         '4slovo.kz/crm4slovokz': 'kz_backend_mfo', 'docker/kz': '', '4slovo/sumsub-client': '', 'sites/4slokz': '',
         'docker/kz-db': '', '4slovo.ru/4slv': '','docker/finance': '', '4slovo/mock-server': '', '4slovo/sawmill': '',
         '4slovo/S3Client': '', "4slovo/event-manager": '', "4slovo/cast-type": '', "4slovo/dto": '',
-        '4slovo/reflection': '', '4slovo/csv': '', '4slovo/xxtea': ''
+        '4slovo/reflection': '', '4slovo/csv': '', '4slovo/xxtea': '', '4slovo/cache': ''
     },
     'kz2': {
         '4slovo/finance': 'kz_finance', '4slovo/fs': 'kz_fileshare', '4slovo.kz/4slovokz': 'kz_frontend',
         '4slovo.kz/crm4slovokz': 'kz_backend_mfo', 'docker/kz': '', '4slovo/sumsub-client': '', 'sites/4slokz': '',
         'docker/kz-db': '', '4slovo.ru/4slv': '', 'docker/finance': '', '4slovo/mock-server': '', '4slovo/sawmill': '',
         '4slovo/S3Client': '', "4slovo/event-manager": '', "4slovo/cast-type": '', "4slovo/dto": '',
-        '4slovo/reflection': '', '4slovo/csv': '', '4slovo/xxtea': ''
+        '4slovo/reflection': '', '4slovo/csv': '', '4slovo/xxtea': '', '4slovo/cache': ''
     }
 }
 
