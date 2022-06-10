@@ -1,6 +1,5 @@
-from configparser import ConfigParser
-
-import gitlab
+TEST = False
+MAKE_LAST_BUILD_FILE_AND_START_TESTS = True  # Не делать last_build когда есть готовая сборка, чтобы не было конфликтов
 
 PROJECTS_NAMES = {"4slovo.ru/chestnoe_slovo": 7, "4slovo.ru/4slv":10, "4slovo.kz/crm4slovokz": 11,
                   "4slovo.kz/4slovokz": 12, "4slovo.ru/chestnoe_slovo_backend": 20, "4slovo.ru/common": 22,
@@ -198,21 +197,3 @@ REMOTE_LINK = 'https://jira.4slovo.ru/rest/api/latest/issue/{}/remotelink'
 
 SMTP_PORT = 587
 SMTP_SERVER = 'smtp.4slovo.ru'
-
-TEST = False
-
-if __name__ == '__main__':
-    config = ConfigParser()
-    config.read('config.ini')
-    gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
-    user_id = 0  # находим id нового сотрудника
-    u = []
-    for number in range (150):
-        try:
-            u.append(gl.users.get(number))
-        except:
-            pass
-    users = gl.users.list()
-    for user in users:
-        if user.attributes['username'] == config['user_data']['login']:
-            user_id = user.attributes['id']

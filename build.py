@@ -360,50 +360,51 @@ class Build:
             else:
                 staging_links.append(mr.attributes['web_url'])
 
-            # Делаем коммит с названием последнего билда - раньше запускал тесты и билд контейнеров докера,
-            # сейчас отключили автоматический запуск тестов - запускаю дальше вручную
-            if pr in tests:
-                try:
-                    project.branches.get(self.rc_name)   # если в проекте нет RC,то и коммит не нужен
+            if MAKE_LAST_BUILD_FILE_AND_START_TESTS:
+                # Делаем коммит с названием последнего билда - раньше запускал тесты и билд контейнеров докера,
+                # сейчас отключили автоматический запуск тестов - запускаю дальше вручную
+                if pr in tests:
                     try:
-                        commit_json = {
-                            "branch": f"{self.rc_name}",
-                            "commit_message": "actualize last_build",
-                            "actions": [
-                                {
-                                    "action": "update",
-                                    "file_path": f"last_build",
-                                    "content": f"{self.rc_name}"
-                                },
-                            ]
-                        }
-                        project.commits.create(commit_json)
-                    except gitlab.exceptions.GitlabCreateError:
-                        commit_json = {
-                            "branch": f"{self.rc_name}",
-                            "commit_message": "actualize last_build",
-                            "actions": [
-                                {
-                                    "action": "create",
-                                    "file_path": f"last_build",
-                                    "content": f"{self.rc_name}"
-                                },
-                            ]
-                        }
-                        project.commits.create(commit_json)
-                except gitlab.exceptions.GitlabGetError:
-                    logging.exception(f'Не найдена ветка {self.rc_name} в {PROJECTS_COUNTRIES[pr]}')
+                        project.branches.get(self.rc_name)   # если в проекте нет RC,то и коммит не нужен
+                        try:
+                            commit_json = {
+                                "branch": f"{self.rc_name}",
+                                "commit_message": "actualize last_build",
+                                "actions": [
+                                    {
+                                        "action": "update",
+                                        "file_path": f"last_build",
+                                        "content": f"{self.rc_name}"
+                                    },
+                                ]
+                            }
+                            project.commits.create(commit_json)
+                        except gitlab.exceptions.GitlabCreateError:
+                            commit_json = {
+                                "branch": f"{self.rc_name}",
+                                "commit_message": "actualize last_build",
+                                "actions": [
+                                    {
+                                        "action": "create",
+                                        "file_path": f"last_build",
+                                        "content": f"{self.rc_name}"
+                                    },
+                                ]
+                            }
+                            project.commits.create(commit_json)
+                    except gitlab.exceptions.GitlabGetError:
+                        logging.exception(f'Не найдена ветка {self.rc_name} в {PROJECTS_COUNTRIES[pr]}')
 
-                if not self.merge_fail:
-                    pipelines = project.pipelines.list()
-                    # Запуск тестов в проекте
-                    for pipeline in pipelines:
-                        if pipeline.attributes['ref'] == self.rc_name and pipeline.attributes['status'] == 'skipped':
-                            pipeline_job = pipeline.jobs.list()[0]
-                            job = project.jobs.get(pipeline_job.id, lazy=True)
-                            job.play()
-                            logging.info(f'Тесты запущены в проекте {PROJECTS_NUMBERS[pr]}')
-                            break
+                    if not self.merge_fail:
+                        pipelines = project.pipelines.list()
+                        # Запуск тестов в проекте
+                        for pipeline in pipelines:
+                            if pipeline.attributes['ref'] == self.rc_name and pipeline.attributes['status'] == 'skipped':
+                                pipeline_job = pipeline.jobs.list()[0]
+                                job = project.jobs.get(pipeline_job.id, lazy=True)
+                                job.play()
+                                logging.info(f'Тесты запущены в проекте {PROJECTS_NUMBERS[pr]}')
+                                break
         return master_links, staging_links
 
     def make_mr_to_master(self, projects):
