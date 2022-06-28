@@ -62,22 +62,22 @@ def csv(month):
         gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
         project = gl.projects.get(130)
         mrs = project.mergerequests.list(state='merged', target_branch='master')
+        mrs = [mr for mr in mrs if datetime.datetime.strptime(mr.attributes['merged_at'].split('T')[0], '%Y-%m-%d').month == month]
+        if len(mrs) == 20:
+            print('Возможно учтены не все задачи AT - проверить!')
         for mr in mrs:
-            if datetime.datetime.strptime(mr.attributes['merged_at'].split('T')[0], '%Y-%m-%d').month == month:
-                for action in ['создание', 'разработка', 'ревью']:
-                    if action == 'разработка':
-                        creator = mr.attributes['author']['name']
-                    else:
-                        creator = ''
-                    query = f"{index + 1}," \
-                            f"{mr.attributes['source_branch']},," \
-                            f"{mr.attributes['merged_at'].split('T')[0]}," \
-                            f"{creator}," \
-                            f"{action},,,1,1,,,\n"
-                    file.write(query)
-                    index += 1
-            else:
-                continue
+            for action in ['создание', 'разработка', 'ревью']:
+                if action == 'разработка':
+                    creator = mr.attributes['author']['name']
+                else:
+                    creator = ''
+                query = f"{index + 1}," \
+                        f"{mr.attributes['source_branch']},," \
+                        f"{mr.attributes['merged_at'].split('T')[0]}," \
+                        f"{creator}," \
+                        f"{action},,,1,1,,,\n"
+                file.write(query)
+                index += 1
 
 
 if __name__ == '__main__':
