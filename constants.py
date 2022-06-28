@@ -1,6 +1,5 @@
-from configparser import ConfigParser
-
-import gitlab
+TEST = False
+MAKE_LAST_BUILD_FILE_AND_START_TESTS = True  # Не делать last_build когда есть готовая сборка, чтобы не было конфликтов
 
 PROJECTS_NAMES = {"4slovo.ru/chestnoe_slovo": 7, "4slovo.ru/4slv":10, "4slovo.kz/crm4slovokz": 11,
                   "4slovo.kz/4slovokz": 12, "4slovo.ru/chestnoe_slovo_backend": 20, "4slovo.ru/common": 22,
@@ -69,7 +68,8 @@ SYSTEM_USERS = {
         '4slovo/expression': '', '4slovo.ru/common': '', '4slovo/common': '', '4slovo/sawmill': '', 'docker/ru-db': '',
         'docker/fias': '', '4slovo.ru/fias': '', 'docker/alpine-pkgs-repo': '', '4slovo.ru/osticket': '',
         "4slovo/short_link_client": '', '4slovo/mock-server': '', "4slovo/event-manager": '', "4slovo/cast-type": '',
-        "4slovo/dto": '', '4slovo/reflection': '', '4slovo/csv': '', '4slovo/xxtea': ''
+        "4slovo/dto": '', '4slovo/reflection': '', '4slovo/csv': '', '4slovo/xxtea': '',
+        '4slovo/cache': ''
     },
     'ru2': {
         '4slovo/finance': 'ru_finance', '4slovo/fs': 'ru_fs', '4slovo.ru/chestnoe_slovo': 'ru_frontend',
@@ -80,21 +80,24 @@ SYSTEM_USERS = {
         '4slovo/expression': '', '4slovo.ru/common': '', '4slovo/common': '', '4slovo/sawmill': '', 'docker/ru-db': '',
         'docker/fias': '', '4slovo.ru/fias': '', 'docker/alpine-pkgs-repo': '', '4slovo.ru/osticket': '',
         "4slovo/short_link_client": '', '4slovo/mock-server': '', "4slovo/event-manager": '', "4slovo/cast-type": '',
-        "4slovo/dto": '', '4slovo/reflection': '', '4slovo/csv': '', '4slovo/xxtea': ''
+        "4slovo/dto": '', '4slovo/reflection': '', '4slovo/csv': '', '4slovo/xxtea': '',
+        '4slovo/cache': ''
     },
     'kz': {
         '4slovo/finance': 'kz_finance', '4slovo/fs': 'kz_fs', '4slovo.kz/4slovokz': 'kz_f',
         '4slovo.kz/crm4slovokz': 'kz_backend_mfo', 'docker/kz': '', '4slovo/sumsub-client': '', 'sites/4slokz': '',
         'docker/kz-db': '', '4slovo.ru/4slv': '','docker/finance': '', 'docker/finance_client': '',
         '4slovo/mock-server': '', '4slovo/sawmill': '', '4slovo/S3Client': '', "4slovo/event-manager": '',
-        "4slovo/cast-type": '', "4slovo/dto": '', '4slovo/reflection': '', '4slovo/csv': '', '4slovo/xxtea': ''
+        "4slovo/cast-type": '', "4slovo/dto": '', '4slovo/reflection': '', '4slovo/csv': '', '4slovo/xxtea': '',
+        '4slovo/cache': ''
     },
     'kz2': {
         '4slovo/finance': 'kz_finance', '4slovo/fs': 'kz_fileshare', '4slovo.kz/4slovokz': 'kz_frontend',
         '4slovo.kz/crm4slovokz': 'kz_backend_mfo', 'docker/kz': '', '4slovo/sumsub-client': '', 'sites/4slokz': '',
         'docker/kz-db': '', '4slovo.ru/4slv': '', 'docker/finance': '', 'docker/finance_client': '',
         '4slovo/mock-server': '', '4slovo/sawmill': '', '4slovo/S3Client': '', "4slovo/event-manager": '',
-        "4slovo/cast-type": '', "4slovo/dto": '', '4slovo/reflection': '', '4slovo/csv': '', '4slovo/xxtea': ''
+        "4slovo/cast-type": '', "4slovo/dto": '', '4slovo/reflection': '', '4slovo/csv': '', '4slovo/xxtea': '',
+        '4slovo/cache': ''
     }
 }
 
@@ -108,7 +111,8 @@ PRIORITY = {'Critical': '(*r) - Critical', 'Highest': '(!) - Highest', 'High': '
             'MEGA Critical': '(flag) - MEGA Critical'}
 STATUS_FOR_RELEASE = ['MEGA Critical', 'Released to production', 'Passed QA', 'In regression test', 'Ready for release',
     'Закрыт', 'Fixed', 'Closed', 'Готово'
-    ]#, 'Ready for review', 'Ready for technical solution review', 'In QA', 'Open', 'Ready for QA', 'In development', 'Reopened', 'Reviewing', 'Technical solution' ]
+    ]#, 'Ready for review', 'Ready for technical solution review', 'In QA', 'Open', 'Ready for QA',
+     # 'In development', 'Reopened', 'Reviewing', 'Technical solution' ]
 STATUS_READY = ['Released to production', 'Ready for release', 'Закрыт', 'Fixed', 'Closed']
 
 TESTERS = {
@@ -118,7 +122,7 @@ TESTERS = {
     'a.tsyuan': 114
 }
 
-PROJECTS_WITH_TESTS = [11, 20, 61, 79, 93, 94, 97, 100, 104, 110, 166, 172, 178, 187, 194, 201, 227]
+PROJECTS_WITH_TESTS = [11, 20, 61, 79, 93, 94, 97, 100, 110, 166, 172, 178, 187, 194, 201, 227]
 """
         11: 4slovo.kz/crm4slovokz
         20: 4slovo.ru/chestnoe_slovo_backend
@@ -128,7 +132,6 @@ PROJECTS_WITH_TESTS = [11, 20, 61, 79, 93, 94, 97, 100, 104, 110, 166, 172, 178,
         94: docker/finance
         97: docker/api
         100: docker/ge
-        104: docker/finance_client
         110: docker/kz
         166: docker/ru
         172: docker/fias
@@ -173,12 +176,11 @@ PROJECTS_WITHOUT_STAGING = [
         232: 4slovo/csv
         233: 4slovo/xxtea
 """
-DOCKER_PROJECTS = [94, 97, 100, 104, 110, 166, 167, 172, 201]
+DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167, 172, 201]
 """
         94: docker/finance
         97: docker/api
         100: docker/ge
-        104: docker/finance_client
         110: docker/kz
         166: docker/ru
         167: docker/ru-db
@@ -202,21 +204,3 @@ REMOTE_LINK = 'https://jira.4slovo.ru/rest/api/latest/issue/{}/remotelink'
 
 SMTP_PORT = 587
 SMTP_SERVER = 'smtp.4slovo.ru'
-
-TEST = False
-
-if __name__ == '__main__':
-    config = ConfigParser()
-    config.read('config.ini')
-    gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
-    user_id = 0  # находим id нового сотрудника
-    u = []
-    for number in range (150):
-        try:
-            u.append(gl.users.get(number))
-        except:
-            pass
-    users = gl.users.list()
-    for user in users:
-        if user.attributes['username'] == config['user_data']['login']:
-            user_id = user.attributes['id']
