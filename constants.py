@@ -106,7 +106,8 @@ PRIORITY = {'Critical': '(*r) - Critical', 'Highest': '(!) - Highest', 'High': '
             'MEGA Critical': '(flag) - MEGA Critical'}
 STATUS_FOR_RELEASE = ['MEGA Critical', 'Released to production', 'Passed QA', 'In regression test', 'Ready for release',
     'Закрыт', 'Fixed', 'Closed', 'Готово'
-    ]#, 'Ready for review', 'Ready for technical solution review', 'In QA', 'Open', 'Ready for QA', 'In development', 'Reopened', 'Reviewing', 'Technical solution' ]
+    ]#, 'Ready for review', 'Ready for technical solution review', 'In QA', 'Open', 'Ready for QA',
+     # 'In development', 'Reopened', 'Reviewing', 'Technical solution' ]
 STATUS_READY = ['Released to production', 'Ready for release', 'Закрыт', 'Fixed', 'Closed']
 
 TESTERS = {
