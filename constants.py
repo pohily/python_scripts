@@ -1,5 +1,6 @@
 TEST = False
-MAKE_LAST_BUILD_FILE_AND_START_TESTS = True  # Не делать last_build когда есть готовая сборка, чтобы не было конфликтов
+# Делать ли last_build если уже есть незарелиженная сборка. Чтобы не было конфликтов - можно не делать
+MAKE_LAST_BUILD_FILE_AND_START_TESTS = True
 
 PROJECTS_NAMES = {"4slovo.ru/chestnoe_slovo": 7, "4slovo.ru/4slv":10, "4slovo.kz/crm4slovokz": 11,
                   "4slovo.kz/4slovokz": 12, "4slovo.ru/chestnoe_slovo_backend": 20, "4slovo.ru/common": 22,

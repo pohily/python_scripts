@@ -281,8 +281,9 @@ class Build:
             issue = mr.issue.lower()
             pipelines = project.pipelines.list(ref=f'{issue}')
             if pipelines:
-                pipelines = pipelines[0]
-                if pipelines.attributes['status'] != 'success':
+                pipeline = pipelines[-1]
+                pipeline_job = pipeline.jobs.list()[-1]
+                if pipeline_job.attributes['status'] == 'failed':
                     logging.warning(f'В задаче {mr.issue} в проекте {PROJECTS_NUMBERS[mr.project]} не прошли тесты')
                     status = '(x) Тесты не прошли!, '
 
