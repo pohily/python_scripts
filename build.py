@@ -186,8 +186,6 @@ class Build:
             #           Пытаемся создать MR из текущей задачи в RC. Выводим статус в таблицу
             #
             logging.info('------------------------------------------')
-            logging.info(f'Пытаемся сделать MR из {merge.issue} в {self.rc_name} в {PROJECTS_NUMBERS[merge.project]}')
-
             status, url, mr = self.make_mr_to_rc(mr=merge)
             if MR_STATUS['can_be_merged'] not in status:
                 logging.warning(f"Конфликт в задаче {merge.issue} в {merge.project}")
@@ -283,7 +281,8 @@ class Build:
             if pipelines:
                 pipeline = pipelines[-1]
                 pipeline_job = pipeline.jobs.list()[-1]
-                if pipeline_job.attributes['status'] == 'failed':
+                logging.info(f"pipeline {pipeline_job.attributes['id']} status = '{pipeline_job.attributes['status']}'")
+                if pipeline_job.attributes['status'] != 'success':
                     logging.warning(f'В задаче {mr.issue} в проекте {PROJECTS_NUMBERS[mr.project]} не прошли тесты')
                     status = '(x) Тесты не прошли!, '
 

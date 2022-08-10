@@ -19,7 +19,6 @@ def main():
         #
         #           Определяем состав релиза
         #
-        logging.info('Определяем состав релиза')
         build = Build()
         _, release_name, _, release_issues, release_id = build.get_release_details()
         #
@@ -30,24 +29,20 @@ def main():
         #
         #           Выбираем задачи для релиза в нужных статусах
         #
-        logging.info(f'Выбираем задачи для релиза {release_name} в нужных статусах')
         issues_list, before_deploy, post_deploy = build.get_issues_list_and_deploy_actions(release_issues)
         #
         #           Собираем мердж реквесты
         #
-        logging.info('Собираем мердж реквесты')
         merge_requests, used_projects, MRless_issues_number, message = build.get_mrs_and_used_projects(
             issues_list, message)
         #
         #           Удаляем и создаем RC
         #
-        logging.info('Удаляем и создаем RC')
         for project in used_projects:
             build.delete_create_rc(project)
         #
         #           Заполняем таблицу
         #
-        logging.info('------------------------------------------')
         logging.info('Заполняем таблицу')  # делаем МР в RC и заполняем таблицу ссылками и статусами МР
         for index, issue_number in enumerate(sorted(issues_list)):
             priority = issues_list[issue_number]
@@ -63,24 +58,20 @@ def main():
         #           Создаем MR RC -> Staging, RC -> Master для Docker и проектов без стейджинга
         #
         logging.info('------------------------------------------')
-        logging.info('Делаем МР RC -> Staging, RC -> Master')
         rc_master_links, staging_links = build.make_mr_to_staging(projects=used_projects)
         #
         #           RC -> Staging
         #
-        logging.info('Заполняем ссылки на МР RC -> Staging')
         message += '\n\r*RC -> Staging*\r\n'
         for link in staging_links:
             message += f'\n[{link}]\r'
         #
         #           Создаем MR Staging -> Master
         #
-        logging.info('Делаем МР Staging -> Master')
         master_links = build.make_mr_to_master(projects=used_projects)
         #
         #           Staging -> Master
         #
-        logging.info('Заполняем ссылки на МР Staging -> Master')
         message += '\n\r*Staging -> Master*\r\n'
         for link in master_links:
             message += f'\n[{link}]\r'
@@ -88,14 +79,12 @@ def main():
         #           Docker и проекты без стейджинга -> Master
         #
         if rc_master_links:
-            logging.info('Заполняем ссылки на МР RC -> Master')
             message += '\r\n*RC -> Master*\r\n'
             for link in rc_master_links:
                 message += f'\n[{link}]\r'
         #
         #           Преддеплойные действия
         #
-        logging.info('Заполняем деплойные действия')
         message_before_deploy = ''
         if before_deploy:
             for issue in before_deploy:

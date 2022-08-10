@@ -44,7 +44,10 @@ def main():
     for pr in release_projects:
         project = build.gitlab.projects.get(pr)
         logging.info(f'make tag {release_name} for {PROJECTS_NUMBERS[pr]}')
-        project.tags.create({'tag_name': release_name, 'ref': 'master'})
+        try:
+            project.tags.create({'tag_name': release_name, 'ref': 'master'})
+        except build.gitlab.exceptions.GitlabHttpError:
+            logging.error(f'Не создан tag {release_name} for {PROJECTS_NUMBERS[pr]}')
 
     logging.info(f'для релиза {release_name}')
     issues_list = {}
