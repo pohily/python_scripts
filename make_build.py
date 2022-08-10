@@ -29,6 +29,7 @@ def main():
         #
         #           Выбираем задачи для релиза в нужных статусах
         #
+        logging.info(f'Выбираем задачи для релиза {release_name} в нужных статусах')
         issues_list, before_deploy, post_deploy = build.get_issues_list_and_deploy_actions(release_issues)
         #
         #           Собираем мердж реквесты
