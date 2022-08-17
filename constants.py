@@ -2,11 +2,11 @@ TEST = False
 # Делать ли last_build если уже есть незарелиженная сборка. Чтобы не было конфликтов - можно не делать
 MAKE_LAST_BUILD_FILE_AND_START_TESTS = True
 
-PROJECTS_NAMES = {"4slovo.ru/chestnoe_slovo": 7, "4slovo.ru/4slv":10, "4slovo.kz/crm4slovokz": 11,
+PROJECTS_NAMES = {"4slovo.ru/chestnoe_slovo": 7, "4slovo.ru/4slv": 10, "4slovo.kz/crm4slovokz": 11,
                   "4slovo.kz/4slovokz": 12, "4slovo.ru/chestnoe_slovo_backend": 20, "4slovo.ru/common": 22,
                   "mrloan.ge/mrloange": 23, "mrloan.ge/crmmrloange": 24, "4slovo.ru/fias": 61,
                   "4slovo.ru/chestnoe_slovo_landing": 62, "4slovo.ru/api": 79, "4slovo/cache": 86, "4slovo/sawmill": 90,
-                  "4slovo/common": 91, "4slovo/inn": 92,"4slovo/finance": 93, "docker/finance": 94, "docker/api": 97,
+                  "4slovo/common": 91, "4slovo/inn": 92, "4slovo/finance": 93, "docker/finance": 94, "docker/api": 97,
                   "docker/ge": 100, "4slovo/finance_client": 103, "docker/finance_client": 104,
                   "docker/kz": 110, "4slovo/rabbitclient": 113, "4slovo/fs-client": 116,
                   "4slovo/fs": 117, "4slovo/enum-generator": 121, "4slovo/expression": 125,
@@ -31,7 +31,7 @@ PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo", 10: "4slovo.ru/4slv", 11: "4s
                     117: "4slovo/fs", 121: "4slovo/enum-generator", 125: "4slovo/expression", 128: "almal.ge/almalge",
                     129: "almal.ge/crmalmalge", 130: "4slovo.ru/python-tests", 135: "4slovo/logging",
                     138: "4slovo/timeservice", 139: "4slovo/timeservice_client", 144: "docker/replicator",
-                    154: "4slovo.ru/python-scripts", 159: "4slovo.kz/landing", 166: "docker/ru",167: "docker/ru-db",
+                    154: "4slovo.ru/python-scripts", 159: "4slovo.kz/landing", 166: "docker/ru", 167: "docker/ru-db",
                     171: "docker/kz-db", 172: "docker/fias", 178: "4slovo/anonymize-replicator", 187: "module/msm",
                     194: "4slovo/anon-server", 201: "docker/external_images", 204: "sites/4slokz",
                     207: "4slovo/sumsub-client", 212: "docker/alpine-pkgs-repo", 215: "4slovo/S3Client",
@@ -45,7 +45,7 @@ PROJECTS_COUNTRIES = {7: "ru", 10: "ru, kz", 11: "kz", 12: "kz", 20: "ru", 22: "
                       92: "ru, kz, ge", 93: "ru, kz, ge", 94: "ru, kz, ge", 97: "ru, kz, ge", 100: "ge",
                       103: "ru, kz, ge", 104: "ru, kz, ge", 110: "kz", 113: "ru, kz, ge", 116: "ru, kz, ge",
                       117: "ru, kz, ge", 121: "ge", 125: "ru, kz, ge", 128: "ge", 129: "ge", 130: "ru",
-                      135: "ru, kz, ge", 138: "ru, kz, ge", 139: "ru, kz, ge",144: "ru, kz, ge", 154: "ru", 159: "kz",
+                      135: "ru, kz, ge", 138: "ru, kz, ge", 139: "ru, kz, ge", 144: "ru, kz, ge", 154: "ru", 159: "kz",
                       166: "ru", 167: "ru", 171: "kz", 172: "ru, kz", 178: "ru, kz", 187: "ru", 194: "ru, kz",
                       201: "ru, kz, ge", 204: "kz", 207: "ru, kz, ge", 212: "ru, kz, ge", 215: "kz", 223: "ru",
                       225: "ru, kz, ge", 227: "ru, kz, ge", 228: "ru, kz, ge", 229: "", 230: "ru, kz, ge",
@@ -87,7 +87,7 @@ SYSTEM_USERS = {
     'kz': {
         '4slovo/finance': 'kz_finance', '4slovo/fs': 'kz_fs', '4slovo.kz/4slovokz': 'kz_f',
         '4slovo.kz/crm4slovokz': 'kz_backend_mfo', 'docker/kz': '', '4slovo/sumsub-client': '', 'sites/4slokz': '',
-        'docker/kz-db': '', '4slovo.ru/4slv': '','docker/finance': '', 'docker/finance_client': '',
+        'docker/kz-db': '', '4slovo.ru/4slv': '', 'docker/finance': '', 'docker/finance_client': '',
         '4slovo/mock-server': '', '4slovo/sawmill': '', '4slovo/S3Client': '', "4slovo/event-manager": '',
         "4slovo/cast-type": '', "4slovo/dto": '', '4slovo/reflection': '', '4slovo/csv': '', '4slovo/xxtea': '',
         '4slovo/cache': '', "4slovo/fs-client": '', "external/PHPExcel": ''
@@ -105,15 +105,14 @@ SYSTEM_USERS = {
 MR_STATUS = {
     True: '(x) Конфликт!, ', False: '(/) Нет конфликтов, ',
     'can_be_merged': '(/) Нет конфликтов, ', 'cannot_be_merged': '(x) Конфликт!, ', 'unchecked': '(/) Нет конфликтов,',
-    'cannot_be_merged_recheck': '(x) Конфликт!, ','checking': '(x) Конфликт!, ',
+    'cannot_be_merged_recheck': '(x) Конфликт!, ', 'checking': '(x) Конфликт!, ',
 }
 PRIORITY = {'Critical': '(*r) - Critical', 'Highest': '(!) - Highest', 'High': '(*) - High', 'Medium': '(*g) - Medium',
             'Low': '(*b) - Low', 'Lowest': '(*b) - Lowest', 'Критический': '(*r) - Critical',
             'MEGA Critical': '(flag) - MEGA Critical'}
 STATUS_FOR_RELEASE = ['MEGA Critical', 'Released to production', 'Passed QA', 'In regression test', 'Ready for release',
-    'Закрыт', 'Fixed', 'Closed', 'Готово'
-    ]#, 'Ready for review', 'Ready for technical solution review', 'In QA', 'Open', 'Ready for QA',
-     # 'In development', 'Reopened', 'Reviewing', 'Technical solution', 'В работе']
+                      'Закрыт', 'Fixed', 'Closed', 'Готово'
+                      ]  # , 'Ready for review', 'Ready for technical solution review', 'In QA', 'Open', 'Ready for QA', 'In development', 'Reopened', 'Reviewing', 'Technical solution', 'В работе']
 STATUS_READY = ['Released to production', 'Ready for release', 'Закрыт', 'Fixed', 'Closed']
 
 TESTERS = {
@@ -144,8 +143,8 @@ PROJECTS_WITH_TESTS = [11, 20, 61, 79, 93, 94, 97, 100, 110, 166, 172, 178, 187,
         227: 4slovo/mock-server
 """
 PROJECTS_WITHOUT_STAGING = [
-    22, 86, 90, 91, 92, 103, 104, 113, 116, 121, 125, 128, 129, 135, 138, 139, 171, 178, 194, 204, 207, 212, 215, 227, 228,
-    229, 230, 231, 232, 233, 240
+    22, 86, 90, 91, 92, 103, 104, 113, 116, 121, 125, 128, 129, 135, 138, 139, 171, 178, 194, 204, 207, 212, 215, 227,
+    228, 229, 230, 231, 232, 233, 240
 ]
 """
         90: 4slovo/sawmill

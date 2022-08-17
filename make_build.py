@@ -121,7 +121,7 @@ def main():
                     'customfield_15303': message_before_deploy,
                     'customfield_15302': message_post_deploy,
                 }
-                new_issue = build.jira.create_issue(fields=issue_dict)
+                build.jira.create_issue(fields=issue_dict)
         #
         #           Вывод результата в файл
         #

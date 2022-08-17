@@ -102,7 +102,8 @@ class Build:
         return name
 
     def get_release_details(self, date=False, release=False):
-        """ Получает имя релиза из коммандной строки, либо передается агрументом, либо в тестовом режиме - хардкод
+        """ Получает имя релиза из командной строки, либо передается аргументом,
+            либо в тестовом режиме - HARDCODE_RELEASE из конфига
             Возвращает: дату, имя, страну, задачи релиза и id """
 
         if not release:
@@ -280,7 +281,7 @@ class Build:
             pipelines = project.pipelines.list(ref=f'{issue}')
             if pipelines:
                 pipeline = pipelines[-1]
-                pipeline_job = pipeline.jobs.list()[-1]
+                pipeline_job = pipeline.jobs.list()[0]
                 logging.info(f"pipeline {pipeline_job.attributes['id']} status = '{pipeline_job.attributes['status']}'")
                 if pipeline_job.attributes['status'] != 'success':
                     logging.warning(f'В задаче {mr.issue} в проекте {PROJECTS_NUMBERS[mr.project]} не прошли тесты')
