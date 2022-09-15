@@ -280,9 +280,15 @@ class Build:
             issue = mr.issue.lower()
             pipelines = project.pipelines.list(ref=f'{issue}')
             if pipelines:
-                pipeline = pipelines[-1]
-                pipeline_job = pipeline.jobs.list()[0]
-                logging.info(f"pipeline {pipeline_job.attributes['id']} status = '{pipeline_job.attributes['status']}'")
+                pipeline = pipelines[0]
+                pipeline_jobs = pipeline.jobs.list()
+                pipeline_job = pipeline_jobs[0]
+                logging.info(f"pipelines - {[pipeline.attributes['id'] for pipeline in pipelines]}")
+                logging.info(f"jobs in {pipeline.attributes['id']} - "
+                             f"{[pipeline_job.attributes['id'] for pipeline_job in pipeline_jobs]}")
+                logging.info(f"pipeline {pipeline.attributes['id']} "
+                             f"job {pipeline_job.attributes['id']} "
+                             f"status = '{pipeline_job.attributes['status']}'")
                 if pipeline_job.attributes['status'] != 'success':
                     logging.warning(f'В задаче {mr.issue} в проекте {PROJECTS_NUMBERS[mr.project]} не прошли тесты')
                     status = '(x) Тесты не прошли!, '
@@ -364,38 +370,38 @@ class Build:
             if MAKE_LAST_BUILD_FILE_AND_START_TESTS:
                 # Делаем коммит с названием последнего билда - раньше запускал тесты и билд контейнеров докера,
                 # сейчас отключили автоматический запуск тестов - запускаю дальше вручную
-                if pr in tests:
+                try:
+                    project.branches.get(self.rc_name)   # если в проекте нет RC,то и коммит не нужен
                     try:
-                        project.branches.get(self.rc_name)   # если в проекте нет RC,то и коммит не нужен
-                        try:
-                            commit_json = {
-                                "branch": f"{self.rc_name}",
-                                "commit_message": "actualize last_build",
-                                "actions": [
-                                    {
-                                        "action": "update",
-                                        "file_path": f"last_build",
-                                        "content": f"{self.rc_name}"
-                                    },
-                                ]
-                            }
-                            project.commits.create(commit_json)
-                        except gitlab.exceptions.GitlabCreateError:
-                            commit_json = {
-                                "branch": f"{self.rc_name}",
-                                "commit_message": "actualize last_build",
-                                "actions": [
-                                    {
-                                        "action": "create",
-                                        "file_path": f"last_build",
-                                        "content": f"{self.rc_name}"
-                                    },
-                                ]
-                            }
-                            project.commits.create(commit_json)
-                    except gitlab.exceptions.GitlabGetError:
-                        logging.exception(f'Не найдена ветка {self.rc_name} в {PROJECTS_COUNTRIES[pr]}')
+                        commit_json = {
+                            "branch": f"{self.rc_name}",
+                            "commit_message": "actualize last_build",
+                            "actions": [
+                                {
+                                    "action": "update",
+                                    "file_path": f"last_build",
+                                    "content": f"{self.rc_name}"
+                                },
+                            ]
+                        }
+                        project.commits.create(commit_json)
+                    except gitlab.exceptions.GitlabCreateError:
+                        commit_json = {
+                            "branch": f"{self.rc_name}",
+                            "commit_message": "actualize last_build",
+                            "actions": [
+                                {
+                                    "action": "create",
+                                    "file_path": f"last_build",
+                                    "content": f"{self.rc_name}"
+                                },
+                            ]
+                        }
+                        project.commits.create(commit_json)
+                except gitlab.exceptions.GitlabGetError:
+                    logging.exception(f'Не найдена ветка {self.rc_name} в {PROJECTS_COUNTRIES[pr]}')
 
+                if pr in tests:
                     if not self.merge_fail:
                         pipelines = project.pipelines.list()
                         # Запуск тестов в проекте
