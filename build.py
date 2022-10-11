@@ -262,7 +262,7 @@ class Build:
         return bool(mr)
 
     def make_mr_to_rc(self, mr):
-        """ Создаем МР slov -> RC. Возвращем статус МР, его url и сам МР"""
+        """ Создаем МР slov -> RC. Возвращаем статус МР, его url и сам МР"""
         if TEST:
             return '(/) Тест', 'https://gitlab.4slovo.ru/4slovo.ru/chestnoe_slovo_backend/merge_requests/тест', 'тест'
 
@@ -403,6 +403,7 @@ class Build:
 
                 if pr in tests:
                     if not self.merge_fail:
+                        sleep(2)  # ждем пока создастся pipeline, иначе тесты запустятся на предыдущей
                         pipelines = project.pipelines.list()
                         # Запуск тестов в проекте
                         for pipeline in pipelines:
@@ -435,3 +436,14 @@ class Build:
                                                    })
             mr_links.append(mr.attributes['web_url'])
         return mr_links
+
+
+if __name__ == '__main__':
+    config = ConfigParser()
+    config.read('config.ini')
+    jira = JIRA(options=JIRA_OPTIONS, auth=(config['user_data']['login'],
+                                                 config['user_data']['jira_password']))
+    gitlab = gitlab.Gitlab(GIT_LAB_SERVER, private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
+    project = gitlab.projects.get(11)
+    pipelines = project.pipelines.list()
+    pass

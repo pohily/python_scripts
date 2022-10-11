@@ -46,7 +46,7 @@ def main():
         logging.info(f'make tag {release_name} for {PROJECTS_NUMBERS[pr]}')
         try:
             project.tags.create({'tag_name': release_name, 'ref': 'master'})
-        except build.gitlab.exceptions.GitlabHttpError:
+        except Exception:
             logging.error(f'Не создан tag {release_name} for {PROJECTS_NUMBERS[pr]}')
 
     logging.info(f'для релиза {release_name}')
