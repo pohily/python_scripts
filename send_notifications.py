@@ -61,7 +61,7 @@ def main():
             message += f"{index + 1}. <a href='{ISSUE_URL}{issue_number}'>{issue_number}</a> - {issues_list[issue_number]}<br>"
         if release_country == 'Россия':
             country_key = 'ru'
-        elif release_country == 'Казахстан' or release_country == '7da.Казахстан':
+        elif release_country == 'Казахстан':
             country_key = 'kz'
         elif release_country == 'Грузия':
             country_key = 'ge'
