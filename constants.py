@@ -14,6 +14,7 @@ PROJECTS_NAMES = {"4slovo.ru/chestnoe_slovo": 7, "4slovo.ru/4slv": 10, "4slovo.k
                   "4slovo/logging": 135, "4slovo/timeservice": 138, "4slovo/timeservice_client": 139,
                   "docker/replicator": 144, "4slovo.ru/python-scripts": 154, "4slovo.kz/landing": 159, "docker/ru": 166,
                   "docker/ru-db": 167, "docker/kz-db": 171, "docker/fias": 172, "4slovo/anonymize-replicator": 178,
+                  "module/message-sender-package": 186,
                   "module/msm": 187, "4slovo/anon-server": 194, "docker/external_images": 201, "sites/4slokz": 204,
                   "4slovo/sumsub-client": 207, "docker/alpine-pkgs-repo": 212, "4slovo/S3Client": 215,
                   "4slovo.ru/osticket": 223, "4slovo/short_link_client": 225, '4slovo/mock-server': 227,
@@ -34,7 +35,8 @@ PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo", 10: "4slovo.ru/4slv", 11: "4s
                     129: "almal.ge/crmalmalge", 130: "4slovo.ru/python-tests", 135: "4slovo/logging",
                     138: "4slovo/timeservice", 139: "4slovo/timeservice_client", 144: "docker/replicator",
                     154: "4slovo.ru/python-scripts", 159: "4slovo.kz/landing", 166: "docker/ru", 167: "docker/ru-db",
-                    171: "docker/kz-db", 172: "docker/fias", 178: "4slovo/anonymize-replicator", 187: "module/msm",
+                    171: "docker/kz-db", 172: "docker/fias", 178: "4slovo/anonymize-replicator",
+                    186: "module/message-sender-package", 187: "module/msm",
                     194: "4slovo/anon-server", 201: "docker/external_images", 204: "sites/4slokz",
                     207: "4slovo/sumsub-client", 212: "docker/alpine-pkgs-repo", 215: "4slovo/S3Client",
                     223: "4slovo.ru/osticket", 225: "4slovo/short_link_client", 227: '4slovo/mock-server',
@@ -50,8 +52,9 @@ PROJECTS_COUNTRIES = {7: "ru", 10: "ru, kz", 11: "kz", 12: "kz", 20: "ru", 22: "
                       103: "ru, kz, ge", 104: "ru, kz, ge", 110: "kz", 113: "ru, kz, ge", 116: "ru, kz, ge",
                       117: "ru, kz, ge", 121: "ge", 125: "ru, kz, ge", 128: "ge", 129: "ge", 130: "ru",
                       135: "ru, kz, ge", 138: "ru, kz, ge", 139: "ru, kz, ge", 144: "ru, kz, ge", 154: "ru", 159: "kz",
-                      166: "ru", 167: "ru", 171: "kz", 172: "ru, kz", 178: "ru, kz", 187: "ru", 194: "ru, kz",
-                      201: "ru, kz, ge", 204: "kz", 207: "ru, kz, ge", 212: "ru, kz, ge", 215: "kz", 223: "ru",
+                      166: "ru", 167: "ru", 171: "kz", 172: "ru, kz", 178: "ru, kz",
+                      186: "ru", 187: "ru", 194: "ru, kz",
+                      201: "ru, kz, ge", 204: "kz", 207: "ru, kz, ge", 212: "ru, kz, ge", 215: "ru, kz, ge", 223: "ru",
                       225: "ru, kz, ge", 227: "ru, kz, ge", 228: "ru, kz, ge", 229: "", 230: "ru, kz, ge",
                       231: "ru, kz, ge", 232: "ru, kz, ge", 233: "ru, kz, ge", 240: "ru, kz, ge", 242: "ru, kz, ge",
                       244: "7da.kz", 245: "7da.kz", 246: "7da.kz", 247: "7da.kz"
@@ -150,8 +153,8 @@ PROJECTS_WITH_TESTS = [11, 20, 61, 79, 93, 94, 97, 100, 110, 166, 172, 178, 187,
         247: docker/7paydakz-db
 """
 PROJECTS_WITHOUT_STAGING = [
-    22, 86, 90, 91, 92, 103, 104, 113, 116, 121, 125, 128, 129, 135, 138, 139, 171, 178, 194, 204, 207, 212, 215, 227,
-    228, 229, 230, 231, 232, 233, 240, 242, 246, 247
+    22, 86, 90, 91, 92, 103, 104, 113, 116, 121, 125, 128, 129, 135, 138, 139, 171, 178, 186, 194, 204, 207, 212, 215,
+    227, 228, 229, 230, 231, 232, 233, 240, 242, 246, 247
 ]
 """
         90: 4slovo/sawmill
@@ -170,6 +173,7 @@ PROJECTS_WITHOUT_STAGING = [
         139: 4slovo/timeservice_client
         171: docker/kz-db
         178: 4slovo/anonymize-replicator
+        186: module/message-sender-package
         194: 4slovo/anon-server
         204: sites/4slokz
         207: 4slovo/sumsub-client

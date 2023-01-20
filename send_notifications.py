@@ -49,7 +49,6 @@ def main():
         except Exception:
             logging.error(f'Не создан tag {release_name} for {PROJECTS_NUMBERS[pr]}')
 
-    logging.info(f'для релиза {release_name}')
     issues_list = {}
     message = get_release_message(release_date, release_country, release_name)
     for issue in release_issues:
