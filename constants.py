@@ -123,6 +123,8 @@ STATUS_FOR_RELEASE = ['MEGA Critical', 'Released to production', 'Passed QA', 'I
                       ]  # , 'Ready for review', 'Ready for technical solution review', 'In QA', 'Open', 'Ready for QA', 'In development', 'Reopened', 'Reviewing', 'Technical solution', 'В работе']
 STATUS_READY = ['Released to production', 'Ready for release', 'Закрыт', 'Fixed', 'Closed']
 
+STATUS_FOR_QA = ['Ready for QA', 'In QA']
+
 TESTERS = {
     'm.pohilyj': 77,
     'g.kozlov': 99,

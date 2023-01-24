@@ -1,21 +1,23 @@
 import logging
 import os
-from datetime import datetime
 from sys import argv
 
-from constants import STATUS_FOR_RELEASE, STATUS_READY
+from constants import STATUS_FOR_RELEASE, STATUS_FOR_QA
 from build import Build
 
 
 def main():
+    """
+    без флага - переносятся все задачи в статусах неподходящих для релиза:    python move.py ru.1.2.3 ru.1.3.0
+    -g - переносятся задачи в подходящих для релиза статусах                  python move.py -g ru.1.2.3 ru.1.3.0
+    -q - переносятся задачи в подходящих для тестирования статусах            python move.py -q ru.1.2.3 ru.1.3.0
+    """
     build = Build()
     level = logging.DEBUG
     handlers = [logging.FileHandler('logs/log.txt'), logging.StreamHandler()]
     format = u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s'
     logging.basicConfig(level=level, format=format, handlers=handlers)
 
-    # без флага - переносятся все задачи в статусах неподходящих для релиза:    python move.py ru.1.2.3 ru.1.3.0
-    # -g - переносятся задачи в подходящих для релиза статусах                  python move.py -g ru.1.2.3 ru.1.3.0
 
     def is_country_ok(source, target):
         # проверка на совпадение страны
@@ -64,6 +66,26 @@ def main():
         else:
             logging.exception('Ошибка при вводе релиза-источника и релиза-назначения!')
             raise Exception('Ошибка при вводе релиза-источника и релиза-назначения!')
+
+    def move_qa(source, target):
+        if is_country_ok(source, target):
+            _, _, _, release_issues, _ = build.get_release_details(release=source)
+            logging.info(f'Выбираем готовые для тестирования задачи из релиза {source}')
+            for_move = []
+            for issue in release_issues:
+                if 'сборка' not in issue.fields.summary.lower() and issue.fields.status.name in STATUS_FOR_QA:
+                    for_move.append(issue)
+            logging.info(f'Найдено {len(for_move)} готовых для тестирования задач(-и, -а)')
+            logging.info(f'Переносим готовые для тестирования задачи в релиз {target}')
+            for issue in for_move:
+                logging.info(f'Переносим задачу {issue}')
+                issue.update(fields={
+                    "fixVersions": [{"name": target, }]
+                })
+            logging.info(f'Перенос выполнен')
+        else:
+            logging.exception('Ошибка при вводе релиза-источника и релиза-назначения!')
+            raise Exception('Ошибка при вводе релиза-источника и релиза-назначения!')
     #
     # Получаем данные из коммандной строки
     #
@@ -81,6 +103,10 @@ def main():
                     source = argv[2]
                     target = argv[3]
                     move_good(source, target)
+                elif argv[1] == '-q':
+                    source = argv[2]
+                    target = argv[3]
+                    move_qa(source, target)
                 else:
                     logging.exception('Неизвестная команда!')
                     raise Exception('Неизвестная команда!')
