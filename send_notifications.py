@@ -2,10 +2,11 @@ import logging
 import os
 from email.header import Header
 from email.mime.text import MIMEText
+from functools import lru_cache
 from smtplib import SMTP
 
-from constants import SMTP_PORT, SMTP_SERVER, ISSUE_URL, PROJECTS_NUMBERS
 from build import Build
+from constants import SMTP_PORT, SMTP_SERVER, ISSUE_URL, PROJECTS_NUMBERS
 
 
 def get_release_message(release_date, release_country, release_name):
@@ -30,6 +31,12 @@ def send(release_country, release_name, country_key, message, config):
 
 def main():
     build = Build()
+
+    @lru_cache(maxsize=None)
+    def get_epic(epic_issue_name):
+        epic_issue = build.jira.search_issues(f'key={epic_issue_name}')[0]
+        return epic_issue.fields.customfield_10008
+
     os.makedirs('logs', exist_ok=True)
     level = logging.INFO
     handlers = [logging.FileHandler('logs/log.txt'), logging.StreamHandler()]
@@ -53,11 +60,29 @@ def main():
     message = get_release_message(release_date, release_country, release_name)
     for issue in release_issues:
         if 'сборка' not in issue.fields.summary.lower():
-            issues_list[issue.key] = issue.fields.summary
+            epic = ''
+            if issue.fields.customfield_10009:
+                epic = get_epic(epic_issue_name=issue.fields.customfield_10009)
+            issuetype = issue.fields.issuetype.name
+            priority = issue.fields.priority.name
+            summary = issue.fields.summary
+            issues_list[issue.key] = (epic, issuetype, priority, summary)
 
     if issues_list and release_date:
+        message += "<table>"
         for index, issue_number in enumerate(sorted(issues_list)):
-            message += f"{index + 1}. <a href='{ISSUE_URL}{issue_number}'>{issue_number}</a> - {issues_list[issue_number]}<br>"
+            epic = ''
+            if issues_list[issue_number][0]:
+                epic = f'{issues_list[issue_number][0]} '
+            message += f"<tr>" \
+                       f"<td>{index + 1}.</td>" \
+                       f"<td>  <a href='{ISSUE_URL}{issue_number}'>{issue_number}</a> </td>" \
+                       f"<td>  {epic} </td>" \
+                       f"<td>  {issues_list[issue_number][1]} </td>" \
+                       f"<td>  {issues_list[issue_number][2]} </td>" \
+                       f"<td>  {issues_list[issue_number][3]} </td>" \
+                       f"</tr>"
+        message += "</table>"
         if release_country == 'Россия':
             country_key = 'ru'
         elif release_country == 'Казахстан':

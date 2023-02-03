@@ -78,7 +78,7 @@ SYSTEM_USERS = {
         'docker/fias': '', '4slovo.ru/fias': '', 'docker/alpine-pkgs-repo': '', '4slovo.ru/osticket': '',
         "4slovo/short_link_client": '', '4slovo/mock-server': '', "4slovo/event-manager": '', "4slovo/cast-type": '',
         "4slovo/dto": '', '4slovo/reflection': '', '4slovo/csv': '', '4slovo/xxtea': '',
-        '4slovo/cache': '', "4slovo/fs-client": '', "external/PHPExcel": ''
+        '4slovo/cache': '', "4slovo/fs-client": '', "external/PHPExcel": '', 'module/message-sender-package': ''
     },
     'ru2': {
         '4slovo/finance': 'ru_finance', '4slovo/fs': 'ru_fs', '4slovo.ru/chestnoe_slovo': 'ru_frontend',
@@ -90,7 +90,7 @@ SYSTEM_USERS = {
         'docker/fias': '', '4slovo.ru/fias': '', 'docker/alpine-pkgs-repo': '', '4slovo.ru/osticket': '',
         "4slovo/short_link_client": '', '4slovo/mock-server': '', "4slovo/event-manager": '', "4slovo/cast-type": '',
         "4slovo/dto": '', '4slovo/reflection': '', '4slovo/csv': '', '4slovo/xxtea': '',
-        '4slovo/cache': '', "4slovo/fs-client": '', "external/PHPExcel": ''
+        '4slovo/cache': '', "4slovo/fs-client": '', "external/PHPExcel": '', 'module/message-sender-package': ''
     },
     'kz': {
         '4slovo/finance': 'kz_finance', '4slovo/fs': 'kz_fs', '4slovo.kz/4slovokz': 'kz_f',
