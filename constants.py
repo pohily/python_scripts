@@ -115,7 +115,7 @@ MR_STATUS = {
     'can_be_merged': '(/) Нет конфликтов, ', 'cannot_be_merged': '(x) Конфликт!, ', 'unchecked': '(/) Нет конфликтов,',
     'cannot_be_merged_recheck': '(x) Конфликт!, ', 'checking': '(x) Конфликт!, ',
 }
-PRIORITY = {'Critical': '(*r) - Critical', 'Highest': '(!) - Highest', 'High': '(*) - High', 'Medium': '(*g) - Medium',
+PRIORITY = {'Critical': '(!) - Critical', 'Highest': '(*r) - Highest', 'High': '(*) - High', 'Medium': '(*g) - Medium',
             'Low': '(*b) - Low', 'Lowest': '(*b) - Lowest', 'Критический': '(*r) - Critical',
             'MEGA Critical': '(flag) - MEGA Critical'}
 STATUS_FOR_RELEASE = ['MEGA Critical', 'Released to production', 'Passed QA', 'In regression test', 'Ready for release',

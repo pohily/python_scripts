@@ -69,7 +69,7 @@ def main():
             issues_list[issue.key] = (epic, issuetype, priority, summary)
 
     if issues_list and release_date:
-        message += "<table>"
+        message += '<table border="1" cellpadding="5" style="border: 1px solid black;">'
         for index, issue_number in enumerate(sorted(issues_list)):
             epic = ''
             if issues_list[issue_number][0]:

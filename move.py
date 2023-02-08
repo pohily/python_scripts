@@ -38,7 +38,7 @@ def main():
             logging.info(f'Найдено {len(for_move)} неготовых задач(-и, -а)')
             logging.info(f'Переносим неготовые задачи в релиз {target}')
             for issue in for_move:
-                logging.info(f'Переносим задачу {issue}')
+                logging.info(f'Переносим задачу {issue}, {issue.fields.status.name}')
                 issue.update(fields={
                     "fixVersions": [{"name": target, }]
                 })
@@ -58,7 +58,7 @@ def main():
             logging.info(f'Найдено {len(for_move)} готовых задач(-и, -а)')
             logging.info(f'Переносим готовые задачи в релиз {target}')
             for issue in for_move:
-                logging.info(f'Переносим задачу {issue}')
+                logging.info(f'Переносим задачу {issue}, {issue.fields.status.name}')
                 issue.update(fields={
                     "fixVersions": [{"name": target, }]
                 })
@@ -78,7 +78,7 @@ def main():
             logging.info(f'Найдено {len(for_move)} готовых для тестирования задач(-и, -а)')
             logging.info(f'Переносим готовые для тестирования задачи в релиз {target}')
             for issue in for_move:
-                logging.info(f'Переносим задачу {issue}')
+                logging.info(f'Переносим задачу {issue}, {issue.fields.status.name}')
                 issue.update(fields={
                     "fixVersions": [{"name": target, }]
                 })
