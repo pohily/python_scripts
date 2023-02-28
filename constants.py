@@ -46,8 +46,8 @@ PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo", 10: "4slovo.ru/4slv", 11: "4s
                     247: "docker/7paydakz-db"
                     }
 
-PROJECTS_COUNTRIES = {7: "ru", 10: "ru, kz", 11: "kz", 12: "kz", 20: "ru", 22: "ru, kz, ge", 23: "ge", 24: "ge",
-                      61: "ru", 62: "ru", 79: "ru", 86: "ru, kz, ge", 90: "ru, kz, ge", 91: "ru, kz, ge",
+PROJECTS_COUNTRIES = {7: "ru", 10: "ru, kz", 11: "kz", 12: "kz", 20: "ru", 22: "ru, kz, ge, 7da.kz", 23: "ge", 24: "ge",
+                      61: "ru", 62: "ru", 79: "ru", 86: "ru, kz, ge, 7da.kz", 90: "ru, kz, ge", 91: "ru, kz, ge",
                       92: "ru, kz, ge", 93: "ru, kz, ge", 94: "ru, kz, ge", 97: "ru, kz, ge", 100: "ge",
                       103: "ru, kz, ge", 104: "ru, kz, ge", 110: "kz", 113: "ru, kz, ge", 116: "ru, kz, ge",
                       117: "ru, kz, ge", 121: "ge", 125: "ru, kz, ge", 128: "ge", 129: "ge", 130: "ru",
@@ -56,8 +56,8 @@ PROJECTS_COUNTRIES = {7: "ru", 10: "ru, kz", 11: "kz", 12: "kz", 20: "ru", 22: "
                       186: "ru", 187: "ru", 194: "ru, kz",
                       201: "ru, kz, ge", 204: "kz", 207: "ru, kz, ge", 212: "ru, kz, ge", 215: "ru, kz, ge", 223: "ru",
                       225: "ru, kz, ge", 227: "ru, kz, ge", 228: "ru, kz, ge", 229: "", 230: "ru, kz, ge",
-                      231: "ru, kz, ge", 232: "ru, kz, ge", 233: "ru, kz, ge", 240: "ru, kz, ge", 242: "ru, kz, ge",
-                      244: "7da.kz", 245: "7da.kz", 246: "7da.kz", 247: "7da.kz"
+                      231: "ru, kz, ge", 232: "ru, kz, ge", 233: "ru, kz, ge", 240: "ru, kz, ge",
+                      242: "ru, kz, ge, 7da.kz", 244: "7da.kz", 245: "7da.kz", 246: "7da.kz", 247: "7da.kz"
                       }
 
 COUNTRIES = {
@@ -115,7 +115,7 @@ MR_STATUS = {
     'can_be_merged': '(/) Нет конфликтов, ', 'cannot_be_merged': '(x) Конфликт!, ', 'unchecked': '(/) Нет конфликтов,',
     'cannot_be_merged_recheck': '(x) Конфликт!, ', 'checking': '(x) Конфликт!, ',
 }
-PRIORITY = {'Critical': '(!) - Critical', 'Highest': '(*r) - Highest', 'High': '(*) - High', 'Medium': '(*g) - Medium',
+PRIORITY = {'Critical': '(*r) - Critical', 'Highest': '(!) - Highest', 'High': '(*) - High', 'Medium': '(*g) - Medium',
             'Low': '(*b) - Low', 'Lowest': '(*b) - Lowest', 'Критический': '(*r) - Critical',
             'MEGA Critical': '(flag) - MEGA Critical'}
 STATUS_FOR_RELEASE = ['MEGA Critical', 'Released to production', 'Passed QA', 'In regression test', 'Ready for release',

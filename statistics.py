@@ -35,7 +35,7 @@ def main():
     without_epic = []
     for issue_number in fix_issues:
         # Проверка что у всех задач есть эпик
-        if not issue_number.fields.customfield_10009:
+        if 'сборка' not in issue_number.fields.summary.lower() and not issue_number.fields.customfield_10009:
             without_epic.append(issue_number.key)
         if issue_number.fields.status.name in STATUS_FOR_RELEASE:
             issue_count += 1
