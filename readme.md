@@ -37,9 +37,11 @@
 
 **-l 1** - переносятся задачи c приоритетом <= l ###priority### Значение смотреть в constants.PRIORITY_VALUE 
 
+**python move.py -l 1 [откуда] [куда]** 
+
 **-h 1** - переносятся задачи c приоритетом >= h ###priority### Значение смотреть в constants.PRIORITY_VALUE 
 
-**python move.py -p 1 [откуда] [куда]**  
+**python move.py -h 1 [откуда] [куда]**  
 
 ## Установка и настройка
 
