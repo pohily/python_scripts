@@ -111,7 +111,13 @@ class Build:
                 COMMAND_LINE_INPUT = eval(self.config['options']['COMMAND_LINE_INPUT'])
                 if COMMAND_LINE_INPUT:
                     if argv[1].startswith('-'):
-                        release_input = argv[2]
+                        if argv[1] in ('-g', '-q'):
+                            release_input = argv[2]
+                        elif argv[1] in ('-l', '-h'):
+                            release_input = argv[3]
+                        else:
+                            release_input = argv[2]
+                            logging.exception('Неизвестный флаг!')
                     else:
                         release_input = argv[1]
                 else:

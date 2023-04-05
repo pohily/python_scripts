@@ -98,7 +98,8 @@ SYSTEM_USERS = {
         'docker/kz-db': '', '4slovo.ru/4slv': '', 'docker/finance': '', 'docker/finance_client': '',
         '4slovo/mock-server': '', '4slovo/sawmill': '', '4slovo/S3Client': '', "4slovo/event-manager": '',
         "4slovo/cast-type": '', "4slovo/dto": '', '4slovo/reflection': '', '4slovo/csv': '', '4slovo/xxtea': '',
-        '4slovo/cache': '', "4slovo/fs-client": '', "external/PHPExcel": '', "4slovo/config": '', '4slovo.ru/common': ''
+        '4slovo/cache': '', "4slovo/fs-client": '', "external/PHPExcel": '', "4slovo/config": '',
+        '4slovo.ru/common': '', '7payda.kz/crm7paydakz': 'crm_paydak', '7payda.kz/7paydakz': 'f_paydakz'
     },
     'kz2': {
         '4slovo/finance': 'kz_finance', '4slovo/fs': 'kz_fileshare', '4slovo.kz/4slovokz': 'kz_frontend',
@@ -118,7 +119,11 @@ MR_STATUS = {
 PRIORITY = {'Critical': '(*r) - Critical', 'Highest': '(!) - Highest', 'High': '(*) - High', 'Medium': '(*g) - Medium',
             'Low': '(*b) - Low', 'Lowest': '(*b) - Lowest', 'Критический': '(*r) - Critical',
             'MEGA Critical': '(flag) - MEGA Critical'}
-STATUS_FOR_RELEASE = ['MEGA Critical', 'Released to production', 'Passed QA', 'In regression test', 'Ready for release',
+PRIORITY_VALUE = {
+    'MEGA Critical': 1, 'Critical': 2, 'Критический': 2, 'Highest': 3, 'High': 4, 'Medium': 5, 'Low': 6, 'Lowest': 7
+}
+
+STATUS_FOR_RELEASE = ['Released to production', 'Passed QA', 'In regression test', 'Ready for release',
                       'Закрыт', 'Fixed', 'Closed', 'Готово'
                       ]  # , 'Ready for review', 'Ready for technical solution review', 'In QA', 'Open', 'Ready for QA', 'In development', 'Reopened', 'Reviewing', 'Technical solution', 'В работе']
 STATUS_READY = ['Released to production', 'Ready for release', 'Закрыт', 'Fixed', 'Closed']
@@ -129,6 +134,8 @@ TESTERS = {
     'm.pohilyj': 77,
     'g.kozlov': 99,
     'a.melnik': 101,
+    'v.dolinin': 139,
+    'a.kuznetsov': 140
 }
 
 PROJECTS_WITH_TESTS = [11, 20, 61, 79, 93, 94, 97, 100, 110, 166, 172, 178, 187, 194, 201, 227, 245, 246, 247]
@@ -156,7 +163,7 @@ PROJECTS_WITH_TESTS = [11, 20, 61, 79, 93, 94, 97, 100, 110, 166, 172, 178, 187,
 """
 PROJECTS_WITHOUT_STAGING = [
     22, 86, 90, 91, 92, 103, 104, 113, 116, 121, 125, 128, 129, 135, 138, 139, 171, 178, 186, 194, 204, 207, 212, 215,
-    227, 228, 229, 230, 231, 232, 233, 240, 242, 246, 247
+    225, 227, 228, 229, 230, 231, 232, 233, 240, 242, 246, 247
 ]
 """
         90: 4slovo/sawmill
@@ -181,6 +188,7 @@ PROJECTS_WITHOUT_STAGING = [
         207: 4slovo/sumsub-client
         212: docker/alpine-pkgs-repo
         215: 4slovo/S3Client
+        225: 4slovo/short_link_client
         227: 4slovo/mock-server
         228: 4slovo/event-manager, 
         229: 4slovo/reflection, 

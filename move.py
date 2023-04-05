@@ -2,7 +2,7 @@ import logging
 import os
 from sys import argv
 
-from constants import STATUS_FOR_RELEASE, STATUS_FOR_QA
+from constants import STATUS_FOR_RELEASE, STATUS_FOR_QA, PRIORITY_VALUE
 from build import Build
 
 
@@ -17,7 +17,6 @@ def main():
     handlers = [logging.FileHandler('logs/log.txt'), logging.StreamHandler()]
     format = u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s'
     logging.basicConfig(level=level, format=format, handlers=handlers)
-
 
     def is_country_ok(source, target):
         # проверка на совпадение страны
@@ -86,8 +85,50 @@ def main():
         else:
             logging.exception('Ошибка при вводе релиза-источника и релиза-назначения!')
             raise Exception('Ошибка при вводе релиза-источника и релиза-назначения!')
+
+    def move_low(source, target, priority_treshold):
+        if is_country_ok(source, target):
+            _, _, _, release_issues, _ = build.get_release_details(release=source)
+            logging.info(f'Выбираем подходящие задачи из релиза {source}')
+            for_move = []
+            for issue in release_issues:
+                if 'сборка' not in issue.fields.summary.lower():
+                    if PRIORITY_VALUE[issue.fields.priority.name] <= int(priority_treshold):
+                        for_move.append(issue)
+            logging.info(f'Найдено {len(for_move)} подходящих задач(-и, -а)')
+            logging.info(f'Переносим подходящие задачи в релиз {target}')
+            for issue in for_move:
+                logging.info(f'Переносим задачу {issue}, {issue.fields.status.name}')
+                issue.update(fields={
+                    "fixVersions": [{"name": target, }]
+                })
+            logging.info(f'Перенос выполнен')
+        else:
+            logging.exception('Ошибка при вводе релиза-источника и релиза-назначения!')
+            raise Exception('Ошибка при вводе релиза-источника и релиза-назначения!')
+
+    def move_high(source, target, priority_treshold):
+        if is_country_ok(source, target):
+            _, _, _, release_issues, _ = build.get_release_details(release=source)
+            logging.info(f'Выбираем подходящие задачи из релиза {source}')
+            for_move = []
+            for issue in release_issues:
+                if 'сборка' not in issue.fields.summary.lower():
+                    if PRIORITY_VALUE[issue.fields.priority.name] >= int(priority_treshold):
+                        for_move.append(issue)
+            logging.info(f'Найдено {len(for_move)} подходящих задач(-и, -а)')
+            logging.info(f'Переносим подходящие задачи в релиз {target}')
+            for issue in for_move:
+                logging.info(f'Переносим задачу {issue}, {issue.fields.status.name}')
+                issue.update(fields={
+                    "fixVersions": [{"name": target, }]
+                })
+            logging.info(f'Перенос выполнен')
+        else:
+            logging.exception('Ошибка при вводе релиза-источника и релиза-назначения!')
+            raise Exception('Ошибка при вводе релиза-источника и релиза-назначения!')
     #
-    # Получаем данные из коммандной строки
+    # Получаем данные из командной строки
     #
     if not os.path.exists('logs'):
         os.mkdir(os.getcwd() + '/log')
@@ -107,6 +148,16 @@ def main():
                     source = argv[2]
                     target = argv[3]
                     move_qa(source, target)
+                elif argv[1] == '-l':
+                    priority_treshold = argv[2]
+                    source = argv[3]
+                    target = argv[4]
+                    move_low(source, target, priority_treshold)
+                elif argv[1] == '-h':
+                    priority_treshold = argv[2]
+                    source = argv[3]
+                    target = argv[4]
+                    move_high(source, target, priority_treshold)
                 else:
                     logging.exception('Неизвестная команда!')
                     raise Exception('Неизвестная команда!')
