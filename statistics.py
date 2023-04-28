@@ -83,24 +83,24 @@ def main():
     logging.info(f'\033[34m Изменения в них затронули \033[31m {len(used_projects)} \033[34m проект(-а, '
           f'-ов): \033[31m {", ".join(sorted(projects))}. \033[0m')
     if is_blocked:
-        logging.warning('\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n')
+        logging.warning('\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
         logging.info(f'\033[34m Есть заблокированные задачи: \033[31m {", ".join(sorted(set(is_blocked)))}. \033[0m')
     if without_epic:
-        logging.warning('\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n')
+        logging.warning('\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
         logging.info(f'\033[34m Задачи без эпика: \033[31m {", ".join(sorted(without_epic))}. \033[0m')
     if reporter:
-        logging.warning('\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n')
+        logging.warning('\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
         logging.info(f'\033[34m Вам надо получить доступ Developer в проект(-е,'
               f' -ах): \033[31m {", ".join(sorted(reporter))}. \033[0m')
-        logging.info('\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n')
+        logging.info('\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
     if before_deploy or post_deploy:
-        logging.info(f'Есть следующие деплойные действия:')
+        logging.info(f'\033[34m Есть следующие деплойные действия:\033[0m')
     for action in chain(before_deploy, post_deploy):
         summary = action[1].replace('# ', '').strip()
         summary = sub('h\d\.', '', summary)
         logging.info(f'\033[31m{action[0]} - \033[0m{summary}')
     if wrong_release_issues:
-        logging.warning('\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n')
+        logging.warning('\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
         logging.info(f'\033[34m Следующие задачи не подходят для данного релиза (неправильная страна):\033[0m')
         for issue in sorted(wrong_release_issues):
             logging.info(f'\033[31m {issue}\033[0m')
