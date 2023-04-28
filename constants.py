@@ -19,7 +19,8 @@ PROJECTS_NAMES = {"4slovo.ru/chestnoe_slovo": 7, "4slovo.ru/4slv": 10, "4slovo.k
                   "4slovo/sumsub-client": 207, "docker/alpine-pkgs-repo": 212, "4slovo/S3Client": 215,
                   "4slovo.ru/osticket": 223, "4slovo/short_link_client": 225, '4slovo/mock-server': 227,
                   "4slovo/event-manager": 228, "4slovo/reflection": 229, "4slovo/cast-type": 230, "4slovo/dto": 231,
-                  "4slovo/csv": 232, "4slovo/xxtea": 233, "external/PHPExcel": 240, "4slovo/config": 242,
+                  "4slovo/csv": 232, "4slovo/xxtea": 233, "4slovo/satis": 237,
+                  "external/PHPExcel": 240, "4slovo/config": 242,
                   "7payda.kz/7paydakz": 244, "7payda.kz/crm7paydakz": 245, "docker/7paydakz": 246,
                   "docker/7paydakz-db": 247
                   }
@@ -41,7 +42,8 @@ PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo", 10: "4slovo.ru/4slv", 11: "4s
                     207: "4slovo/sumsub-client", 212: "docker/alpine-pkgs-repo", 215: "4slovo/S3Client",
                     223: "4slovo.ru/osticket", 225: "4slovo/short_link_client", 227: '4slovo/mock-server',
                     228: "4slovo/event-manager", 229: "4slovo/reflection", 230: "4slovo/cast-type", 231: "4slovo/dto",
-                    232: "4slovo/csv", 233: "4slovo/xxtea", 240: "external/PHPExcel", 242: "4slovo/config",
+                    232: "4slovo/csv", 233: "4slovo/xxtea", 237: "4slovo/satis",
+                    240: "external/PHPExcel", 242: "4slovo/config",
                     244: "7payda.kz/7paydakz", 245: "7payda.kz/crm7paydakz", 246: "docker/7paydakz",
                     247: "docker/7paydakz-db"
                     }
@@ -56,7 +58,7 @@ PROJECTS_COUNTRIES = {7: "ru", 10: "ru, kz", 11: "kz", 12: "kz", 20: "ru", 22: "
                       186: "ru", 187: "ru", 194: "ru, kz",
                       201: "ru, kz, ge", 204: "kz", 207: "ru, kz, ge", 212: "ru, kz, ge", 215: "ru, kz, ge", 223: "ru",
                       225: "ru, kz, ge", 227: "ru, kz, ge", 228: "ru, kz, ge", 229: "", 230: "ru, kz, ge",
-                      231: "ru, kz, ge", 232: "ru, kz, ge", 233: "ru, kz, ge", 240: "ru, kz, ge",
+                      231: "ru, kz, ge", 232: "ru, kz, ge", 233: "ru, kz, ge", 237: "", 240: "ru, kz, ge",
                       242: "ru, kz, ge, 7da.kz", 244: "7da.kz", 245: "7da.kz", 246: "7da.kz", 247: "7da.kz"
                       }
 
@@ -78,7 +80,8 @@ SYSTEM_USERS = {
         'docker/fias': '', '4slovo.ru/fias': '', 'docker/alpine-pkgs-repo': '', '4slovo.ru/osticket': '',
         "4slovo/short_link_client": '', '4slovo/mock-server': '', "4slovo/event-manager": '', "4slovo/cast-type": '',
         "4slovo/dto": '', '4slovo/reflection': '', '4slovo/csv': '', '4slovo/xxtea': '',
-        '4slovo/cache': '', "4slovo/fs-client": '', "external/PHPExcel": '', 'module/message-sender-package': ''
+        '4slovo/cache': '', "4slovo/fs-client": '', "external/PHPExcel": '', 'module/message-sender-package': '',
+        '4slovo/satis': 'satis'
     },
     'ru2': {
         '4slovo/finance': 'ru_finance', '4slovo/fs': 'ru_fs', '4slovo.ru/chestnoe_slovo': 'ru_frontend',

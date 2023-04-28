@@ -33,7 +33,17 @@ def main():
     before_deploy = []
     post_deploy = []
     without_epic = []
+    is_blocked = []
     for issue_number in fix_issues:
+        # проверка, что задача блокируется
+        issue_links = issue_number.fields.issuelinks
+        for issue_link in issue_links:
+            if issue_link.type.name == 'Blocks':
+                try:
+                    if issue_link.inwardIssue:
+                        is_blocked.append(issue_number.key)
+                except AttributeError:
+                    pass
         # Проверка что у всех задач есть эпик
         if 'сборка' not in issue_number.fields.summary.lower() and not issue_number.fields.customfield_10009:
             without_epic.append(issue_number.key)
@@ -72,6 +82,9 @@ def main():
     logging.info(f'\033[34m Из них \033[31m{issue_count}\033[34m задач в статусах выше "Passed QA".\033[0m')
     logging.info(f'\033[34m Изменения в них затронули \033[31m {len(used_projects)} \033[34m проект(-а, '
           f'-ов): \033[31m {", ".join(sorted(projects))}. \033[0m')
+    if is_blocked:
+        logging.warning('\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n')
+        logging.info(f'\033[34m Есть заблокированные задачи: \033[31m {", ".join(sorted(set(is_blocked)))}. \033[0m')
     if without_epic:
         logging.warning('\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n')
         logging.info(f'\033[34m Задачи без эпика: \033[31m {", ".join(sorted(without_epic))}. \033[0m')
