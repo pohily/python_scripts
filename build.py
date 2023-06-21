@@ -327,7 +327,7 @@ class Build:
                 logging.info('OK')
                 return '(/) Влит'
             except:
-                sleep(2)  # 2nd try после обновления Гитлаб бывает не сразу дает статус МР
+                sleep(3)  # 2nd try после обновления Гитлаб бывает не сразу дает статус МР
                 try:
                     mr.merge()
                     logging.info('2 Try. OK')
