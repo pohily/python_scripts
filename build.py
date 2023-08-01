@@ -113,7 +113,7 @@ class Build:
                     if argv[1].startswith('-'):
                         if argv[1] in ('-g', '-q'):
                             release_input = argv[2]
-                        elif argv[1] in ('-l', '-h'):
+                        elif argv[1] in ('-l', '-h', '-e'):
                             release_input = argv[3]
                         else:
                             release_input = argv[2]
@@ -127,7 +127,7 @@ class Build:
                 raise Exception('Введите имя релиза!')
         else:
             release_input = release
-        fix_issues = self.jira.search_issues(f'fixVersion={release_input}')
+        fix_issues = self.jira.search_issues(f'fixVersion={release_input} ORDER BY priority DESC')
         if date:
             try:
                 fix_date = fix_issues[0].fields.fixVersions[0].releaseDate

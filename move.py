@@ -11,6 +11,10 @@ def main():
     без флага - переносятся все задачи в статусах неподходящих для релиза:    python move.py ru.1.2.3 ru.1.3.0
     -g - переносятся задачи в подходящих для релиза статусах                  python move.py -g ru.1.2.3 ru.1.3.0
     -q - переносятся задачи в подходящих для тестирования статусах            python move.py -q ru.1.2.3 ru.1.3.0
+    -l 1 - переносятся задачи c приоритетом <= l ###priority### Значение смотреть в constants.PRIORITY_VALUE
+        python move.py -l 1 [откуда] [куда]
+    -h 1 - переносятся задачи c приоритетом >= h ###priority### Значение смотреть в constants.PRIORITY_VALUE
+        python move.py -h 1 [откуда] [куда]
     """
     build = Build()
     level = logging.DEBUG
@@ -86,14 +90,14 @@ def main():
             logging.exception('Ошибка при вводе релиза-источника и релиза-назначения!')
             raise Exception('Ошибка при вводе релиза-источника и релиза-назначения!')
 
-    def move_low(source, target, priority_treshold):
+    def move_low(source, target, priority_threshold):
         if is_country_ok(source, target):
             _, _, _, release_issues, _ = build.get_release_details(release=source)
             logging.info(f'Выбираем подходящие задачи из релиза {source}')
             for_move = []
             for issue in release_issues:
                 if 'сборка' not in issue.fields.summary.lower():
-                    if PRIORITY_VALUE[issue.fields.priority.name] <= int(priority_treshold):
+                    if PRIORITY_VALUE[issue.fields.priority.name] <= int(priority_threshold):
                         for_move.append(issue)
             logging.info(f'Найдено {len(for_move)} подходящих задач(-и, -а)')
             logging.info(f'Переносим подходящие задачи в релиз {target}')
@@ -107,14 +111,35 @@ def main():
             logging.exception('Ошибка при вводе релиза-источника и релиза-назначения!')
             raise Exception('Ошибка при вводе релиза-источника и релиза-назначения!')
 
-    def move_high(source, target, priority_treshold):
+    def move_high(source, target, priority_threshold):
         if is_country_ok(source, target):
             _, _, _, release_issues, _ = build.get_release_details(release=source)
             logging.info(f'Выбираем подходящие задачи из релиза {source}')
             for_move = []
             for issue in release_issues:
                 if 'сборка' not in issue.fields.summary.lower():
-                    if PRIORITY_VALUE[issue.fields.priority.name] >= int(priority_treshold):
+                    if PRIORITY_VALUE[issue.fields.priority.name] >= int(priority_threshold):
+                        for_move.append(issue)
+            logging.info(f'Найдено {len(for_move)} подходящих задач(-и, -а)')
+            logging.info(f'Переносим подходящие задачи в релиз {target}')
+            for issue in for_move:
+                logging.info(f'Переносим задачу {issue}, {issue.fields.status.name}')
+                issue.update(fields={
+                    "fixVersions": [{"name": target, }]
+                })
+            logging.info(f'Перенос выполнен')
+        else:
+            logging.exception('Ошибка при вводе релиза-источника и релиза-назначения!')
+            raise Exception('Ошибка при вводе релиза-источника и релиза-назначения!')
+
+    def move_extra(source, target, threshold):
+        if is_country_ok(source, target):
+            _, _, _, release_issues, _ = build.get_release_details(release=source)
+            logging.info(f'Выбираем подходящие задачи из релиза {source}')
+            for_move = []
+            for index, issue in enumerate(release_issues):
+                if index >= int(threshold):
+                    if 'сборка' not in issue.fields.summary.lower():
                         for_move.append(issue)
             logging.info(f'Найдено {len(for_move)} подходящих задач(-и, -а)')
             logging.info(f'Переносим подходящие задачи в релиз {target}')
@@ -149,15 +174,20 @@ def main():
                     target = argv[3]
                     move_qa(source, target)
                 elif argv[1] == '-l':
-                    priority_treshold = argv[2]
+                    priority_threshold = argv[2]
                     source = argv[3]
                     target = argv[4]
-                    move_low(source, target, priority_treshold)
+                    move_low(source, target, priority_threshold)
                 elif argv[1] == '-h':
-                    priority_treshold = argv[2]
+                    priority_threshold = argv[2]
                     source = argv[3]
                     target = argv[4]
-                    move_high(source, target, priority_treshold)
+                    move_high(source, target, priority_threshold)
+                elif argv[1] == '-e':
+                    threshold = argv[2]
+                    source = argv[3]
+                    target = argv[4]
+                    move_extra(source, target, threshold)
                 else:
                     logging.exception('Неизвестная команда!')
                     raise Exception('Неизвестная команда!')
