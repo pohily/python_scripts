@@ -195,7 +195,7 @@ class Build:
             logging.info('------------------------------------------')
             status, url, mr = self.make_mr_to_rc(mr=merge)
             if MR_STATUS['can_be_merged'] not in status:
-                logging.warning(f"Конфликт в задаче {merge.issue} в {merge.project}")
+                logging.error(f"Конфликт в задаче {merge.issue} в {PROJECTS_NUMBERS[merge.project]}")
                 conflict = True
 
             statuses[index] = [status]  # 0

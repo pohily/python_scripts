@@ -9,8 +9,7 @@ PROJECTS_NAMES = {"4slovo.ru/chestnoe_slovo": 7, "4slovo.ru/4slv": 10, "4slovo.k
                   "4slovo/common": 91, "4slovo/inn": 92, "4slovo/finance": 93, "docker/finance": 94, "docker/api": 97,
                   "docker/ge": 100, "4slovo/finance_client": 103, "docker/finance_client": 104,
                   "docker/kz": 110, "4slovo/rabbitclient": 113, "4slovo/fs-client": 116,
-                  "4slovo/fs": 117, "4slovo/yaml-config": 119,
-                  "4slovo/enum-generator": 121, "4slovo/expression": 125,
+                  "4slovo/fs": 117, "4slovo/yaml-config": 119, "4slovo/enum-generator": 121, "4slovo/expression": 125,
                   "almal.ge/almalge": 128, "almal.ge/crmalmalge": 129, "4slovo.ru/python-tests": 130,
                   "4slovo/logging": 135, "4slovo/timeservice": 138, "4slovo/timeservice_client": 139,
                   "docker/replicator": 144, "4slovo.ru/python-scripts": 154, "4slovo.kz/landing": 159, "docker/ru": 166,
@@ -23,7 +22,8 @@ PROJECTS_NAMES = {"4slovo.ru/chestnoe_slovo": 7, "4slovo.ru/4slv": 10, "4slovo.k
                   "4slovo/csv": 232, "4slovo/xxtea": 233, "4slovo/satis": 237,
                   "external/PHPExcel": 240, "4slovo/config": 242,
                   "7payda.kz/7paydakz": 244, "7payda.kz/crm7paydakz": 245, "docker/7paydakz": 246,
-                  "docker/7paydakz-db": 247
+                  "docker/7paydakz-db": 247, "4slovo/production-profiler": 251, "docker/ru-db-v2": 253,
+                  "4slovo/php-cs-fixer": 254
                   }
 
 PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo", 10: "4slovo.ru/4slv", 11: "4slovo.kz/crm4slovokz",
@@ -47,7 +47,8 @@ PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo", 10: "4slovo.ru/4slv", 11: "4s
                     232: "4slovo/csv", 233: "4slovo/xxtea", 237: "4slovo/satis",
                     240: "external/PHPExcel", 242: "4slovo/config",
                     244: "7payda.kz/7paydakz", 245: "7payda.kz/crm7paydakz", 246: "docker/7paydakz",
-                    247: "docker/7paydakz-db"
+                    247: "docker/7paydakz-db", 251 : "4slovo/production-profiler", 253: "docker/ru-db-v2",
+                    254: "4slovo/php-cs-fixer"
                     }
 
 PROJECTS_COUNTRIES = {7: "ru", 10: "ru, kz", 11: "kz", 12: "kz", 20: "ru", 22: "ru, kz, ge, 7da.kz", 23: "ge", 24: "ge",
@@ -61,7 +62,8 @@ PROJECTS_COUNTRIES = {7: "ru", 10: "ru, kz", 11: "kz", 12: "kz", 20: "ru", 22: "
                       201: "ru, kz, ge", 204: "kz", 207: "ru, kz, ge", 212: "ru, kz, ge", 215: "ru, kz, ge", 223: "ru",
                       225: "ru, kz, ge", 227: "ru, kz, ge", 228: "ru, kz, ge", 229: "", 230: "ru, kz, ge",
                       231: "ru, kz, ge", 232: "ru, kz, ge", 233: "ru, kz, ge", 237: "", 240: "ru, kz, ge",
-                      242: "ru, kz, ge, 7da.kz", 244: "7da.kz", 245: "7da.kz", 246: "7da.kz", 247: "7da.kz"
+                      242: "ru, kz, ge, 7da.kz", 244: "7da.kz", 245: "7da.kz", 246: "7da.kz", 247: "7da.kz",
+                      251: "ru, kz, ge, 7da.kz", 253: "ru, kz, ge, 7da.kz", 254: "ru"
                       }
 
 COUNTRIES = {
@@ -83,7 +85,7 @@ SYSTEM_USERS = {
         "4slovo/short_link_client": '', '4slovo/mock-server': '', "4slovo/event-manager": '', "4slovo/cast-type": '',
         "4slovo/dto": '', '4slovo/reflection': '', '4slovo/csv': '', '4slovo/xxtea': '',
         '4slovo/cache': '', "4slovo/fs-client": '', "external/PHPExcel": '', 'module/message-sender-package': '',
-        '4slovo/satis': 'satis', "4slovo/yaml-config": ''
+        '4slovo/satis': 'satis', "4slovo/yaml-config": '', "4slovo/php-cs-fixer": ''
     },
     'ru2': {
         '4slovo/finance': 'ru_finance', '4slovo/fs': 'ru_fs', '4slovo.ru/chestnoe_slovo': 'ru_frontend',
@@ -95,7 +97,8 @@ SYSTEM_USERS = {
         'docker/fias': '', '4slovo.ru/fias': '', 'docker/alpine-pkgs-repo': '', '4slovo.ru/osticket': '',
         "4slovo/short_link_client": '', '4slovo/mock-server': '', "4slovo/event-manager": '', "4slovo/cast-type": '',
         "4slovo/dto": '', '4slovo/reflection': '', '4slovo/csv': '', '4slovo/xxtea': '',
-        '4slovo/cache': '', "4slovo/fs-client": '', "external/PHPExcel": '', 'module/message-sender-package': ''
+        '4slovo/cache': '', "4slovo/fs-client": '', "external/PHPExcel": '', 'module/message-sender-package': '',
+        '4slovo/php-cs-fixer': ''
     },
     'kz': {
         '4slovo/finance': 'kz_finance', '4slovo/fs': 'kz_fs', '4slovo.kz/4slovokz': 'kz_f',
