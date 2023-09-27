@@ -1,9 +1,7 @@
-from datetime import datetime
-
 import paramiko
 
-from constants import PROJECTS_NUMBERS, SYSTEM_USERS, COUNTRIES_ABBR
 from build import Build
+from constants import PROJECTS_NUMBERS, SYSTEM_USERS, COUNTRIES_ABBR
 
 """ Показывает деплой логи всех измененных в релизе проектов"""
 
@@ -35,10 +33,12 @@ def main():
     client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     client.connect(server, port=22, username=username, password=password, )
 
-    today = datetime.now().strftime("%Y-%m-%d")
     if 'n4slovo' in system_users:
         system_users += ['ru_lk', 'partner4slovo']
     for user in system_users:
+        cmd = f"sudo -Siu {user} date"
+        _, ssh_stdout, stderr = client.exec_command(cmd)
+        today = ssh_stdout.read().decode('utf-8').strip("\n")[:10]  # Ищу строку вида 'Wed Sep 27' - вывод команды date
         cmd = f"sudo -Siu {user} awk '/{today}/ ? ++i : i' logs/deploy.log"
         _, ssh_stdout, stderr = client.exec_command(cmd)
         err = stderr.read().decode('utf-8').strip("\n")

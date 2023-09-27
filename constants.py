@@ -84,7 +84,7 @@ SYSTEM_USERS = {
         "4slovo/dto": '', '4slovo/reflection': '', '4slovo/csv': '', '4slovo/xxtea': '',
         '4slovo/cache': '', "4slovo/fs-client": '', "external/PHPExcel": '', 'module/message-sender-package': '',
         '4slovo/satis': 'satis', "4slovo/yaml-config": '', "4slovo/php-cs-fixer": '',
-        "module/message-scheduler-module": '', "cards/card-info-recognizer": ''
+        "module/message-scheduler-module": '', "cards/card-info-recognizer": '', "4slovo/rabbitclient": ''
     },
     'ru2': {
         '4slovo/finance': 'ru_finance', '4slovo/fs': 'ru_fs', '4slovo.ru/chestnoe_slovo': 'ru_frontend',
@@ -97,7 +97,8 @@ SYSTEM_USERS = {
         "4slovo/short_link_client": '', '4slovo/mock-server': '', "4slovo/event-manager": '', "4slovo/cast-type": '',
         "4slovo/dto": '', '4slovo/reflection': '', '4slovo/csv': '', '4slovo/xxtea': '',
         '4slovo/cache': '', "4slovo/fs-client": '', "external/PHPExcel": '', 'module/message-sender-package': '',
-        '4slovo/php-cs-fixer': '', "module/message-scheduler-module": '', "cards/card-info-recognizer": ''
+        '4slovo/php-cs-fixer': '', "module/message-scheduler-module": '', "cards/card-info-recognizer": '',
+        "4slovo/rabbitclient": ''
     },
     'kz': {
         '4slovo/finance': 'kz_finance', '4slovo/fs': 'kz_fs', '4slovo.kz/4slovokz': 'kz_f',
@@ -107,7 +108,7 @@ SYSTEM_USERS = {
         "4slovo/cast-type": '', "4slovo/dto": '', '4slovo/reflection': '', '4slovo/csv': '', '4slovo/xxtea': '',
         '4slovo/cache': '', "4slovo/fs-client": '', "external/PHPExcel": '', "4slovo/config": '',
         '4slovo.ru/common': '', '7payda.kz/crm7paydakz': 'crm_paydak', '7payda.kz/7paydakz': 'f_paydakz',
-        'docker/7paydakz': '', "cards/card-info-recognizer": ''
+        'docker/7paydakz': '', "cards/card-info-recognizer": '', "4slovo.kz/landing": 'kz_4slo'
     },
     'kz2': {
         '4slovo/finance': 'kz_finance', '4slovo/fs': 'kz_fileshare', '4slovo.kz/4slovokz': 'kz_frontend',
@@ -116,7 +117,7 @@ SYSTEM_USERS = {
         '4slovo/mock-server': '', '4slovo/sawmill': '', '4slovo/S3Client': '', "4slovo/event-manager": '',
         "4slovo/cast-type": '', "4slovo/dto": '', '4slovo/reflection': '', '4slovo/csv': '', '4slovo/xxtea': '',
         '4slovo/cache': '', "4slovo/fs-client": '', "external/PHPExcel": '', "4slovo/config": '',
-        '4slovo.ru/common': '', "cards/card-info-recognizer": ''
+        '4slovo.ru/common': '', "cards/card-info-recognizer": '', "4slovo.kz/landing": ''
     }
 }
 
@@ -147,7 +148,7 @@ TESTERS = {
     'e.korolev': 149
 }
 
-PROJECTS_WITH_TESTS = [11, 20, 61, 79, 93, 94, 97, 100, 110, 166, 172, 178, 187, 194, 201, 227, 245, 246, 247]
+PROJECTS_WITH_TESTS = [11, 20, 61, 79, 93, 94, 97, 100, 110, 166, 172, 178, 187, 194, 201, 227, 245, 246, 247, 252]
 """
         11: 4slovo.kz/crm4slovokz
         20: 4slovo.ru/chestnoe_slovo_backend
@@ -169,6 +170,7 @@ PROJECTS_WITH_TESTS = [11, 20, 61, 79, 93, 94, 97, 100, 110, 166, 172, 178, 187,
         245: 7payda.kz/7paydakz
         246: docker/7paydakz
         247: docker/7paydakz-db
+        252: cards/card-info-recognizer
 """
 PROJECTS_WITHOUT_STAGING = [
     22, 86, 90, 91, 92, 103, 104, 113, 116, 119, 121, 125, 128, 129, 135, 138, 139, 171, 178, 186, 194, 204, 207, 212,
