@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import paramiko
 
 from build import Build
@@ -38,7 +40,8 @@ def main():
     for user in system_users:
         cmd = f"sudo -Siu {user} date"
         _, ssh_stdout, stderr = client.exec_command(cmd)
-        today = ssh_stdout.read().decode('utf-8').strip("\n")[:10]  # Ищу строку вида 'Wed Sep 27' - вывод команды date
+        today = ssh_stdout.read().decode('utf-8').strip("\n")[:10]  # Ищу строку вида 'Wed Sep 27' - вывод date
+
         cmd = f"sudo -Siu {user} awk '/{today}/ ? ++i : i' logs/deploy.log"
         _, ssh_stdout, stderr = client.exec_command(cmd)
         err = stderr.read().decode('utf-8').strip("\n")
@@ -46,6 +49,15 @@ def main():
             print(f'!!!!!!! Error in {user}: {err}')
         else:
             result = ssh_stdout.read().decode('utf-8').strip("\n")
+            if not result:
+                today = datetime.now().strftime("%Y-%m-%d")
+                cmd = f"sudo -Siu {user} awk '/{today}/ ? ++i : i' logs/deploy.log"
+                _, ssh_stdout, stderr = client.exec_command(cmd)
+                err = stderr.read().decode('utf-8').strip("\n")
+                if err:
+                    print(f'!!!!!!! Error in {user}: {err}')
+                else:
+                    result = ssh_stdout.read().decode('utf-8').strip("\n")
             print(f'{user} ================ Ok. {result}')
             if '[RuntimeException]' in result or 'Fatal:' in result:
                 print('\033[31m!!!!!!!!!!!!!!!!Есть ошибки!!!!!!!!!!!!!!!!!\033[0m')

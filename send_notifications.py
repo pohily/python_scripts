@@ -10,7 +10,7 @@ from constants import SMTP_PORT, SMTP_SERVER, ISSUE_URL, PROJECTS_NUMBERS
 
 
 def get_release_message(release_date, release_country, release_name):
-    return f'Уважаемые коллеги, добрый день! <br>{release_date} состоялся выпуск релиза для страны {release_country} \
+    return f'Уважаемые коллеги, добрый день! <br>{release_date} состоялся выпуск релиза для {release_country} \
     {release_name}<br>Состав выпуска:<br><br>'
 
 
