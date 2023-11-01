@@ -83,11 +83,11 @@ def main():
                        f"<td>  {issues_list[issue_number][3]} </td>" \
                        f"</tr>"
         message += "</table>"
-        if release_country == 'Россия':
+        if release_country == 'России':
             country_key = 'ru'
-        elif release_country == 'Казахстан':
+        elif release_country == 'Казахстана':
             country_key = 'kz'
-        elif release_country == 'Грузия':
+        elif release_country == 'Грузии':
             country_key = 'ge'
         else:
             logging.exception('Страна для релиза не определена')
