@@ -89,7 +89,7 @@ SYSTEM_USERS = {
         '4slovo/satis': 'satis', "4slovo/yaml-config": '', "4slovo/php-cs-fixer": '',
         "module/message-scheduler-module": '', "cards/card-info-recognizer": '', "4slovo/rabbitclient": '',
         "4slovo/interface-generator": '', "4slovo/money": '', "4slovo/registry-generator": '',
-        '4slovo/enum-generator': ''
+        '4slovo/enum-generator': '', "4slovo/timeservice_client": ''
     },
     'ru2': {
         '4slovo/finance': 'ru_finance', '4slovo/fs': 'ru_fs', '4slovo.ru/chestnoe_slovo': 'ru_frontend',
@@ -104,7 +104,7 @@ SYSTEM_USERS = {
         '4slovo/cache': '', "4slovo/fs-client": '', "external/PHPExcel": '', 'module/message-sender-package': '',
         '4slovo/php-cs-fixer': '', "module/message-scheduler-module": '', "cards/card-info-recognizer": '',
         "4slovo/rabbitclient": '', "4slovo/interface-generator": '', "4slovo/money": '',
-        "4slovo/registry-generator": '', '4slovo/enum-generator': ''
+        "4slovo/registry-generator": '', '4slovo/enum-generator': '', "4slovo/timeservice_client": ''
     },
     'kz': {
         '4slovo/finance': 'kz_finance', '4slovo/fs': 'kz_fs', '4slovo.kz/4slovokz': 'kz_f',
@@ -150,7 +150,8 @@ TESTERS = {
     'm.pohilyj': 77,
     'g.kozlov': 99,
     'a.melnik': 101,
-    'v.dolinin': 139
+    'v.dolinin': 139,
+    'm.hachatryan': 167
 }
 
 PROJECTS_WITH_TESTS = [11, 20, 61, 79, 93, 94, 97, 100, 110, 166, 172, 178, 187, 194, 201, 227, 245, 246, 247, 252]

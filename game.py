@@ -66,7 +66,7 @@ def csv(month):
         if len(mrs) == 20:
             print('Возможно учтены не все задачи AT - проверить!')
         for mr in mrs:
-            for action in ['создание', 'разработка', 'ревью']:
+            for action in ['разработка', 'ревью']:
                 if action == 'разработка':
                     creator = mr.attributes['author']['name']
                 else:
@@ -82,5 +82,5 @@ def csv(month):
 
 if __name__ == '__main__':
     """ Геймификация - https://confluence.4slovo.ru/pages/viewpage.action?pageId=77201416 """
-    month = 10
+    month = 11
     csv(month)
