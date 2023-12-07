@@ -84,7 +84,8 @@ def main():
           f'-ов): \033[31m {", ".join(sorted(projects))}. \033[0m')
     if is_blocked:
         logging.warning('\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-        logging.info(f'\033[34m Есть заблокированные задачи: \033[31m {", ".join(sorted(set(is_blocked)))}. \033[0m')
+        logging.info(f'\033[34m Проверить не заблокированы ли задачи: \033[31m '
+                     f'{", ".join(sorted(set(is_blocked)))}. \033[0m')
     if without_epic:
         logging.warning('\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
         logging.info(f'\033[34m Задачи без эпика: \033[31m {", ".join(sorted(without_epic))}. \033[0m')

@@ -7,6 +7,7 @@ def main():
     Создание БД для поиска недействительных папортов с
     http://xn--b1afk4ade4e.xn--b1ab2a0a.xn--b1aew.xn--p1ai/info-service.htm?sid=2000
     Размер файла слишком большой - Libre Office не открывает
+    grep 6722,067081 ../list_of_expired_passports.csv
     """
     with sqlite3.connect(f'inactive_passports_{datetime.now().strftime("%Y.%m.%d")}.db') as connection:
         cursor = connection.cursor()

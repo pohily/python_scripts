@@ -89,7 +89,7 @@ SYSTEM_USERS = {
         '4slovo/satis': 'satis', "4slovo/yaml-config": '', "4slovo/php-cs-fixer": '',
         "module/message-scheduler-module": '', "cards/card-info-recognizer": '', "4slovo/rabbitclient": '',
         "4slovo/interface-generator": '', "4slovo/money": '', "4slovo/registry-generator": '',
-        '4slovo/enum-generator': '', "4slovo/timeservice_client": ''
+        '4slovo/enum-generator': '', "4slovo/timeservice_client": '', "4slovo/config": ''
     },
     'ru2': {
         '4slovo/finance': 'ru_finance', '4slovo/fs': 'ru_fs', '4slovo.ru/chestnoe_slovo': 'ru_frontend',
@@ -104,7 +104,8 @@ SYSTEM_USERS = {
         '4slovo/cache': '', "4slovo/fs-client": '', "external/PHPExcel": '', 'module/message-sender-package': '',
         '4slovo/php-cs-fixer': '', "module/message-scheduler-module": '', "cards/card-info-recognizer": '',
         "4slovo/rabbitclient": '', "4slovo/interface-generator": '', "4slovo/money": '',
-        "4slovo/registry-generator": '', '4slovo/enum-generator': '', "4slovo/timeservice_client": ''
+        "4slovo/registry-generator": '', '4slovo/enum-generator': '', "4slovo/timeservice_client": '',
+        "4slovo/config": ''
     },
     'kz': {
         '4slovo/finance': 'kz_finance', '4slovo/fs': 'kz_fs', '4slovo.kz/4slovokz': 'kz_f',
@@ -154,11 +155,12 @@ TESTERS = {
     'm.hachatryan': 167
 }
 
-PROJECTS_WITH_TESTS = [11, 20, 61, 79, 93, 94, 97, 100, 110, 166, 172, 178, 187, 194, 201, 227, 245, 246, 247, 252]
+PROJECTS_WITH_TESTS = [11, 20, 61, 62, 79, 93, 94, 97, 100, 110, 166, 172, 178, 187, 194, 201, 227, 245, 246, 247, 252]
 """
         11: 4slovo.kz/crm4slovokz
         20: 4slovo.ru/chestnoe_slovo_backend
         61: 4slovo.ru/fias
+        62: 4slovo.ru/chestnoe_slovo_landing
         79: 4slovo.ru/api
         93: 4slovo/finance
         94: docker/finance
@@ -173,7 +175,7 @@ PROJECTS_WITH_TESTS = [11, 20, 61, 79, 93, 94, 97, 100, 110, 166, 172, 178, 187,
         201: docker/external_images
         212: docker/alpine-pkgs-repo
         227: 4slovo/mock-server
-        245: 7payda.kz/7paydakz
+        245: 7payda.kz/crm7paydakz
         246: docker/7paydakz
         247: docker/7paydakz-db
         252: cards/card-info-recognizer
