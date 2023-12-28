@@ -89,7 +89,7 @@ SYSTEM_USERS = {
         '4slovo/satis': 'satis', "4slovo/yaml-config": '', "4slovo/php-cs-fixer": '',
         "module/message-scheduler-module": '', "cards/card-info-recognizer": '', "4slovo/rabbitclient": '',
         "4slovo/interface-generator": '', "4slovo/money": '', "4slovo/registry-generator": '',
-        '4slovo/enum-generator': '', "4slovo/timeservice_client": '', "4slovo/config": ''
+        '4slovo/enum-generator': '', "4slovo/timeservice_client": '', "4slovo/config": '', "docker/ru-db-v2": ''
     },
     'ru2': {
         '4slovo/finance': 'ru_finance', '4slovo/fs': 'ru_fs', '4slovo.ru/chestnoe_slovo': 'ru_frontend',
@@ -105,7 +105,7 @@ SYSTEM_USERS = {
         '4slovo/php-cs-fixer': '', "module/message-scheduler-module": '', "cards/card-info-recognizer": '',
         "4slovo/rabbitclient": '', "4slovo/interface-generator": '', "4slovo/money": '',
         "4slovo/registry-generator": '', '4slovo/enum-generator': '', "4slovo/timeservice_client": '',
-        "4slovo/config": ''
+        "4slovo/config": '', "docker/ru-db-v2": ''
     },
     'kz': {
         '4slovo/finance': 'kz_finance', '4slovo/fs': 'kz_fs', '4slovo.kz/4slovokz': 'kz_f',

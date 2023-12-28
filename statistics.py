@@ -44,6 +44,13 @@ def main():
                         is_blocked.append(issue_number.key)
                 except AttributeError:
                     pass
+            if issue_link.type.name == 'Gantt End to End' \
+                    and issue_link.type.inward == 'has to be finished together with':
+                try:
+                    if issue_link.outwardIssue:
+                        is_blocked.append(issue_number.key)
+                except AttributeError:
+                    pass
         # Проверка что у всех задач есть эпик
         if 'сборка' not in issue_number.fields.summary.lower() and not issue_number.fields.customfield_10009:
             without_epic.append(issue_number.key)

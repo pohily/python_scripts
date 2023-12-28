@@ -27,17 +27,48 @@ def csv(month):
         date = datetime.datetime.strptime(start, '%Y-%m-%d')
         # сперва ищем названия всех зарелиженных релизов
         fixes = set()
+        cls_issues = set()
+        sd_issues = set()
         while date < finish:
             next_day = date + datetime.timedelta(days=1)
-            tmp = jira.search_issues(
+            slov = jira.search_issues(
                 f'status = "Released to production" and resolved >= "{date.strftime("%Y-%m-%d")}" '
                 f'and resolved < "{next_day.strftime("%Y-%m-%d")}"'
             )
-            if tmp:
-                for i in tmp:
+            if slov:
+                for i in slov:
                     try:
                         fixes.add(i.fields.fixVersions[0].name)
                     except IndexError:
+                        pass
+            # поддержка
+            cls_query = f'project = "Клиентская поддержка" AND created >= "{date.strftime("%Y-%m-%d")}" and ' \
+                        f'created < "{next_day.strftime("%Y-%m-%d")}"'
+            cls = jira.search_issues(cls_query)
+            if cls:
+                for issue in cls:
+                    try:
+                        if issue.fields.assignee.name in TESTERS:
+                            cls_issues.add(issue)
+                            continue
+                        for comment in issue.fields.comment.comments:
+                            if comment.author.name in TESTERS:
+                                cls_issues.add(issue)
+                                continue
+                    except AttributeError:
+                        pass
+            # Servicedesk
+            sd_query = f'"Epic Link" = BA-2362  and status = Closed AND created >= "{date.strftime("%Y-%m-%d")}" and' \
+                       f' created < "{next_day.strftime("%Y-%m-%d")}"'
+            cls = jira.search_issues(sd_query)
+            if cls:
+                for issue in cls:
+                    try:
+                        for comment in issue.fields.comment.comments:
+                            if comment.author.name in TESTERS:
+                                sd_issues.add(issue)
+                                continue
+                    except AttributeError:
                         pass
             date = next_day
         # теперь ищем все задачи из найденных релизов
@@ -78,6 +109,13 @@ def csv(month):
                         f"{action},,,1,1,,,\n"
                 file.write(query)
                 index += 1
+        # cls and servicedesk issues
+        support_issues = list(cls_issues) + list(sd_issues)
+        for issue in support_issues:
+            create_ts = datetime.datetime.strptime(issue.fields.created.split('T')[0], '%Y-%m-%d').strftime('%Y-%m-%d')
+            query = f"{index + 1},{issue.key},,{create_ts},,поддержка,,1,1,1,,,\n"
+            file.write(query)
+            index += 1
 
 
 if __name__ == '__main__':
