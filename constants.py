@@ -23,7 +23,8 @@ PROJECTS_NAMES = {"4slovo.ru/chestnoe_slovo": 7, "4slovo.ru/4slv": 10, "4slovo.k
                   "4slovo/xxtea": 233, "4slovo/satis": 237, "external/PHPExcel": 240, "4slovo/config": 242,
                   "7payda.kz/7paydakz": 244, "7payda.kz/crm7paydakz": 245, "docker/7paydakz": 246,
                   "docker/7paydakz-db": 247, "module/message-scheduler-module": 248, "4slovo/production-profiler": 251,
-                  "cards/card-info-recognizer": 252, "docker/ru-db-v2": 253, "4slovo/php-cs-fixer": 254
+                  "cards/card-info-recognizer": 252, "docker/ru-db-v2": 253, "4slovo/php-cs-fixer": 254,
+                  "4slovo/metrics-provider": 257
                   }
 
 PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo", 10: "4slovo.ru/4slv", 11: "4slovo.kz/crm4slovokz",
@@ -48,7 +49,7 @@ PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo", 10: "4slovo.ru/4slv", 11: "4s
                     242: "4slovo/config", 244: "7payda.kz/7paydakz", 245: "7payda.kz/crm7paydakz",
                     246: "docker/7paydakz", 247: "docker/7paydakz-db", 248: "module/message-scheduler-module",
                     251: "4slovo/production-profiler", 252: "cards/card-info-recognizer", 253: "docker/ru-db-v2",
-                    254: "4slovo/php-cs-fixer"
+                    254: "4slovo/php-cs-fixer", 257: "4slovo/metrics-provider"
                     }
 
 PROJECTS_COUNTRIES = {7: "ru", 10: "ru, kz", 11: "kz", 12: "kz", 20: "ru", 22: "ru, kz, ge, 7da.kz", 23: "ge", 24: "ge",
@@ -61,10 +62,10 @@ PROJECTS_COUNTRIES = {7: "ru", 10: "ru, kz", 11: "kz", 12: "kz", 20: "ru", 22: "
                       159: "kz", 166: "ru", 167: "ru", 171: "kz", 172: "ru, kz", 178: "ru, kz", 186: "ru", 187: "ru",
                       194: "ru, kz", 201: "ru, kz, ge", 204: "kz", 207: "ru, kz, ge", 212: "ru, kz, ge",
                       215: "ru, kz, ge", 223: "ru", 225: "ru, kz, ge", 227: "ru, kz, ge", 228: "ru, kz, ge", 229: "",
-                      230: "ru, kz, ge", 231: "ru, kz, ge", 232: "ru, kz, ge", 233: "ru, kz, ge", 237: "",
-                      240: "ru, kz, ge",242: "ru, kz, ge, 7da.kz", 244: "7da.kz", 245: "7da.kz", 246: "7da.kz",
-                      247: "7da.kz", 248 : "ru", 251: "ru, kz, ge, 7da.kz", 252: "ru, kz, ge, 7da.kz",
-                      253: "ru, kz, ge, 7da.kz", 254: "ru"
+                      230: "ru, kz, ge", 231: "ru, kz, ge", 232: "ru, kz, ge", 233: "ru, kz, ge",
+                      237: "ru, kz, ge, 7da.kz", 240: "ru, kz, ge",242: "ru, kz, ge, 7da.kz", 244: "7da.kz",
+                      245: "7da.kz", 246: "7da.kz", 247: "7da.kz", 248 : "ru", 251: "ru, kz, ge, 7da.kz",
+                      252: "ru, kz, ge, 7da.kz", 253: "ru, kz, ge, 7da.kz", 254: "ru", 257: "ru, kz, ge, 7da.kz"
                       }
 
 COUNTRIES = {
@@ -89,7 +90,8 @@ SYSTEM_USERS = {
         '4slovo/satis': 'satis', "4slovo/yaml-config": '', "4slovo/php-cs-fixer": '',
         "module/message-scheduler-module": '', "cards/card-info-recognizer": '', "4slovo/rabbitclient": '',
         "4slovo/interface-generator": '', "4slovo/money": '', "4slovo/registry-generator": '',
-        '4slovo/enum-generator': '', "4slovo/timeservice_client": '', "4slovo/config": '', "docker/ru-db-v2": ''
+        '4slovo/enum-generator': '', "4slovo/timeservice_client": '', "4slovo/config": '', "docker/ru-db-v2": '',
+        '4slovo/metrics-provider': ''
     },
     'ru2': {
         '4slovo/finance': 'ru_finance', '4slovo/fs': 'ru_fs', '4slovo.ru/chestnoe_slovo': 'ru_frontend',

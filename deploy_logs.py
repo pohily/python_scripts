@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 
 import paramiko
 
@@ -50,7 +50,10 @@ def main():
         else:
             result = ssh_stdout.read().decode('utf-8').strip("\n")
             if not result:
-                today = datetime.now().strftime("%Y-%m-%d")
+                now = datetime.datetime.now()
+                if release_country != 'ru' and int(now.strftime("%H")) >= 21:
+                    now += datetime.timedelta(days=1)  # в КЗ уже следующий день
+                today = now.strftime("%Y-%m-%d")
                 cmd = f"sudo -Siu {user} awk '/{today}/ ? ++i : i' logs/deploy.log"
                 _, ssh_stdout, stderr = client.exec_command(cmd)
                 err = stderr.read().decode('utf-8').strip("\n")
