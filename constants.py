@@ -117,7 +117,8 @@ SYSTEM_USERS = {
         "4slovo/cast-type": '', "4slovo/dto": '', '4slovo/reflection': '', '4slovo/csv': '', '4slovo/xxtea': '',
         '4slovo/cache': '', "4slovo/fs-client": '', "external/PHPExcel": '', "4slovo/config": '',
         '4slovo.ru/common': '', '7payda.kz/crm7paydakz': 'crm_paydak', '7payda.kz/7paydakz': 'f_paydakz',
-        'docker/7paydakz': '', "cards/card-info-recognizer": '', "4slovo.kz/landing": 'kz_4slo'
+        'docker/7paydakz': '', "cards/card-info-recognizer": '', "4slovo.kz/landing": 'kz_4slo',
+        '4slovo/finance_client': ''
     },
     'kz2': {
         '4slovo/finance': 'kz_finance', '4slovo/fs': 'kz_fileshare', '4slovo.kz/4slovokz': 'kz_frontend',
@@ -126,7 +127,7 @@ SYSTEM_USERS = {
         '4slovo/mock-server': '', '4slovo/sawmill': '', '4slovo/S3Client': '', "4slovo/event-manager": '',
         "4slovo/cast-type": '', "4slovo/dto": '', '4slovo/reflection': '', '4slovo/csv': '', '4slovo/xxtea': '',
         '4slovo/cache': '', "4slovo/fs-client": '', "external/PHPExcel": '', "4slovo/config": '',
-        '4slovo.ru/common': '', "cards/card-info-recognizer": '', "4slovo.kz/landing": ''
+        '4slovo.ru/common': '', "cards/card-info-recognizer": '', "4slovo.kz/landing": '', '4slovo/finance_client': ''
     }
 }
 
@@ -135,15 +136,15 @@ MR_STATUS = {
     'can_be_merged': '(/) Нет конфликтов, ', 'cannot_be_merged': '(x) Конфликт!, ', 'unchecked': '(/) Нет конфликтов,',
     'cannot_be_merged_recheck': '(x) Конфликт!, ', 'checking': '(x) Конфликт!, ',
 }
-PRIORITY = {'Critical': '(*r) - Critical', 'Highest': '(!) - Highest', 'High': '(*) - High', 'Medium': '(*g) - Medium',
-            'Low': '(*b) - Low', 'Lowest': '(*b) - Lowest', 'Критический': '(*r) - Critical',
-            'MEGA Critical': '(flag) - MEGA Critical'}
+PRIORITY = {'Critical': '(*r) Critical', 'Highest': '(!) Highest', 'High': '(*) High', 'Medium': '(*g) Medium',
+            'Low': '(*b) Low', 'Lowest': '(*b) Lowest', 'Критический': '(*r) Critical',
+            'MEGA Critical': '(flag) MEGA Critical'}
 PRIORITY_VALUE = {
     'MEGA Critical': 1, 'Critical': 2, 'Критический': 2, 'Highest': 3, 'High': 4, 'Medium': 5, 'Low': 6, 'Lowest': 7
 }
 
 STATUS_FOR_RELEASE = ['Released to production', 'Passed QA', 'In regression test', 'Ready for release',
-                      'Закрыт', 'Fixed', 'Closed', 'Готово'
+                      'Закрыт', 'Fixed', 'Closed', 'Готово', 'In regress test RC'
                       ]  # , 'Ready for review', 'Ready for technical solution review', 'In QA', 'Open', 'Ready for QA', 'In development', 'Reopened', 'Reviewing', 'Technical solution', 'В работе']
 STATUS_READY = ['Released to production', 'Ready for release', 'Закрыт', 'Fixed', 'Closed']
 

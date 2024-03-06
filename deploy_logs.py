@@ -64,6 +64,8 @@ def main():
             print(f'{user} ================ Ok. {result}')
             if '[RuntimeException]' in result or 'Fatal:' in result:
                 print('\033[31m!!!!!!!!!!!!!!!!Есть ошибки!!!!!!!!!!!!!!!!!\033[0m')
+            if 'Warning:' in result:
+                print('\033[31m!!!!!!!!!!!!!!!!Warnings!!!!!!!!!!!!!!!!!\033[0m')
         print(f'\033[34m Деплой лог для {user}\033[0m')
         input('Нажмите Enter для продолжения')
     client.close()

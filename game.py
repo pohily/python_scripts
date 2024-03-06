@@ -49,11 +49,11 @@ def csv(month):
                 for issue in cls:
                     try:
                         if issue.fields.assignee.name in TESTERS:
-                            cls_issues.add(issue)
+                            cls_issues.add((issue, issue.fields.assignee.name))
                             continue
                         for comment in issue.fields.comment.comments:
                             if comment.author.name in TESTERS:
-                                cls_issues.add(issue)
+                                cls_issues.add((issue, comment.author.name))
                                 continue
                     except AttributeError:
                         pass
@@ -66,7 +66,7 @@ def csv(month):
                     try:
                         for comment in issue.fields.comment.comments:
                             if comment.author.name in TESTERS:
-                                sd_issues.add(issue)
+                                sd_issues.add((issue, comment.author.name))
                                 continue
                     except AttributeError:
                         pass
@@ -101,7 +101,7 @@ def csv(month):
                 if action == 'разработка':
                     creator = mr.attributes['author']['name']
                 else:
-                    creator = ''
+                    creator = 'Михаил А. Похилый'
                 query = f"{index + 1}," \
                         f"{mr.attributes['source_branch']},," \
                         f"{mr.attributes['merged_at'].split('T')[0]}," \
@@ -109,16 +109,17 @@ def csv(month):
                         f"{action},,,1,1,,,\n"
                 file.write(query)
                 index += 1
-        # cls and servicedesk issues
+        # cls and service_desk issues
         support_issues = list(cls_issues) + list(sd_issues)
         for issue in support_issues:
-            create_ts = datetime.datetime.strptime(issue.fields.created.split('T')[0], '%Y-%m-%d').strftime('%Y-%m-%d')
-            query = f"{index + 1},{issue.key},,{create_ts},,поддержка,,1,1,1,,,\n"
+            create_ts = datetime.datetime.strptime(
+                issue[0].fields.created.split('T')[0], '%Y-%m-%d').strftime('%Y-%m-%d')
+            query = f"{index + 1},{issue[0].key},,{create_ts},{issue[1]},поддержка,,1,1,1,,,\n"
             file.write(query)
             index += 1
 
 
 if __name__ == '__main__':
     """ Геймификация - https://confluence.4slovo.ru/pages/viewpage.action?pageId=77201416 """
-    month = 2
+    month = 3
     csv(month)
