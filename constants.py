@@ -144,7 +144,7 @@ PRIORITY_VALUE = {
 }
 
 STATUS_FOR_RELEASE = ['Released to production', 'Passed QA', 'In regression test', 'Ready for release',
-                      'Закрыт', 'Fixed', 'Closed', 'Готово', 'In regress test RC'
+                      'Закрыт', 'Fixed', 'Closed', 'Готово', 'In Regress Test RC'
                       ]  # , 'Ready for review', 'Ready for technical solution review', 'In QA', 'Open', 'Ready for QA', 'In development', 'Reopened', 'Reviewing', 'Technical solution', 'В работе']
 STATUS_READY = ['Released to production', 'Ready for release', 'Закрыт', 'Fixed', 'Closed']
 

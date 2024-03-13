@@ -34,7 +34,8 @@ def main():
     post_deploy = []
     without_epic = []
     is_blocked = []
-    for issue_number in fix_issues:
+    projects = {}
+    for index, issue_number in enumerate(fix_issues):
         # проверка, что задача блокируется
         issue_links = issue_number.fields.issuelinks
         for issue_link in issue_links:
@@ -65,7 +66,13 @@ def main():
         else:
             continue
         mr_count = build.get_merge_requests(issue_number=issue_number)
+        print(f'{index + 1}) {issue_number}:')
         for merge in mr_count:
+            if merge.project in projects:
+                projects[merge.project] += 1
+            else:
+                projects[merge.project] = 1
+            print(f'    {PROJECTS_NUMBERS[merge.project]} - {projects[merge.project]}')
             status, _, _, _ = build.get_merge_request_details(merge)
             if status != '(/) Нет конфликтов, ':
                 logging.exception(f'\033[31m Конфликт в задаче {merge.issue} в мердж реквесте {merge.url}\033[0m')
@@ -76,6 +83,11 @@ def main():
                     wrong_release_issues.add(issue)
             except:
                 logging.exception(f'У вас нет доступа к проекту {PROJECTS_COUNTRIES[merge.project]}')
+    print()
+    print('\033[34mИтого:\033[0m')
+    for project in projects:
+        print(f'    {PROJECTS_NUMBERS[project]} - \033[31m{projects[project]}\033[34m \033[0m')
+    print()
     projects = [PROJECTS_NUMBERS[pr] for pr in used_projects]
     user_id = TESTERS[build.config['user_data']['login']]
     reporter = []
