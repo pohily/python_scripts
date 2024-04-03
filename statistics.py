@@ -66,7 +66,7 @@ def main():
         else:
             continue
         mr_count = build.get_merge_requests(issue_number=issue_number)
-        print(f'{index + 1}) {issue_number}:')
+        print(f'{index + 1}) {issue_number} - {issue_number.fields.status.name} - {issue_number.fields.priority.name}:')
         for merge in mr_count:
             if merge.project in projects:
                 projects[merge.project] += 1
@@ -84,9 +84,10 @@ def main():
             except:
                 logging.exception(f'У вас нет доступа к проекту {PROJECTS_COUNTRIES[merge.project]}')
     print()
-    print('\033[34mИтого:\033[0m')
+    print(f'\033[34mИтого:\033[0m')
     for project in projects:
-        print(f'    {PROJECTS_NUMBERS[project]} - \033[31m{projects[project]}\033[34m \033[0m')
+        print(f'    {PROJECTS_NUMBERS[project]} - \033[31m{projects[project]}\033[34m \033[0m ('
+              f'{ round(projects[project] / (index + 1) * 100)}%)')
     print()
     projects = [PROJECTS_NUMBERS[pr] for pr in used_projects]
     user_id = TESTERS[build.config['user_data']['login']]

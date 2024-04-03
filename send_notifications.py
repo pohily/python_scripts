@@ -59,14 +59,15 @@ def main():
     issues_list = {}
     message = get_release_message(release_date, release_country, release_name)
     for issue in release_issues:
-        if 'сборка' not in issue.fields.summary.lower():
-            epic = ''
-            if issue.fields.customfield_10009:
-                epic = get_epic(epic_issue_name=issue.fields.customfield_10009)
-            issuetype = issue.fields.issuetype.name
-            priority = issue.fields.priority.name
-            summary = issue.fields.summary
-            issues_list[issue.key] = (epic, issuetype, priority, summary)
+        if issue.fields.issuetype.name == 'Defect' or 'сборка' in issue.fields.summary.lower():
+            continue
+        epic = ''
+        if issue.fields.customfield_10009:
+            epic = get_epic(epic_issue_name=issue.fields.customfield_10009)
+        issuetype = issue.fields.issuetype.name
+        priority = issue.fields.priority.name
+        summary = issue.fields.summary
+        issues_list[issue.key] = (epic, issuetype, priority, summary)
 
     if issues_list and release_date:
         message += '<table border="1" cellpadding="5" style="border: 1px solid black;">'
@@ -92,6 +93,10 @@ def main():
         else:
             logging.exception('Страна для релиза не определена')
             raise Exception('Страна для релиза не определена')
+        message += '<br><br>Релиз затронул следующие проекты:<ul style="list-style-type:circle">'
+        for project in release_projects:
+            message += f'<li> {PROJECTS_NUMBERS[project]}</li>'
+        message += '</ul>'
         send(release_country, release_name, country_key, message, build.config)
 
 

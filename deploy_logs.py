@@ -51,7 +51,7 @@ def main():
             result = ssh_stdout.read().decode('utf-8').strip("\n")
             if not result:
                 now = datetime.datetime.now()
-                if release_country != 'ru' and int(now.strftime("%H")) >= 21:
+                if release_country != 'ru' and int(now.strftime("%H")) >= 22:
                     now += datetime.timedelta(days=1)  # в КЗ уже следующий день
                 today = now.strftime("%Y-%m-%d")
                 cmd = f"sudo -Siu {user} awk '/{today}/ ? ++i : i' logs/deploy.log"
