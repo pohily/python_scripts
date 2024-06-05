@@ -247,7 +247,7 @@ class Build:
             pr.branches.create({'branch': f'{self.rc_name}', 'ref': 'master'})
 
     def get_merge_request_details(self, mr):
-        """ Возвращает статус (есть или нет конфликты), source_branch """
+        """ Возвращает статус (есть или нет конфликты), source_branch, target_branch, state: влит/не влит"""
         _, iid, project, _ = mr
         token = f"private_token={(self.config['user_data']['GITLAB_PRIVATE_TOKEN'])}"
         details = requests.get(url=MR_BY_IID.format(project, iid, token)).json()
@@ -373,7 +373,8 @@ class Build:
             else:
                 staging_links.append(mr.attributes['web_url'])
 
-            if MAKE_LAST_BUILD_FILE_AND_START_TESTS:
+            # для 4slovo.ru/api (проект 79) всегда делаем файл last_build - т.к. там билдится образ на его основе
+            if MAKE_LAST_BUILD_FILE_AND_START_TESTS or pr == 79:
                 # Делаем коммит с названием последнего билда - раньше запускал тесты и билд контейнеров докера,
                 # сейчас отключили автоматический запуск тестов - запускаю дальше вручную
                 try:
