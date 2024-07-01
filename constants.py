@@ -16,15 +16,16 @@ PROJECTS_NAMES = {"4slovo.ru/chestnoe_slovo": 7, "4slovo.ru/4slv": 10, "4slovo.k
                   "4slovo.ru/python-scripts": 154, "4slovo.kz/landing": 159, "docker/ru": 166, "docker/ru-db": 167,
                   "docker/kz-db": 171, "docker/fias": 172, "4slovo/anonymize-replicator": 178,
                   "module/message-sender-package": 186, "module/msm": 187, "4slovo/anon-server": 194,
-                  "docker/external_images": 201, "sites/4slokz": 204, "4slovo/sumsub-client": 207,
-                  "docker/alpine-pkgs-repo": 212, "4slovo/S3Client": 215, "4slovo.ru/osticket": 223,
-                  "4slovo/short_link_client": 225, '4slovo/mock-server': 227, "4slovo/event-manager": 228,
-                  "4slovo/reflection": 229, "4slovo/cast-type": 230, "4slovo/dto": 231, "4slovo/csv": 232,
-                  "4slovo/xxtea": 233, "4slovo/satis": 237, "external/PHPExcel": 240, "4slovo/config": 242,
-                  "7payda.kz/7paydakz": 244, "7payda.kz/crm7paydakz": 245, "docker/7paydakz": 246,
+                  "docker/external_images": 201, "module/rabbitmq": 202, "sites/4slokz": 204,
+                  "4slovo/sumsub-client": 207, "docker/alpine-pkgs-repo": 212, "4slovo/S3Client": 215,
+                  "4slovo.ru/osticket": 223, "4slovo/short_link_client": 225, '4slovo/mock-server': 227,
+                  "4slovo/event-manager": 228, "4slovo/reflection": 229, "4slovo/cast-type": 230, "4slovo/dto": 231,
+                  "4slovo/csv": 232, "4slovo/xxtea": 233, "4slovo/satis": 237, "external/PHPExcel": 240,
+                  "4slovo/config": 242, "7payda.kz/7paydakz": 244, "7payda.kz/crm7paydakz": 245, "docker/7paydakz": 246,
                   "docker/7paydakz-db": 247, "module/message-scheduler-module": 248, "4slovo/production-profiler": 251,
                   "cards/card-info-recognizer": 252, "docker/ru-db-v2": 253, "4slovo/php-cs-fixer": 254,
-                  "4slovo/metrics-provider": 257
+                  "4slovo/metrics-provider": 257, "4slovo/satisfy": 259, "4slovo.kz/leasing/front": 262,
+                  "4slovo.kz/leasing/crm": 263, "docker/leasing": 264, "docker/leasing-db": 265
                   }
 
 PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo", 10: "4slovo.ru/4slv", 11: "4slovo.kz/crm4slovokz",
@@ -41,15 +42,17 @@ PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo", 10: "4slovo.ru/4slv", 11: "4s
                     144: "docker/replicator", 154: "4slovo.ru/python-scripts", 159: "4slovo.kz/landing",
                     166: "docker/ru", 167: "docker/ru-db", 171: "docker/kz-db", 172: "docker/fias",
                     178: "4slovo/anonymize-replicator",186: "module/message-sender-package", 187: "module/msm",
-                    194: "4slovo/anon-server", 201: "docker/external_images", 204: "sites/4slokz",
-                    207: "4slovo/sumsub-client", 212: "docker/alpine-pkgs-repo", 215: "4slovo/S3Client",
-                    223: "4slovo.ru/osticket", 225: "4slovo/short_link_client", 227: '4slovo/mock-server',
-                    228: "4slovo/event-manager", 229: "4slovo/reflection", 230: "4slovo/cast-type", 231: "4slovo/dto",
-                    232: "4slovo/csv", 233: "4slovo/xxtea", 237: "4slovo/satis", 240: "external/PHPExcel",
-                    242: "4slovo/config", 244: "7payda.kz/7paydakz", 245: "7payda.kz/crm7paydakz",
-                    246: "docker/7paydakz", 247: "docker/7paydakz-db", 248: "module/message-scheduler-module",
-                    251: "4slovo/production-profiler", 252: "cards/card-info-recognizer", 253: "docker/ru-db-v2",
-                    254: "4slovo/php-cs-fixer", 257: "4slovo/metrics-provider"
+                    194: "4slovo/anon-server", 201: "docker/external_images", 202: "module/rabbitmq",
+                    204: "sites/4slokz", 207: "4slovo/sumsub-client", 212: "docker/alpine-pkgs-repo",
+                    215: "4slovo/S3Client", 223: "4slovo.ru/osticket", 225: "4slovo/short_link_client",
+                    227: '4slovo/mock-server', 228: "4slovo/event-manager", 229: "4slovo/reflection",
+                    230: "4slovo/cast-type", 231: "4slovo/dto", 232: "4slovo/csv", 233: "4slovo/xxtea",
+                    237: "4slovo/satis", 240: "external/PHPExcel", 242: "4slovo/config", 244: "7payda.kz/7paydakz",
+                    245: "7payda.kz/crm7paydakz", 246: "docker/7paydakz", 247: "docker/7paydakz-db",
+                    248: "module/message-scheduler-module", 251: "4slovo/production-profiler",
+                    252: "cards/card-info-recognizer", 253: "docker/ru-db-v2", 254: "4slovo/php-cs-fixer",
+                    257: "4slovo/metrics-provider", 259: "4slovo/satisfy", 262: "4slovo.kz/leasing/front",
+                    263: "4slovo.kz/leasing/crm", 264: "docker/leasing", 265: "docker/leasing-db"
                     }
 
 PROJECTS_COUNTRIES = {7: "ru", 10: "ru, kz", 11: "kz", 12: "kz", 20: "ru", 22: "ru, kz, ge, 7da.kz", 23: "ge", 24: "ge",
@@ -60,16 +63,18 @@ PROJECTS_COUNTRIES = {7: "ru", 10: "ru, kz", 11: "kz", 12: "kz", 20: "ru", 22: "
                       124: "ru, kz, ge", 125: "ru, kz, ge", 128: "ge", 129: "ge",
                       130: "ru", 135: "ru, kz, ge", 138: "ru, kz, ge", 139: "ru, kz, ge", 144: "ru, kz, ge", 154: "ru",
                       159: "kz", 166: "ru", 167: "ru", 171: "kz", 172: "ru, kz", 178: "ru, kz", 186: "ru", 187: "ru",
-                      194: "ru, kz", 201: "ru, kz, ge", 204: "kz", 207: "ru, kz, ge", 212: "ru, kz, ge",
-                      215: "ru, kz, ge", 223: "ru", 225: "ru, kz, ge", 227: "ru, kz, ge", 228: "ru, kz, ge", 229: "",
-                      230: "ru, kz, ge", 231: "ru, kz, ge", 232: "ru, kz, ge", 233: "ru, kz, ge",
-                      237: "ru, kz, ge, 7da.kz", 240: "ru, kz, ge",242: "ru, kz, ge, 7da.kz", 244: "7da.kz",
-                      245: "7da.kz", 246: "7da.kz", 247: "7da.kz", 248 : "ru", 251: "ru, kz, ge, 7da.kz",
-                      252: "ru, kz, ge, 7da.kz", 253: "ru, kz, ge, 7da.kz", 254: "ru", 257: "ru, kz, ge, 7da.kz"
+                      194: "ru, kz", 201: "ru, kz, ge", 202: "ru, kz, ge", 204: "kz", 207: "ru, kz, ge",
+                      212: "ru, kz, ge", 215: "ru, kz, ge", 223: "ru", 225: "ru, kz, ge", 227: "ru, kz, ge",
+                      228: "ru, kz, ge", 229: "ru, kz, ge", 230: "ru, kz, ge", 231: "ru, kz, ge", 232: "ru, kz, ge",
+                      233: "ru, kz, ge", 237: "ru, kz, ge, 7da.kz", 240: "ru, kz, ge",242: "ru, kz, ge, 7da.kz",
+                      244: "7da.kz", 245: "7da.kz", 246: "7da.kz", 247: "7da.kz", 248 : "ru", 251: "ru, kz, ge, 7da.kz",
+                      252: "ru, kz, ge, 7da.kz", 253: "ru, kz, ge, 7da.kz", 254: "ru", 257: "ru, kz, ge, 7da.kz",
+                      259: "ru, kz, ge, 7da.kz", 262: "leasing.kz", 263: "leasing.kz", 264: "leasing.kz",
+                      265: "leasing.kz"
                       }
 
 COUNTRIES = {
-    'ru': 'России', 'kz': 'Казахстана', 'ge': 'Грузии', '7da': 'Казахстана'
+    'ru': 'России', 'kz': 'Казахстана', 'ge': 'Грузии', '7da': 'Казахстана', 'leasing': 'Казахстана'
 }
 COUNTRIES_ABBR = {
     'России': 'ru', 'Казахстана': 'kz', 'Грузии': 'ge'
@@ -158,7 +163,9 @@ TESTERS = {
     'e.evdokimov': 169
 }
 
-PROJECTS_WITH_TESTS = [11, 20, 61, 62, 79, 93, 94, 97, 100, 110, 166, 172, 178, 187, 194, 201, 227, 245, 246, 247, 252]
+PROJECTS_WITH_TESTS = [
+    11, 20, 61, 62, 79, 93, 94, 97, 100, 110, 166, 172, 178, 187, 194, 201, 227, 245, 246, 247, 252, 259, 263, 264, 265
+]
 """
         11: 4slovo.kz/crm4slovokz
         20: 4slovo.ru/chestnoe_slovo_backend
@@ -182,10 +189,15 @@ PROJECTS_WITH_TESTS = [11, 20, 61, 62, 79, 93, 94, 97, 100, 110, 166, 172, 178, 
         246: docker/7paydakz
         247: docker/7paydakz-db
         252: cards/card-info-recognizer
+        259: 4slovo/satisfy
+        263: 4slovo.kz/leasing/crm
+        264: docker/leasing
+        265: docker/leasing-db
 """
 PROJECTS_WITHOUT_STAGING = [
     22, 86, 90, 91, 92, 103, 104, 113, 116, 119, 120, 121, 123, 124, 125, 128, 129, 135, 138, 139, 171, 178, 186, 194,
-    204, 207, 212, 215, 225, 227, 228, 229, 230, 231, 232, 233, 240, 242, 246, 247, 248, 251, 252, 253, 254, 257
+    202, 204, 207, 212, 215, 225, 227, 228, 229, 230, 231, 232, 233, 240, 242, 246, 247, 248, 251, 252, 253, 254, 257,
+    259, 264, 265
 ]
 """
         90: 4slovo/sawmill
@@ -210,6 +222,7 @@ PROJECTS_WITHOUT_STAGING = [
         178: 4slovo/anonymize-replicator
         186: module/message-sender-package
         194: 4slovo/anon-server
+        202: module/rabbitmq
         204: sites/4slokz
         207: 4slovo/sumsub-client
         212: docker/alpine-pkgs-repo
@@ -227,8 +240,11 @@ PROJECTS_WITHOUT_STAGING = [
         246: docker/7paydakz
         247: docker/7paydakz-db
         257: 4slovo/metrics-provider
+        259: 4slovo/satisfy
+        264: docker/leasing
+        265: docker/leasing-db
 """
-DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167, 172, 201, 246, 247]
+DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167, 172, 201, 246, 247, 264, 265]
 """
         94: docker/finance
         97: docker/api
@@ -242,6 +258,8 @@ DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167, 172, 201, 246, 247]
         212: docker/alpine-pkgs-repo
         246: docker/7paydakz
         247: docker/7paydakz-db
+        264: docker/leasing
+        265: docker/leasing-db
 """
 
 GIT_LAB = 'https://gitlab'
