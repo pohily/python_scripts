@@ -161,16 +161,28 @@ class Build:
             url_parts = link['object']['url'].split('/')
             if len(url_parts) < 6:
                 continue
-            try:
-                project = PROJECTS_NAMES[f'{url_parts[3]}/{url_parts[4]}']
-            except KeyError:
-                logging.exception(f'Проверьте задачу {issue_number} - не найден проект {url_parts[3]}/{url_parts[4]}')
-                continue
-            # в связи с обновлением gitlab поменялись url 11/03/20:
+            if 'leasing' in link['object']['url'] and '4slovo.kz' in link['object']['url']:
+                # добавился новый тип проектов из трех частей 06.24
+                try:
+                    project = PROJECTS_NAMES[f'{url_parts[3]}/{url_parts[4]}/{url_parts[5]}']
+                except KeyError:
+                    logging.exception(
+                        f'Проверьте {issue_number} - не найден проект {url_parts[3]}/{url_parts[4]}/{url_parts[5]}')
+                    continue
+            else:
+                try:
+                    project = PROJECTS_NAMES[f'{url_parts[3]}/{url_parts[4]}']
+                except KeyError:
+                    logging.exception(
+                        f'Проверьте {issue_number} - не найден проект {url_parts[3]}/{url_parts[4]}')
+                    continue
+            # в связи с обновлением gitlab поменялись url 11/03/20, добавился новый тип проектов из трех частей 06.24:
             if GIT_LAB in link['object']['url'] and url_parts[6].isdigit():
                 iid = url_parts[6]
             elif GIT_LAB in link['object']['url'] and url_parts[7].isdigit():
                 iid = url_parts[7]
+            elif GIT_LAB in link['object']['url'] and 'leasing' in link['object']['url'] and url_parts[8].isdigit():
+                iid = url_parts[8]
             else:
                 logging.warning(f"Проверьте ссылку {link['object']['url']} в задаче {issue_number}")
                 continue
@@ -202,14 +214,21 @@ class Build:
             statuses[index].append(mr)  # 1
             url_parts = url.split('/')
             # в связи с обновлением gitlab поменялись url 11/03/20:
+            leasing = 0
             if GIT_LAB in url and url_parts[6].isdigit():
                 iid = url_parts[6]
             elif GIT_LAB in url and url_parts[7].isdigit():
                 iid = url_parts[7]
+            elif GIT_LAB in url and 'leasing' in url and url_parts[8].isdigit():
+                iid = url_parts[8]
+                leasing = 1
             else:
                 logging.exception(f'Проверьте задачу {issue_number} - некорректная ссылка {url}')
                 continue
-            statuses[index].append(f'[{url_parts[3]}/{url_parts[4]}/{iid}|{url}]')  # 2
+            if leasing:
+                statuses[index].append(f'[{url_parts[3]}/{url_parts[4]}/{url_parts[5]}/{iid}|{url}]')  # 2
+            else:
+                statuses[index].append(f'[{url_parts[3]}/{url_parts[4]}/{iid}|{url}]')  # 2
         #
         #           Мержим MR из текущей задачи в RC
         #
