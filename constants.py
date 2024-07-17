@@ -157,7 +157,6 @@ STATUS_FOR_QA = ['Ready for QA', 'In QA']
 
 TESTERS = {
     'm.pohilyj': 77,
-    'g.kozlov': 99,
     'a.melnik': 101,
     'v.dolinin': 139,
     'e.evdokimov': 169
@@ -195,9 +194,9 @@ PROJECTS_WITH_TESTS = [
         265: docker/leasing-db
 """
 PROJECTS_WITHOUT_STAGING = [
-    22, 86, 90, 91, 92, 103, 104, 113, 116, 119, 120, 121, 123, 124, 125, 128, 129, 135, 138, 139, 171, 178, 186, 194,
-    202, 204, 207, 212, 215, 225, 227, 228, 229, 230, 231, 232, 233, 240, 242, 246, 247, 248, 251, 252, 253, 254, 257,
-    259, 264, 265
+    22, 86, 90, 91, 92, 103, 104, 113, 116, 119, 120, 121, 123, 124, 125, 135, 138, 139, 171, 178, 186, 194, 202, 204,
+    207, 212, 215, 225, 227, 228, 229, 230, 231, 232, 233, 240, 242, 246, 247, 248, 251, 252, 253, 254, 257, 259, 264,
+    265
 ]
 """
         90: 4slovo/sawmill
@@ -213,8 +212,6 @@ PROJECTS_WITHOUT_STAGING = [
         123: 4slovo/registry-generator
         124: 4slovo/interface-generator
         125: 4slovo/expression
-        128: almal.ge/almalge
-        129: almal.ge/crmalmalge
         135: 4slovo/logging
         138: 4slovo/timeservice
         139: 4slovo/timeservice_client
