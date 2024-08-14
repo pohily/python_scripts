@@ -45,19 +45,18 @@ def main():
                         is_blocked.append(issue_number.key)
                 except AttributeError:
                     pass
-            if issue_link.type.name == 'Gantt End to End' \
+            elif issue_link.type.name == 'Gantt End to End' \
                     and issue_link.type.inward == 'has to be finished together with':
-                try:
-                    if issue_link.outwardIssue:
-                        is_blocked.append(issue_number.key)
-                except AttributeError:
-                    pass
+                is_blocked.append(issue_number.key)
+            elif issue_link.type.name == 'Gantt End to Start' \
+                    and issue_link.type.inward == 'has to be done after':
+                is_blocked.append(issue_number.key)
         # Проверка что у всех задач есть эпик
         if 'сборка' not in issue_number.fields.summary.lower() and not issue_number.fields.customfield_10009:
             without_epic.append(issue_number.key)
         if issue_number.fields.status.name in STATUS_FOR_RELEASE:
             issue_count += 1
-            bd = issue_number.fields.customfield_15303  # переддеплойные действия
+            bd = issue_number.fields.customfield_15303  # преддеплойные действия
             if bd:
                 before_deploy.append((issue_number.key, bd))
             pd = issue_number.fields.customfield_15302  # постдеплойные действия
@@ -75,7 +74,7 @@ def main():
             print(f'    {PROJECTS_NUMBERS[merge.project]} - {projects[merge.project]}')
             status, _, _, _ = build.get_merge_request_details(merge)
             if status != '(/) Нет конфликтов, ':
-                logging.exception(f'\033[31m Конфликт в задаче {merge.issue} в мердж реквесте {merge.url}\033[0m')
+                logging.exception(f'\033[31m Проверьте мердж реквест {merge.url} в задаче {merge.issue}\033[0m')
             used_projects.add(merge.project)
             try:
                 if country not in PROJECTS_COUNTRIES[merge.project].lower():
