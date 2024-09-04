@@ -1,9 +1,8 @@
 import logging
 import os
-from email.header import Header
-from email.mime.text import MIMEText
 from functools import lru_cache
-from smtplib import SMTP
+
+from envelopes import Envelope
 
 from build import Build
 from constants import SMTP_PORT, SMTP_SERVER, ISSUE_URL, PROJECTS_NUMBERS
@@ -15,19 +14,15 @@ def get_release_message(release_date, release_country, release_name):
 
 
 def send(release_country, release_name, country_key, message, config):
-    with SMTP(SMTP_SERVER, SMTP_PORT) as connection:
-        connection.ehlo()
-        connection.starttls()
-        connection.ehlo()
-        connection.login(config['user_data']['login'], config['user_data']['domain_password'])
-        msg = MIMEText(message, 'plain', 'utf-8')
-        msg['subject'] = Header('Релиз для {}: {}'.format(release_country, release_name), 'utf-8')
-        msg['from'] = config['user_data']['login'] + '@fairtech.ru'
-        msg['to'] = config['recipients'][country_key]
-        msg.add_header('Content-Type', 'text/html')
-        logging.info('Высылаем письмо')
-        recipients = msg['to'] + ', ' + config['recipients']['bcc']
-        connection.sendmail(msg['from'], recipients, msg.as_string())
+    envelope = Envelope(
+        from_addr=(config['user_data']['login'] + '@fairtech.ru'),
+        to_addr=(config['recipients'][country_key]),
+        subject=f'Релиз для {release_country}: {release_name}',
+        html_body=message,
+        bcc_addr=config['recipients']['bcc']
+    )
+    envelope.send(SMTP_SERVER, SMTP_PORT,
+                  login=config['user_data']['login'], password=config['user_data']['domain_password'], tls=True)
 
 
 def main():
@@ -59,8 +54,12 @@ def main():
 
     issues_list = {}
     message = get_release_message(release_date, release_country, release_name)
+    build_issue = ''
     for issue in release_issues:
-        if issue.fields.issuetype.name == 'Defect' or 'сборка' in issue.fields.summary.lower():
+        if issue.fields.issuetype.name == 'Defect':
+            continue
+        if 'сборка' in issue.fields.summary.lower():
+            build_issue = issue.key
             continue
         epic = ''
         if issue.fields.customfield_10009:
@@ -98,6 +97,7 @@ def main():
         for project in release_projects:
             message += f'<li> {PROJECTS_NUMBERS[project]}</li>'
         message += '</ul>'
+        message += f"Сборка: <a href='{ISSUE_URL}{build_issue}'>{build_issue}</a>"
         send(release_country, release_name, country_key, message, build.config)
 
 

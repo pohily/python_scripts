@@ -62,7 +62,7 @@ def main():
                 else:
                     result = ssh_stdout.read().decode('utf-8').strip("\n")
             print(f'{user} ================ Ok. {result}')
-            if '[RuntimeException]' in result or 'Fatal:' in result:
+            if '[RuntimeException]' in result or 'Fatal:' in result or 'fatal:' in result or 'error ' in result:
                 print('\033[31m!!!!!!!!!!!!!!!!Есть ошибки!!!!!!!!!!!!!!!!!\033[0m')
             if 'Warning:' in result:
                 print('\033[31m!!!!!!!!!!!!!!!!Warnings!!!!!!!!!!!!!!!!!\033[0m')

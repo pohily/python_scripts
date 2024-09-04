@@ -303,7 +303,7 @@ class Build:
         status = ''
         if mr.project in PROJECTS_WITH_TESTS:
             issue = mr.issue.lower()
-            pipelines = project.pipelines.list(ref=f'{issue}')
+            pipelines = project.pipelines.list(ref=f'{issue}', get_all=True)
             if pipelines:
                 pipeline = pipelines[0]
                 pipeline_jobs = pipeline.jobs.list()
@@ -430,7 +430,7 @@ class Build:
                 if pr in tests:
                     if not self.merge_fail:
                         sleep(2)  # ждем пока создастся pipeline, иначе тесты запустятся на предыдущей
-                        pipelines = project.pipelines.list()
+                        pipelines = project.pipelines.list(get_all=True)
                         # Запуск тестов в проекте
                         for pipeline in pipelines:
                             if pipeline.attributes['ref'] == self.rc_name and pipeline.attributes['status'] == 'skipped':
