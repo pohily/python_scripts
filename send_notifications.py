@@ -21,6 +21,7 @@ def send(release_country, release_name, country_key, message, config):
         html_body=message,
         bcc_addr=config['recipients']['bcc']
     )
+    logging.info('Высылаем письмо')
     envelope.send(SMTP_SERVER, SMTP_PORT,
                   login=config['user_data']['login'], password=config['user_data']['domain_password'], tls=True)
 

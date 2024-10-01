@@ -316,7 +316,10 @@ class Build:
                              f"status = '{pipeline_job.attributes['status']}'")
                 if pipeline_job.attributes['status'] != 'success':
                     logging.warning(f'В задаче {mr.issue} в проекте {PROJECTS_NUMBERS[mr.project]} не прошли тесты')
-                    status = '(x) Тесты не прошли!, '
+                    if mr.project in DOCKER_PROJECTS:
+                        status = '(x) Контейнеры не сбилжены!, '
+                    else:
+                        status = '(x) Тесты не прошли!, '
 
         merge = project.mergerequests.list(state='opened', source_branch=source_branch, target_branch=target_branch)
         if merge:

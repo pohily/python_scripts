@@ -92,7 +92,7 @@ def csv(month):
         # вносим данные по влитым задачам AT
         gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
         project = gl.projects.get(130)
-        mrs = project.mergerequests.list(state='merged', target_branch='master')
+        mrs = project.mergerequests.list(state='merged', target_branch='master', get_all=True)
         mrs = [mr for mr in mrs if datetime.datetime.strptime(mr.attributes['merged_at'].split('T')[0], '%Y-%m-%d').month == month]
         if len(mrs) == 20:
             print('Возможно учтены не все задачи AT - проверить!')
@@ -121,5 +121,5 @@ def csv(month):
 
 if __name__ == '__main__':
     """ Геймификация - https://confluence.4slovo.ru/pages/viewpage.action?pageId=77201416 """
-    month = 9
+    month = 10
     csv(month)
