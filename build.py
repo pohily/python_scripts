@@ -195,7 +195,8 @@ class Build:
         return result
 
     def get_links(self, issue_number, merges):
-        """ принимает номер задачи и список кортежей ее МР. Делает МР SLOV -> RC.
+        """ принимает номер задачи и список кортежей ее МР.
+        Делает МР SLOV -> RC.
         Заполняет таблицу ссылками на SLOV -> RC и статусами SLOV -> RC """
 
         statuses = {}  # предварительно собираем статусы, затем все сразу вписываем в таблицу
@@ -247,7 +248,7 @@ class Build:
         # 0 - статус slov -> RC, 1 - mr, 2 - MR url, 3 - влит/не влит
         for line in range(len(statuses)):
             if not start:  # если МР не первый - добавляем перенос на следующую строку и три пустых ячейки
-                result += f'\n|  |  |  |'
+                result += f'\n| " | " | " |'
             result += f'{statuses[line][2]}|{statuses[line][0]}{statuses[line][3]}|'
             start = False
         return result
@@ -475,4 +476,3 @@ if __name__ == '__main__':
     gitlab = gitlab.Gitlab(GIT_LAB_SERVER, private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
     project = gitlab.projects.get(11)
     pipelines = project.pipelines.list()
-    pass
