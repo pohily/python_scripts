@@ -82,7 +82,8 @@ PROJECTS_NAMES = {"4slovo.ru/chestnoe_slovo": 7,
                   "4slovo.kz/leasing/front": 262,
                   "4slovo.kz/leasing/crm": 263,
                   "docker/leasing": 264,
-                  "docker/leasing-db": 265
+                  "docker/leasing-db": 265,
+                  "4slovo/db2confluence": 266,
                   }
 
 PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo",
@@ -165,7 +166,8 @@ PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo",
                     262: "4slovo.kz/leasing/front",
                     263: "4slovo.kz/leasing/crm",
                     264: "docker/leasing",
-                    265: "docker/leasing-db"
+                    265: "docker/leasing-db",
+                    266: "4slovo/db2confluence",
                     }
 
 PROJECTS_COUNTRIES = {7: "ru",
@@ -248,7 +250,8 @@ PROJECTS_COUNTRIES = {7: "ru",
                       262: "leasing.kz",
                       263: "leasing.kz",
                       264: "leasing.kz",
-                      265: "leasing.kz"
+                      265: "leasing.kz",
+                      266: "ru, kz, ge, 7da.kz",
                       }
 
 COUNTRIES = {
@@ -279,7 +282,7 @@ SYSTEM_USERS = {
         "module/message-scheduler-module": '', "cards/card-info-recognizer": '', "4slovo/rabbitclient": '',
         "4slovo/interface-generator": '', "4slovo/money": '', "4slovo/registry-generator": '',
         '4slovo/enum-generator': '', "4slovo/timeservice_client": '', "4slovo/config": '', "docker/ru-db-v2": '',
-        '4slovo/metrics-provider': '', '4slovo/S3Client': ''
+        '4slovo/metrics-provider': '', '4slovo/S3Client': '', '4slovo/production-profiler': ''
     },
     'ru2': {
         '4slovo/finance': 'ru_finance', '4slovo/fs': 'ru_fs', '4slovo.ru/chestnoe_slovo': 'ru_frontend',
