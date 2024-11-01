@@ -382,7 +382,7 @@ PROJECTS_WITH_TESTS = [
 PROJECTS_WITHOUT_STAGING = [
     22, 86, 90, 91, 92, 103, 104, 113, 116, 119, 120, 121, 123, 124, 125, 135, 138, 139, 171, 178, 186, 194, 202, 204,
     207, 212, 215, 225, 227, 228, 229, 230, 231, 232, 233, 240, 242, 246, 247, 248, 251, 252, 253, 254, 257, 259, 264,
-    265
+    265, 266
 ]
 """
         90: 4slovo/sawmill
@@ -426,6 +426,7 @@ PROJECTS_WITHOUT_STAGING = [
         259: 4slovo/satisfy
         264: docker/leasing
         265: docker/leasing-db
+        266: 4slovo/db2confluence
 """
 DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167, 172, 201, 246, 247, 264, 265]
 """
