@@ -446,13 +446,14 @@ DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167, 172, 201, 246, 247, 264, 265]
         265: docker/leasing-db
 """
 
-DOMEN = '4slovo.ru'
+DOMAIN = '4slovo.ru'
+# DOMAIN = '7pd.kz'
 GIT_LAB = 'https://gitlab'
-GIT_LAB_SERVER = f'https://gitlab.{DOMEN}/'
-ISSUE_URL = f'https://jira.{DOMEN}/browse/'
-JIRA_SERVER = f'https://jira.{DOMEN}/'
+GIT_LAB_SERVER = f'https://gitlab.{DOMAIN}/'
+ISSUE_URL = f'https://jira.{DOMAIN}/browse/'
+JIRA_SERVER = f'https://jira.{DOMAIN}/'
 JIRA_OPTIONS = {'server': JIRA_SERVER}
-CONFLUENCE_SERVER = f"https://confluence.{DOMEN}/"
+CONFLUENCE_SERVER = f"https://confluence.{DOMAIN}/"
 
 CONFLUENCE_LINK = "https://confluence.{}/pages/viewpage.action?pageId={}"
 MR_BY_IID = 'https://gitlab.{}/api/v4/projects/{}/merge_requests?iids[]={}&{}&"with_merge_status_recheck"=True'
