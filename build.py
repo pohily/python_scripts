@@ -93,7 +93,7 @@ class Build:
         )
         try:
             link = confluence.get_page_by_title(space='AT', title=f'Релиз {title} Отчет о тестировании')
-            return CONFLUENCE_LINK.format(link['id'])
+            return CONFLUENCE_LINK.format(DOMEN, link['id'])
         except (TypeError, IndexError):
             return ''
 
@@ -147,7 +147,7 @@ class Build:
         :return_merged: передается True если надо вернуть влитые МР, обычно возвращаются только невлитые"""
 
         result = []
-        links_json = requests.get(url=REMOTE_LINK.format(issue_number),
+        links_json = requests.get(url=REMOTE_LINK.format(DOMEN, issue_number),
                                   auth=(self.config['user_data']['login'],
                                         self.config['user_data']['jira_password'])).json()
         for link in links_json:
@@ -270,7 +270,7 @@ class Build:
         """ Возвращает статус (есть или нет конфликты), source_branch, target_branch, state: влит/не влит"""
         _, iid, project, _ = mr
         token = f"private_token={(self.config['user_data']['GITLAB_PRIVATE_TOKEN'])}"
-        details = requests.get(url=MR_BY_IID.format(project, iid, token)).json()
+        details = requests.get(url=MR_BY_IID.format(DOMEN, project, iid, token)).json()
         if details:
             details = details[0]
             return self.merge_request_details(

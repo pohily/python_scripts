@@ -182,7 +182,7 @@ PROJECTS_COUNTRIES = {7: "ru",
                       62: "ru",
                       79: "ru",
                       86: "ru, kz, ge, 7da.kz",
-                      90: "ru, kz, ge",
+                      90: "ru, kz, ge, 7da.kz",
                       91: "ru, kz, ge",
                       92: "ru, kz, ge",
                       93: "ru, kz, ge",
@@ -228,10 +228,10 @@ PROJECTS_COUNTRIES = {7: "ru",
                       225: "ru, kz, ge",
                       227: "ru, kz, ge",
                       228: "ru, kz, ge",
-                      229: "ru, kz, ge",
-                      230: "ru, kz, ge",
-                      231: "ru, kz, ge",
-                      232: "ru, kz, ge",
+                      229: "ru, kz, ge, 7da.kz",
+                      230: "ru, kz, ge, 7da.kz",
+                      231: "ru, kz, ge, 7da.kz",
+                      232: "ru, kz, ge, 7da.kz",
                       233: "ru, kz, ge",
                       237: "ru, kz, ge, 7da.kz",
                       240: "ru, kz, ge",
@@ -446,17 +446,19 @@ DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167, 172, 201, 246, 247, 264, 265]
         265: docker/leasing-db
 """
 
+DOMEN = '4slovo.ru'
 GIT_LAB = 'https://gitlab'
-GIT_LAB_SERVER = 'https://gitlab.4slovo.ru/'
-ISSUE_URL = 'https://jira.4slovo.ru/browse/'
-JIRA_SERVER = 'https://jira.4slovo.ru/'
+GIT_LAB_SERVER = f'https://gitlab.{DOMEN}/'
+ISSUE_URL = f'https://jira.{DOMEN}/browse/'
+JIRA_SERVER = f'https://jira.{DOMEN}/'
 JIRA_OPTIONS = {'server': JIRA_SERVER}
-CONFLUENCE_SERVER = "https://confluence.4slovo.ru/"
-CONFLUENCE_LINK = "https://confluence.4slovo.ru/pages/viewpage.action?pageId={}"
-MR_BY_IID = 'https://gitlab.4slovo.ru/api/v4/projects/{}/merge_requests?iids[]={}&{}&"with_merge_status_recheck"=True'
-RELEASE_ISSUES_URL = 'https://jira.4slovo.ru/rest/api/latest/search?jql=fixVersion={}'
-RELEASE_URL = 'https://jira.4slovo.ru/projects/SLOV/versions/{}'
-REMOTE_LINK = 'https://jira.4slovo.ru/rest/api/latest/issue/{}/remotelink'
+CONFLUENCE_SERVER = f"https://confluence.{DOMEN}/"
+
+CONFLUENCE_LINK = "https://confluence.{}/pages/viewpage.action?pageId={}"
+MR_BY_IID = 'https://gitlab.{}/api/v4/projects/{}/merge_requests?iids[]={}&{}&"with_merge_status_recheck"=True'
+RELEASE_ISSUES_URL = 'https://jira.{}/rest/api/latest/search?jql=fixVersion={}'
+RELEASE_URL = 'https://jira.{}/projects/SLOV/versions/{}'
+REMOTE_LINK = 'https://jira.{}/rest/api/latest/issue/{}/remotelink'
 
 SMTP_PORT = 587
 SMTP_SERVER = 'smtp.4slovo.ru'

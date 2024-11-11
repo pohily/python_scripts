@@ -3,8 +3,8 @@
 import logging
 import os
 
-from constants import RELEASE_URL, STATUS_FOR_RELEASE, PRIORITY, ISSUE_URL
 from build import Build
+from constants import RELEASE_URL, ISSUE_URL, DOMEN
 
 
 def main():
@@ -24,7 +24,7 @@ def main():
         #
         #           До таблицы
         #
-        message = f"[*Состав релиза:*|{RELEASE_URL.format(release_id)}]\r\n" \
+        message = f"[*Состав релиза:*|{RELEASE_URL.format(DOMEN, release_id)}]\r\n" \
                   f"||№||Задача||Priority||Мердж реквесты SLOV -> RC||Статус реквеста SLOV -> RC||\r\n"
         #
         #           Выбираем задачи для релиза в нужных статусах
