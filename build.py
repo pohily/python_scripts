@@ -431,18 +431,18 @@ class Build:
                 except gitlab.exceptions.GitlabGetError:
                     logging.exception(f'Не найдена ветка {self.rc_name} в {PROJECTS_COUNTRIES[pr]}')
 
-                if pr in tests:
-                    if not self.merge_fail:
-                        sleep(2)  # ждем пока создастся pipeline, иначе тесты запустятся на предыдущей
-                        pipelines = project.pipelines.list(get_all=True)
-                        # Запуск тестов в проекте
-                        for pipeline in pipelines:
-                            if pipeline.attributes['ref'] == self.rc_name and pipeline.attributes['status'] == 'skipped':
-                                pipeline_job = pipeline.jobs.list()[0]
-                                job = project.jobs.get(pipeline_job.id, lazy=True)
-                                job.play()
-                                logging.info(f'Тесты запущены в проекте {PROJECTS_NUMBERS[pr]}')
-                                break
+                # if pr in tests:
+                #     if not self.merge_fail:
+                #         sleep(2)  # ждем пока создастся pipeline, иначе тесты запустятся на предыдущей
+                #         pipelines = project.pipelines.list(get_all=True)
+                #         # Запуск тестов в проекте
+                #         for pipeline in pipelines:
+                #             if pipeline.attributes['ref'] == self.rc_name and pipeline.attributes['status'] == 'skipped':
+                #                 pipeline_job = pipeline.jobs.list()[0]
+                #                 job = project.jobs.get(pipeline_job.id, lazy=True)
+                #                 job.play()
+                #                 logging.info(f'Тесты запущены в проекте {PROJECTS_NUMBERS[pr]}')
+                #                 break
         return master_links, staging_links
 
     def make_mr_to_master(self, projects):

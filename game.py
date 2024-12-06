@@ -82,12 +82,15 @@ def csv(month):
                 creator = issue.fields.creator.displayName
             else:
                 creator = ''
-            query = f"{index + 1}," \
-                    f"{issue.key}," \
-                    f"{issue.fields.fixVersions[0].name}," \
-                    f"{issue.fields.fixVersions[0].releaseDate}," \
-                    f"{creator},,,,1,1,,,\n"
-            file.write(query)
+            try:
+                query = f"{index + 1}," \
+                        f"{issue.key}," \
+                        f"{issue.fields.fixVersions[0].name}," \
+                        f"{issue.fields.fixVersions[0].releaseDate}," \
+                        f"{creator},,,,1,1,,,\n"
+                file.write(query)
+            except AttributeError:  # Если на момент создания есть задачи по статусу зарелиженные, но релиза еще не было
+                continue
             index += 1
         # вносим данные по влитым задачам AT
         gl = gitlab.Gitlab('https://gitlab.4slovo.ru/', private_token=config['user_data']['GITLAB_PRIVATE_TOKEN'])
@@ -122,5 +125,5 @@ def csv(month):
 
 if __name__ == '__main__':
     """ Геймификация - https://confluence.4slovo.ru/pages/viewpage.action?pageId=77201416 """
-    month = 11
+    month = 12
     csv(month)
