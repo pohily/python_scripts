@@ -3,7 +3,7 @@ TEST = False
 MAKE_LAST_BUILD_FILE_AND_START_TESTS = True
 
 PROJECTS_NAMES = {"4slovo.ru/chestnoe_slovo": 7,
-                  "4slovo/4slv": 10,
+                  "4slovo.ru/4slv": 10,
                   "4slovo.kz/crm4slovokz": 11,
                   "4slovo.kz/4slovokz": 12,
                   "4slovo.ru/chestnoe_slovo_backend": 20,
@@ -87,7 +87,7 @@ PROJECTS_NAMES = {"4slovo.ru/chestnoe_slovo": 7,
                   }
 
 PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo",
-                    10: "4slovo/4slv",
+                    10: "4slovo.ru/4slv",
                     11: "4slovo.kz/crm4slovokz",
                     12: "4slovo.kz/4slovokz",
                     20: "4slovo.ru/chestnoe_slovo_backend",
@@ -447,6 +447,7 @@ DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167, 172, 201, 246, 247, 264, 265]
 """
 
 DOMAIN = '4slovo.ru'
+# DOMAIN = '7pd.kz'
 GIT_LAB = 'https://gitlab'
 GIT_LAB_SERVER = f'https://gitlab.{DOMAIN}/'
 ISSUE_URL = f'https://jira.{DOMAIN}/browse/'
