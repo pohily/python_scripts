@@ -309,9 +309,9 @@ class Build:
                 pipeline = pipelines[0]
                 pipeline_jobs = pipeline.jobs.list()
                 pipeline_job = pipeline_jobs[0]
-                logging.info(f"pipelines - {[pipeline.attributes['id'] for pipeline in pipelines]}")
-                logging.info(f"jobs in {pipeline.attributes['id']} - "
-                             f"{[pipeline_job.attributes['id'] for pipeline_job in pipeline_jobs]}")
+                # logging.info(f"pipelines - {[pipeline.attributes['id'] for pipeline in pipelines]}")
+                # logging.info(f"jobs in {pipeline.attributes['id']} - "
+                #              f"{[pipeline_job.attributes['id'] for pipeline_job in pipeline_jobs]}")
                 logging.info(f"pipeline {pipeline.attributes['id']} "
                              f"job {pipeline_job.attributes['id']} "
                              f"status = '{pipeline_job.attributes['status']}'")

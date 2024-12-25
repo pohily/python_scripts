@@ -56,7 +56,7 @@ PROJECTS_NAMES = {"4slovo.ru/chestnoe_slovo": 7,
                   "4slovo/sumsub-client": 207,
                   "docker/alpine-pkgs-repo": 212,
                   "4slovo/S3Client": 215,
-                  "4slovo/osticket": 223,
+                  "4slovo.ru/osticket": 223,
                   "4slovo/short_link_client": 225,
                   '4slovo/mock-server': 227,
                   "4slovo/event-manager": 228,
@@ -84,6 +84,7 @@ PROJECTS_NAMES = {"4slovo.ru/chestnoe_slovo": 7,
                   "docker/leasing": 264,
                   "docker/leasing-db": 265,
                   "4slovo/db2confluence": 266,
+                  "4slovo/fias_client": 271
                   }
 
 PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo",
@@ -140,7 +141,7 @@ PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo",
                     207: "4slovo/sumsub-client",
                     212: "docker/alpine-pkgs-repo",
                     215: "4slovo/S3Client",
-                    223: "4slovo/osticket",
+                    223: "4slovo.ru/osticket",
                     225: "4slovo/short_link_client",
                     227: '4slovo/mock-server',
                     228: "4slovo/event-manager",
@@ -168,6 +169,7 @@ PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo",
                     264: "docker/leasing",
                     265: "docker/leasing-db",
                     266: "4slovo/db2confluence",
+                    271: "4slovo/fias_client"
                     }
 
 PROJECTS_COUNTRIES = {7: "ru",
@@ -252,6 +254,7 @@ PROJECTS_COUNTRIES = {7: "ru",
                       264: "leasing.kz",
                       265: "leasing.kz",
                       266: "ru, kz, ge, 7da.kz",
+                      271: "ru"
                       }
 
 COUNTRIES = {
@@ -269,12 +272,12 @@ SYSTEM_USERS = {
         '4slovo.ru/chestnoe_slovo_backend': 'crm4slovo',
         '4slovo.ru/chestnoe_slovo_landing': 'n4slovo',
         '4slovo.ru/api': 'api4slovo',
-        '4slovo/4slv': 'ru_4slv',
+        '4slovo.ru/4slv': 'ru_4slv',
         'module/msm': '', 'docker/ru': '',
         '4slovo/finance_client': '', '4slovo/anonymize-replicator': '', 'docker/external_images': '',
         'docker/finance': '', 'docker/finance_client': '', '4slovo/anon-server': '', '4slovo/logging': '',
         '4slovo/expression': '', '4slovo.ru/common': '', '4slovo/common': '', '4slovo/sawmill': '', 'docker/ru-db': '',
-        'docker/fias': '', '4slovo.ru/fias': '', 'docker/alpine-pkgs-repo': '', '4slovo/osticket': '',
+        'docker/fias': '', '4slovo.ru/fias': '', 'docker/alpine-pkgs-repo': '', '4slovo.ru/osticket': '',
         "4slovo/short_link_client": '', '4slovo/mock-server': '', "4slovo/event-manager": '', "4slovo/cast-type": '',
         "4slovo/dto": '', '4slovo/reflection': '', '4slovo/csv': '', '4slovo/xxtea': '',
         '4slovo/cache': '', "4slovo/fs-client": '', "external/PHPExcel": '', 'module/message-sender-package': '',
@@ -282,12 +285,12 @@ SYSTEM_USERS = {
         "module/message-scheduler-module": '', "cards/card-info-recognizer": '', "4slovo/rabbitclient": '',
         "4slovo/interface-generator": '', "4slovo/money": '', "4slovo/registry-generator": '',
         '4slovo/enum-generator': '', "4slovo/timeservice_client": '', "4slovo/config": '', "docker/ru-db-v2": '',
-        '4slovo/metrics-provider': '', '4slovo/S3Client': '', '4slovo/production-profiler': ''
+        '4slovo/metrics-provider': '', '4slovo/S3Client': '', '4slovo/production-profiler': '', '4slovo/fias_client': ''
     },
     'ru2': {
         '4slovo/finance': 'ru_finance', '4slovo/fs': 'ru_fs', '4slovo.ru/chestnoe_slovo': 'ru_frontend',
         '4slovo.ru/chestnoe_slovo_backend': 'ru_backend', '4slovo.ru/chestnoe_slovo_landing': 'ru_frontend_new',
-        '4slovo.ru/api': 'ru_api', '4slovo/4slv': 'ru_4slv', 'module/msm': '', 'docker/ru': '',
+        '4slovo.ru/api': 'ru_api', '4slovo.ru/4slv': 'ru_4slv', 'module/msm': '', 'docker/ru': '',
         '4slovo/finance_client': '', '4slovo/anonymize-replicator': '', 'docker/external_images': '',
         'docker/finance': '', 'docker/finance_client': '', '4slovo/anon-server': '', '4slovo/logging': '',
         '4slovo/expression': '', '4slovo.ru/common': '', '4slovo/common': '', '4slovo/sawmill': '', 'docker/ru-db': '',
@@ -382,7 +385,7 @@ PROJECTS_WITH_TESTS = [
 PROJECTS_WITHOUT_STAGING = [
     22, 86, 90, 91, 92, 103, 104, 113, 116, 119, 120, 121, 123, 124, 125, 135, 138, 139, 171, 178, 186, 194, 202, 204,
     207, 212, 215, 225, 227, 228, 229, 230, 231, 232, 233, 240, 242, 246, 247, 248, 251, 252, 253, 254, 257, 259, 264,
-    265, 266
+    265, 266, 271
 ]
 """
         90: 4slovo/sawmill
@@ -427,6 +430,7 @@ PROJECTS_WITHOUT_STAGING = [
         264: docker/leasing
         265: docker/leasing-db
         266: 4slovo/db2confluence
+        271: 4slovo/fias_client
 """
 DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167, 172, 201, 246, 247, 264, 265]
 """
@@ -447,7 +451,6 @@ DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167, 172, 201, 246, 247, 264, 265]
 """
 
 DOMAIN = '4slovo.ru'
-# DOMAIN = '7pd.kz'
 GIT_LAB = 'https://gitlab'
 GIT_LAB_SERVER = f'https://gitlab.{DOMAIN}/'
 ISSUE_URL = f'https://jira.{DOMAIN}/browse/'
