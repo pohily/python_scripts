@@ -125,5 +125,5 @@ def csv(month):
 
 if __name__ == '__main__':
     """ Геймификация - https://confluence.4slovo.ru/pages/viewpage.action?pageId=77201416 """
-    month = 12
+    month = 1
     csv(month)

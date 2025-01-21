@@ -117,7 +117,7 @@ def main():
         logging.info(f'\033[34m Есть следующие деплойные действия:\033[0m')
     for action in chain(before_deploy, post_deploy):
         summary = action[1].replace('# ', '').strip()
-        summary = sub('h\d\.', '', summary)
+        # summary = sub('h\d\.', '', summary)
         logging.info(f'\033[31m{action[0]} - \033[0m{summary}')
     if wrong_release_issues:
         logging.warning('\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
