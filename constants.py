@@ -86,6 +86,11 @@ PROJECTS_NAMES = {"4slovo.ru/chestnoe_slovo": 7,
                   "4slovo/db2confluence": 266,
                   "4slovo/test-coverage-checker": 267,
                   "4slovo/fias_client": 271,
+                  "emoney.kz/lemoneykz": 272,
+                  "lemoney.kz/crmlemoneykz": 273,
+                  "docker/lemoneykz": 274,
+                  "docker/lemoney-db": 275,
+                  "4slovo/4slv": 276,
                   }
 
 PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo",
@@ -172,6 +177,11 @@ PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo",
                     266: "4slovo/db2confluence",
                     267: "4slovo/test-coverage-checker",
                     271: "4slovo/fias_client",
+                    272: "emoney.kz/lemoneykz",
+                    273: "lemoney.kz/crmlemoneykz",
+                    274: "docker/lemoneykz",
+                    275: "docker/lemoney-db",
+                    276: "4slovo/4slv",
                     }
 
 PROJECTS_COUNTRIES = {7: "ru",
@@ -179,7 +189,7 @@ PROJECTS_COUNTRIES = {7: "ru",
                       11: "kz",
                       12: "kz",
                       20: "ru",
-                      22: "ru, kz, ge, 7da.kz",
+                      22: "ru, kz, ge, 7da.kz, lemoney.kz",
                       23: "ge",
                       24: "ge",
                       61: "ru",
@@ -232,36 +242,42 @@ PROJECTS_COUNTRIES = {7: "ru",
                       225: "ru, kz, ge",
                       227: "ru, kz, ge",
                       228: "ru, kz, ge",
-                      229: "ru, kz, ge, 7da.kz",
-                      230: "ru, kz, ge, 7da.kz",
-                      231: "ru, kz, ge, 7da.kz",
-                      232: "ru, kz, ge, 7da.kz",
+                      229: "ru, kz, ge, 7da.kz, lemoney.kz",
+                      230: "ru, kz, ge, 7da.kz, lemoney.kz",
+                      231: "ru, kz, ge, 7da.kz, lemoney.kz",
+                      232: "ru, kz, ge, 7da.kz, lemoney.kz",
                       233: "ru, kz, ge",
-                      237: "ru, kz, ge, 7da.kz",
+                      237: "ru, kz, ge, 7da.kz, lemoney.kz",
                       240: "ru, kz, ge",
-                      242: "ru, kz, ge, 7da.kz",
+                      242: "ru, kz, ge, 7da.kz, lemoney.kz",
                       244: "7da.kz",
                       245: "7da.kz",
                       246: "7da.kz",
                       247: "7da.kz",
                       248 : "ru",
-                      251: "ru, kz, ge, 7da.kz",
-                      252: "ru, kz, ge, 7da.kz",
-                      253: "ru, kz, ge, 7da.kz",
+                      251: "ru, kz, ge, 7da.kz, lemoney.kz",
+                      252: "ru, kz, ge, 7da.kz, lemoney.kz",
+                      253: "ru, kz, ge, 7da.kz, lemoney.kz",
                       254: "ru",
-                      257: "ru, kz, ge, 7da.kz",
-                      259: "ru, kz, ge, 7da.kz",
+                      257: "ru, kz, ge, 7da.kz, lemoney.kz",
+                      259: "ru, kz, ge, 7da.kz, lemoney.kz",
                       262: "leasing.kz",
                       263: "leasing.kz",
                       264: "leasing.kz",
                       265: "leasing.kz",
-                      266: "ru, kz, ge, 7da.kz",
+                      266: "ru, kz, ge, 7da.kz, lemoney.kz",
                       267: "ru",
                       271: "ru",
+                      272: "lemoney.kz",
+                      273: "lemoney.kz",
+                      274: "lemoney.kz",
+                      275: "lemoney.kz",
+                      276: "4slovo/4slv",
                       }
 
 COUNTRIES = {
-    'ru': 'России', 'kz': 'Казахстана', 'ge': 'Грузии', '7da': 'Казахстана', 'leasing': 'Казахстана'
+    'ru': 'России', 'kz': 'Казахстана', 'ge': 'Грузии', 'leasing': 'Казахстана',
+    "lemoney": 'Казахстана', '7da': 'Казахстана',
 }
 COUNTRIES_ABBR = {
     'России': 'ru', 'Казахстана': 'kz', 'Грузии': 'ge'
@@ -351,12 +367,12 @@ STATUS_FOR_QA = ['Ready for QA', 'In QA']
 TESTERS = {
     'm.pohilyj': 77,
     'a.melnik': 101,
-    'v.dolinin': 139,
-    'e.evdokimov': 169
+    'e.evdokimov': 169,
 }
 
 PROJECTS_WITH_TESTS = [
-    11, 20, 61, 62, 79, 93, 94, 97, 100, 110, 166, 172, 178, 187, 194, 201, 227, 245, 246, 247, 252, 259, 263, 264, 265
+    11, 20, 61, 62, 79, 93, 94, 97, 100, 110, 166, 172, 178, 187, 194, 201, 227, 245, 246, 247, 252, 259, 263, 264, 265,
+    273, 274, 275, 276
 ]
 """
         11: 4slovo.kz/crm4slovokz
@@ -385,11 +401,15 @@ PROJECTS_WITH_TESTS = [
         263: 4slovo.kz/leasing/crm
         264: docker/leasing
         265: docker/leasing-db
+        273: lemoney.kz/crmlemoneykz
+        274: docker/lemoneykz
+        275: docker/lemoney-db
+        276: 4slovo/4slv
 """
 PROJECTS_WITHOUT_STAGING = [
     22, 86, 90, 91, 92, 103, 104, 113, 116, 119, 120, 121, 123, 124, 125, 135, 138, 139, 171, 178, 186, 194, 202, 204,
     207, 212, 215, 225, 227, 228, 229, 230, 231, 232, 233, 240, 242, 246, 247, 248, 251, 252, 253, 254, 257, 259, 264,
-    265, 266, 271
+    265, 266, 271, 274, 275
 ]
 """
         90: 4slovo/sawmill
@@ -435,8 +455,10 @@ PROJECTS_WITHOUT_STAGING = [
         265: docker/leasing-db
         266: 4slovo/db2confluence
         271: 4slovo/fias_client
+        274: docker/lemoneykz
+        275: docker/lemoney-db
 """
-DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167, 172, 201, 246, 247, 264, 265]
+DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167, 172, 201, 246, 247, 264, 265, 274, 275, 276]
 """
         94: docker/finance
         97: docker/api
@@ -452,6 +474,9 @@ DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167, 172, 201, 246, 247, 264, 265]
         247: docker/7paydakz-db
         264: docker/leasing
         265: docker/leasing-db
+        274: docker/lemoneykz
+        275: docker/lemoney-db
+        276: 4slovo/4slv
 """
 
 # DOMAIN = '4slovo.ru'
