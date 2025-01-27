@@ -5,7 +5,7 @@ from functools import lru_cache
 from envelopes import Envelope
 
 from build import Build
-from constants import SMTP_PORT, SMTP_SERVER, ISSUE_URL, PROJECTS_NUMBERS
+from constants import SMTP_PORT, SMTP_SERVER, ISSUE_URL, PROJECTS_NUMBERS, DOMAIN
 
 
 def get_release_message(release_date, release_country, release_name):
@@ -15,11 +15,11 @@ def get_release_message(release_date, release_country, release_name):
 
 def send(release_country, release_name, country_key, message, config):
     envelope = Envelope(
-        from_addr=(config['user_data']['login'] + '@fairtech.ru'),
+        from_addr=(config['user_data']['login'] + f'@{DOMAIN}'),
         to_addr=(config['recipients'][country_key]),
         subject=f'Релиз для {release_country}: {release_name}',
-        html_body=message,
-        bcc_addr=config['recipients']['bcc']
+        html_body=message
+        # bcc_addr=config['recipients']['bcc']
     )
     logging.info('Высылаем письмо')
     envelope.send(SMTP_SERVER, SMTP_PORT,

@@ -495,4 +495,4 @@ RELEASE_URL = 'https://jira.{}/projects/SLOV/versions/{}'
 REMOTE_LINK = 'https://jira.{}/rest/api/latest/issue/{}/remotelink'
 
 SMTP_PORT = 587
-SMTP_SERVER = f'smtp.{DOMAIN}'
+SMTP_SERVER = f'mail.{DOMAIN}'
