@@ -357,9 +357,10 @@ PRIORITY_VALUE = {
     'MEGA Critical': 1, 'Critical': 2, 'Критический': 2, 'Highest': 3, 'High': 4, 'Medium': 5, 'Low': 6, 'Lowest': 7
 }
 
+# если надо собрать сборку, но не все задачи прошли тестирование, раскомментить ниже '] #' чтобы статусы стали доступны
 STATUS_FOR_RELEASE = ['Released to production', 'Passed QA', 'In regression test', 'Ready for release',
                       'Закрыт', 'Fixed', 'Closed', 'Готово', 'In Regress Test RC'
-                      ]  # , 'Ready for review', 'Ready for technical solution review', 'In QA', 'Open', 'Ready for QA', 'In development', 'Reopened', 'Reviewing', 'Technical solution', 'В работе']
+                      ] # , 'Ready for review', 'Ready for technical solution review', 'In QA', 'Open', 'Ready for QA', 'In development', 'Reopened', 'Reviewing', 'Technical solution', 'В работе']
 STATUS_READY = ['Released to production', 'Ready for release', 'Закрыт', 'Fixed', 'Closed']
 
 STATUS_FOR_QA = ['Ready for QA', 'In QA']

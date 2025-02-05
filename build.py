@@ -21,8 +21,10 @@ class Build:
     def __init__(self):
         self.config = ConfigParser()
         self.config.read('config.ini')
-        self.jira = JIRA(options=JIRA_OPTIONS, auth=(self.config['user_data']['login'],
-                                                     self.config['user_data']['jira_password']))
+        self.jira = JIRA(
+            options=JIRA_OPTIONS,
+            basic_auth=(self.config['user_data']['login'], self.config['user_data']['jira_password'])
+        )
         self.gitlab = gitlab.Gitlab(GIT_LAB_SERVER, private_token=self.config['user_data']['GITLAB_PRIVATE_TOKEN'])
         self.name = self.get_release_name()
         self.rc_name = f'rc-{self.name.replace(".", "-")}'
