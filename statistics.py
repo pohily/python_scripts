@@ -93,7 +93,7 @@ def main():
     reporter = []
     for project in projects:
         pr = build.gitlab.projects.get(project)
-        member = pr.members.get(user_id)
+        member = pr.members_all.get(user_id)
         access_level = member.attributes['access_level']
         if access_level < 30:
             reporter.append(project)
