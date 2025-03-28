@@ -91,6 +91,8 @@ PROJECTS_NAMES = {"4slovo.ru/chestnoe_slovo": 7,
                   "docker/lemoneykz": 274,
                   "docker/lemoney-db": 275,
                   "4slovo/4slv": 276,
+                  "4slovo.ru/auto-rotate-document": 279,
+                  "4slovo/php-heic-to-jpg": 283,
                   }
 
 PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo",
@@ -182,6 +184,8 @@ PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo",
                     274: "docker/lemoneykz",
                     275: "docker/lemoney-db",
                     276: "4slovo/4slv",
+                    279: "4slovo.ru/auto-rotate-document",
+                    283: "4slovo/php-heic-to-jpg",
                     }
 
 PROJECTS_COUNTRIES = {7: "ru",
@@ -272,7 +276,9 @@ PROJECTS_COUNTRIES = {7: "ru",
                       273: "lemoney.kz",
                       274: "lemoney.kz",
                       275: "lemoney.kz",
-                      276: "4slovo/4slv",
+                      276: "7da.kz, lemoney.kz",
+                      279: "7da.kz, lemoney.kz",
+                      283: "7da.kz, lemoney.kz",
                       }
 
 COUNTRIES = {
@@ -373,7 +379,7 @@ TESTERS = {
 
 PROJECTS_WITH_TESTS = [
     11, 20, 61, 62, 79, 93, 94, 97, 100, 110, 166, 172, 178, 187, 194, 201, 227, 245, 246, 247, 252, 259, 263, 264, 265,
-    273, 274, 275, 276
+    273, 274, 275, 276, 279
 ]
 """
         11: 4slovo.kz/crm4slovokz
@@ -406,11 +412,12 @@ PROJECTS_WITH_TESTS = [
         274: docker/lemoneykz
         275: docker/lemoney-db
         276: 4slovo/4slv
+        279: 4slovo.ru/auto-rotate-document
 """
 PROJECTS_WITHOUT_STAGING = [
     22, 86, 90, 91, 92, 103, 104, 113, 116, 119, 120, 121, 123, 124, 125, 135, 138, 139, 171, 178, 186, 194, 202, 204,
     207, 212, 215, 225, 227, 228, 229, 230, 231, 232, 233, 240, 242, 246, 247, 248, 251, 252, 253, 254, 257, 259, 264,
-    265, 266, 271, 274, 275
+    265, 266, 271, 274, 275, 279, 283
 ]
 """
         90: 4slovo/sawmill
@@ -458,8 +465,9 @@ PROJECTS_WITHOUT_STAGING = [
         271: 4slovo/fias_client
         274: docker/lemoneykz
         275: docker/lemoney-db
+        279: 4slovo.ru/auto-rotate-document
 """
-DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167, 172, 201, 246, 247, 264, 265, 274, 275, 276]
+DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167, 172, 201, 246, 247, 264, 265, 274, 275, 276, 279]
 """
         94: docker/finance
         97: docker/api
@@ -478,6 +486,7 @@ DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167, 172, 201, 246, 247, 264, 265, 274
         274: docker/lemoneykz
         275: docker/lemoney-db
         276: 4slovo/4slv
+        279: 4slovo.ru/auto-rotate-document
 """
 
 # DOMAIN = '4slovo.ru'
