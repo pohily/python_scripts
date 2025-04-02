@@ -1,7 +1,7 @@
 import logging
 from collections import namedtuple, defaultdict
 from configparser import ConfigParser
-from datetime import datetime
+import datetime
 from sys import argv
 from time import sleep
 
@@ -133,7 +133,10 @@ class Build:
         if date:
             try:
                 fix_date = fix_issues[0].fields.fixVersions[0].releaseDate
-                fix_date = datetime.strptime(fix_date, '%Y-%m-%d').strftime('%d.%m.%Y')
+                # todo remove timedelta after jira bug fix
+                # jira returns wrong releaseDate. example: https://jira.7pd.kz/rest/api/2/version/17608
+                fix_date = datetime.datetime.strptime(fix_date, '%Y-%m-%d') + datetime.timedelta(days=1)
+                fix_date = fix_date.strftime('%d.%m.%Y')
             except (AttributeError, UnboundLocalError, TypeError):
                 fix_date = None
                 logging.exception(f'Релиз {release_input} еще не выпущен!')
@@ -307,7 +310,7 @@ class Build:
         if mr.project in PROJECTS_WITH_TESTS:
             issue = mr.issue.lower()
             pipelines = project.pipelines.list(ref=f'{issue}', get_all=True)
-            if pipelines:
+            if pipelines and mr.project != 11:  # в 11 проекте отключены пайплайны
                 pipeline = pipelines[0]
                 pipeline_jobs = pipeline.jobs.list()
                 pipeline_job = pipeline_jobs[0]

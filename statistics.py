@@ -100,7 +100,7 @@ def main():
     logging.info(f'\033[34m В релизе {release_input} \033[31m{len(fix_issues)}\033[34m задач(-a, -и)\033[0m')
     logging.info(f'\033[34m Из них \033[31m{issue_count}\033[34m задач в статусах выше "Passed QA".\033[0m')
     logging.info(f'\033[34m Изменения в них затронули \033[31m {len(used_projects)} \033[34m проект(-а, '
-          f'-ов): \033[31m {", ".join(sorted(projects))}. \033[0m')
+          f'-ов): \033[36m {", ".join(sorted(projects))}. \033[0m')
     if is_blocked:
         logging.warning('\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
         logging.info(f'\033[34m Проверить не заблокированы ли задачи: \033[31m '
