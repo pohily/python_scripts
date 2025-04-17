@@ -156,17 +156,19 @@ class Build:
                                   auth=(self.config['user_data']['login'],
                                         self.config['user_data']['jira_password'])).json()
         for link in links_json:
-            if 'confluence' in link['object']['url']:
+            url = link['object']['url']
+            url = url.replace("lemoney", "myn")  # переименовали репозитории, а старые ссылки остались
+            if 'confluence' in url:
                 continue
-            if 'commit' in link['object']['url'] or GIT_LAB not in link['object']['url']:
+            if 'commit' in url or GIT_LAB not in url:
                 continue
             # для предупреждения о запуске тесто после сборки контейнеров
-            if 'docker' in link['object']['url']:  # or 'msm' in link['object']['url']: - пока убрали - надо вливать в стейджинг
+            if 'docker' in url:  # or 'msm' in url: - пока убрали - надо вливать в стейджинг
                 self.docker = True
-            url_parts = link['object']['url'].split('/')
+            url_parts = url.split('/')
             if len(url_parts) < 6:
                 continue
-            if 'leasing' in link['object']['url'] and '4slovo.kz' in link['object']['url']:
+            if 'leasing' in url and '4slovo.kz' in url:
                 # добавился новый тип проектов из трех частей 06.24
                 try:
                     project = PROJECTS_NAMES[f'{url_parts[3]}/{url_parts[4]}/{url_parts[5]}']
@@ -182,16 +184,16 @@ class Build:
                         f'Проверьте {issue_number} - не найден проект {url_parts[3]}/{url_parts[4]}')
                     continue
             # в связи с обновлением gitlab поменялись url 11/03/20, добавился новый тип проектов из трех частей 06.24:
-            if GIT_LAB in link['object']['url'] and url_parts[6].isdigit():
+            if GIT_LAB in url and url_parts[6].isdigit():
                 iid = url_parts[6]
-            elif GIT_LAB in link['object']['url'] and url_parts[7].isdigit():
+            elif GIT_LAB in url and url_parts[7].isdigit():
                 iid = url_parts[7]
-            elif GIT_LAB in link['object']['url'] and 'leasing' in link['object']['url'] and url_parts[8].isdigit():
+            elif GIT_LAB in url and 'leasing' in url and url_parts[8].isdigit():
                 iid = url_parts[8]
             else:
-                logging.warning(f"Проверьте ссылку {link['object']['url']} в задаче {issue_number}")
+                logging.warning(f"Проверьте ссылку {url} в задаче {issue_number}")
                 continue
-            merge = self.Merge_request(link['object']['url'], iid, project, issue_number)
+            merge = self.Merge_request(url, iid, project, issue_number)
             if return_merged:
                 result.append(merge)
             else:
