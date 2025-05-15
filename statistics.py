@@ -3,7 +3,6 @@
 import logging
 import os
 from itertools import chain
-from re import sub
 
 from constants import STATUS_FOR_RELEASE, PROJECTS_COUNTRIES, PROJECTS_NUMBERS, TESTERS
 from build import Build
@@ -51,7 +50,7 @@ def main():
             elif issue_link.type.name == 'Gantt End to Start' \
                     and issue_link.type.inward == 'has to be done after':
                 is_blocked.append(issue_number.key)
-        # Проверка что у всех задач есть эпик
+        # Проверка того, что у всех задач есть эпик
         if 'сборка' not in issue_number.fields.summary.lower() and not issue_number.fields.customfield_10009:
             without_epic.append(issue_number.key)
         if issue_number.fields.status.name in STATUS_FOR_RELEASE:
