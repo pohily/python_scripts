@@ -140,6 +140,7 @@ class Build:
             except (AttributeError, UnboundLocalError, TypeError):
                 fix_date = None
                 logging.exception(f'Релиз {release_input} еще не выпущен!')
+                return
         else:
             fix_date = None
         country = release_input.split('.')[0].lower()
@@ -314,7 +315,7 @@ class Build:
             pipelines = project.pipelines.list(ref=f'{issue}', get_all=True)
             if pipelines and mr.project != 11:  # в 11 проекте отключены пайплайны
                 pipeline = pipelines[0]
-                pipeline_jobs = pipeline.jobs.list()
+                pipeline_jobs = pipeline.jobs.list(get_all=True)
                 pipeline_job = pipeline_jobs[0]
                 # logging.info(f"pipelines - {[pipeline.attributes['id'] for pipeline in pipelines]}")
                 # logging.info(f"jobs in {pipeline.attributes['id']} - "
