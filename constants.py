@@ -95,6 +95,7 @@ PROJECTS_NAMES = {"4slovo.ru/chestnoe_slovo": 7,
                   "4slovo/php-heic-to-jpg": 283,
                   "docker/lemonade.kz": 284,
                   "docker/profinance.kz": 285,
+                  "4slovo.ru/common.ge": 286,
                   }
 
 PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo",
@@ -190,6 +191,7 @@ PROJECTS_NUMBERS = {7: "4slovo.ru/chestnoe_slovo",
                     283: "4slovo/php-heic-to-jpg",
                     284: "docker/lemonade.kz",
                     285: "docker/profinance.kz",
+                    286: "4slovo.ru/common.ge",
                     }
 
 PROJECTS_COUNTRIES = {7: "ru",
@@ -285,6 +287,7 @@ PROJECTS_COUNTRIES = {7: "ru",
                       283: "7da.kz, myn.kz",
                       284: "lemonade.kz",
                       285: "profinance.kz",
+                      286: "ge",
                       }
 
 COUNTRIES = {
@@ -365,7 +368,7 @@ PROJECTS_WITH_TESTS = [
 PROJECTS_WITHOUT_STAGING = [
     22, 86, 90, 91, 92, 103, 104, 113, 116, 119, 120, 121, 123, 124, 125, 135, 138, 139, 171, 178, 186, 194, 202, 204,
     207, 212, 215, 225, 227, 228, 229, 230, 231, 232, 233, 240, 242, 246, 247, 248, 251, 252, 253, 254, 257, 259, 264,
-    265, 266, 271, 274, 275, 279, 283, 284, 285
+    265, 266, 271, 274, 275, 279, 283, 284, 285, 286
 ]
 DOCKER_PROJECTS = [94, 97, 100, 110, 166, 167, 172, 201, 246, 247, 264, 265, 274, 275, 276, 279, 285]
 
