@@ -11,7 +11,7 @@ def main():
     os.makedirs('logs', exist_ok=True)
     level = logging.INFO
     handlers = [logging.FileHandler('logs/log.txt'), logging.StreamHandler()]
-    format = u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s'
+    format = u'%(filename)21s[LINE:%(lineno)3d] %(levelname)-7s [%(asctime)s]  %(message)s'
     logging.basicConfig(level=level, format=format, handlers=handlers)
     logging.info('--------------Начало сборки----------------')
 

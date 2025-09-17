@@ -36,36 +36,36 @@ class Build:
         )
 
     def get_issues_list_and_deploy_actions(self, release_issues):
-        """ возвращаем  словарь: навание задачи: ее приоритет - для таблички
-                        пред- и пост- деплойные действия"""
+        """ возвращаем словарь: название задачи: ее приоритет - для таблички
+                        пред- и пост-деплойные действия"""
         issues_list = {}
         before_deploy = []
         post_deploy = []
         for issue in release_issues:
             if 'сборка' not in issue.fields.summary.lower() and issue.fields.status.name in STATUS_FOR_RELEASE:
                 issues_list[issue.key] = PRIORITY[issue.fields.priority.name]
-                bd = issue.fields.customfield_15303  # переддеплойные действия
+                bd = issue.fields.customfield_15303  # пред-деплойные действия
                 if bd:
                     before_deploy.append((issue.key, bd))
-                pd = issue.fields.customfield_15302  # постдеплойные действия
+                pd = issue.fields.customfield_15302  # пост-деплойные действия
                 if pd:
                     post_deploy.append((issue.key, pd))
         return issues_list, before_deploy, post_deploy
 
     def get_mrs_and_used_projects(self, issues_list, message, return_merged=False):
         """
-        возвращаем  словарь- задача: список кортежей ссылок и проектов
+        возвращаем словарь- задача: список кортежей ссылок и проектов
                     сет проектов всего затронутых в релизе
                     количество задач без реквестов
-                    и записывает в табличку задачи без реквестов
+                    и записываем в табличку задачи без реквестов
         """
-        merge_requests = defaultdict(list)  # словарь- задача: список кортежей ссылок и проектов
+        merge_requests = defaultdict(list)  # словарь - задача: список кортежей ссылок и проектов
         used_projects = set()  # сет проектов всего затронутых в релизе
         MRless_issues_number = 1
         MRless_issues = []
         if issues_list:
             for issue_number in issues_list:
-                # :return_merged: передается True если надо вернуть влитые МР, обычно возвращаются только невлитые"""
+                # :return_merged: передается True если надо вернуть влитые МР, обычно возвращаются только невлитые
                 MR_count = self.get_merge_requests(issue_number=issue_number, return_merged=return_merged)
                 if not MR_count:  # если в задаче нет МР вносим задачу в таблицу
                     if message:
@@ -79,7 +79,7 @@ class Build:
                 for merge in MR_count:
                     used_projects.add(merge.project)
                     if merge.project not in issue_projects:  # проверяем не было ли в этой задаче нескольких МР в одном
-                        issue_projects.add(merge.project)  # проекте, если несколько - берем один
+                        issue_projects.add(merge.project)  # проект, если несколько - берем один
                         merge_requests[issue_number].append(merge)
 
             if MRless_issues:  # убираем задачу без МР из списка задач для сборки RC
@@ -150,7 +150,7 @@ class Build:
 
     def get_merge_requests(self, issue_number, return_merged=False) -> list:
         """ Ищет ссылки на МР в задаче и возвращает их список
-        :return_merged: передается True если надо вернуть влитые МР, обычно возвращаются только невлитые"""
+        :return_merged: передается True если надо вернуть влитые МР, по умолчанию возвращаются только невлитые"""
 
         result = []
         links_json = requests.get(url=REMOTE_LINK.format(DOMAIN, issue_number),
@@ -163,8 +163,8 @@ class Build:
                 continue
             if 'commit' in url or GIT_LAB not in url:
                 continue
-            # для предупреждения о запуске тесто после сборки контейнеров
-            if 'docker' in url:  # or 'msm' in url: - пока убрали - надо вливать в стейджинг
+            # для предупреждения о запуске тестов после сборки контейнеров
+            if 'docker' in url:
                 self.docker = True
             url_parts = url.split('/')
             if len(url_parts) < 6:
@@ -317,9 +317,6 @@ class Build:
                 pipeline = pipelines[0]
                 pipeline_jobs = pipeline.jobs.list(get_all=True)
                 pipeline_job = pipeline_jobs[0]
-                # logging.info(f"pipelines - {[pipeline.attributes['id'] for pipeline in pipelines]}")
-                # logging.info(f"jobs in {pipeline.attributes['id']} - "
-                #              f"{[pipeline_job.attributes['id'] for pipeline_job in pipeline_jobs]}")
                 logging.info(f"pipeline {pipeline.attributes['id']} "
                              f"job {pipeline_job.attributes['id']} "
                              f"status = '{pipeline_job.attributes['status']}'")
@@ -409,7 +406,7 @@ class Build:
                 # Делаем коммит с названием последнего билда - раньше запускал тесты и билд контейнеров докера,
                 # сейчас отключили автоматический запуск тестов - запускаю дальше вручную
                 try:
-                    project.branches.get(self.rc_name)   # если в проекте нет RC,то и коммит не нужен
+                    project.branches.get(self.rc_name)   # если в проекте нет RC, то и коммит не нужен
                     try:
                         commit_json = {
                             "branch": f"{self.rc_name}",
